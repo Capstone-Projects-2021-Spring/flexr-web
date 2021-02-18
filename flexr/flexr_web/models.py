@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.core.validators import RegexValidator  # used for phone number and email checks in regex
 from django.db import models
 from datetime import datetime
@@ -9,18 +10,6 @@ from datetime import datetime
 
 # possibly use django user/auth for this?
 # TODO research whether this should be here or in admin.py (maybe same for accounts)
-class User(models.Model):
-    first_name = models.CharField(verbose_name="First Name", max_length=50)
-    last_name = models.CharField(verbose_name="Last Name", max_length=50)
-    email = models.EmailField(verbose_name="Email Address", max_length=50)
-    password = models.CharField(verbose_name="Password", max_length=50)
-    # Don't think this needs to be done here
-    # accounts = models.ForeignKey("Account", on_delete=models.CASCADE)  # One to many is a foreign key I believe
-    user_id = models.AutoField(primary_key=True)
-
-    def __str__(self):
-        return str(self.first_name) + " " + str(self.last_name) + " " + str(self.user_id)
-
 
 class Account(models.Model):
     # user.accounts.all() this is how you get all accounts within the user
@@ -35,12 +24,13 @@ class Account(models.Model):
     phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True)  # validators should be a list
 
     date_joined = models.DateTimeField()  # look up parameters
-    type_of_account = models.CharField(verbose_name="Type of account", max_length=50)
-                                     # choices=(("Business", "Business"),
-                                     #          ("Personal", "Personal"),
-                                     #          ("Kids", "Kids"),
-                                     #          ("Private", "Private"),
-                                     #          "Other", "Other"))
+    type_of_account = models.CharField(verbose_name="Type of account", max_length=50,
+                                       choices=(("Business", "Business"),
+                                                ("Personal", "Personal"),
+                                                ("Kids", "Kids"),
+                                                ("Private", "Private"),
+                                                ("Other", "Other")))
+
     # TODO add a default profile picture
     # profile_picture = models.ImageField(default="/static/img/profile_pic.jpg") # not sure if this is the correct path
     #TODO research what on_delete = models.CASCADE does
@@ -60,7 +50,9 @@ class Account(models.Model):
             super().save(*args, **kwargs)  # Call the "real" save() method.
 
     def __str__(self):
-        return str(self.user.first_name) + " " + str(self.user.last_name) + ": " + str(self.type_of_account)
+        return "UserID:" + str(self.user.id) + "." + str(self.account_id)+ " " + str(self.user.username) + " " + str(self.type_of_account)
+    # def __str__(self):
+    #     return str(self.user.first_name) + " " + str(self.user.last_name) + ": " + str(self.type_of_account)
 
 
 class Team(models.Model):
