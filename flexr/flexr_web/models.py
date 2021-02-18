@@ -23,6 +23,7 @@ class User(models.Model):
 
 
 class Account(models.Model):
+    # user.accounts.all() this is how you get all accounts within the user
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="accounts")  # not sure if this is how we do this
 
     # check the snytax on the email field
@@ -44,10 +45,6 @@ class Account(models.Model):
     # profile_picture = models.ImageField(default="/static/img/profile_pic.jpg") # not sure if this is the correct path
     #TODO research what on_delete = models.CASCADE does
     #
-    # below are all models associated with "the current account
-    # bookmarks = models.ForeignKey("Bookmark",on_delete=models.CASCADE, blank=True, null = True)
-    # notes = models.ForeignKey("Note" , on_delete=models.CASCADE, blank=True, null = True)
-    # history = models.ForeignKey("Site", on_delete=models.CASCADE, blank=True, null = True)
     # not sure if next two should be foreignkeys
     # suggested_sites = models.ForeignKey()  # TODO need to make a method for suggested_tabs
     # current_tabs = models.ForeignKey() # TODO need a method for this
@@ -76,7 +73,20 @@ class Team(models.Model):
                                                                           ("Work", "Work")))
     members = models.ManyToManyField(Account) #map this to accounts
 
+    def __str__(self):
+        return str(self.team_name)
+
+
+class SiteHistory(models.Model):
+    site = models.ForeignKey("Site", on_delete=models.CASCADE, related_name="site_history")
+    account = models.ForeignKey("Account", on_delete=models.CASCADE, related_name="history")
+    visit_datetime = models.DateTimeField()
+    def __str__(self):
+        return "User " + str(self.account.account_id)+ ": " + str(self.visit_datetime) + " " + str(self.site.url)
+
+# this is not set up to be history the way I originally intended need to make another object for history
 class Site(models.Model):
+    # Account.Objects.get(account_id = accountObject).site_set.all()
     account = models.ForeignKey("Account", on_delete=models.CASCADE, related_name="sites") #this collection of sites is the history
     # maybe use validators instead?
     url = models.URLField()
@@ -86,7 +96,6 @@ class Site(models.Model):
     number_of_visits = models.IntegerField()  # keeps track of number of visits
     open_tab = models.BooleanField(verbose_name="Is this site opened in a tab?")
     bookmarked = models.BooleanField(verbose_name="Is this site bookmarked?")
-
     def __str__(self):
         return str(self.url)
 
@@ -95,8 +104,11 @@ class Site(models.Model):
 # this is used to keep track of all open tabs. User has option to easily close these tabs
 class Tab(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="tabs")
+
+    # TODO add logic to add a site and create the tab from that site
     # should this be a one to many field?
-    site = models.ForeignKey(Site, on_delete=models.CASCADE) # you can have several tabs of the same site open
+    # I'm not sure if site is mapped here correctly
+    site = models.ForeignKey(Site, on_delete=models.CASCADE, related_name="tabs") # you can have several tabs of the same site open
     created_date = models.DateTimeField()
     # the next two attributes are to suggest a closing of the tab
     # TODO we should implement a setting to have tabs automatically deleted after a certain amount of time
@@ -106,6 +118,11 @@ class Tab(models.Model):
     # TODO make the status of a tab calculated using a method
     status = models.CharField(verbose_name= "Status of the tab", max_length=50) # once tab becomes inactive a notification gets sent to close or it autmatically closes?
     # TODO change tab status in the Site model on save
+
+    def __str__(self):
+        return str(self.site.url)
+
+
 # Should we have a window class? this would probably be handled by the android app
 
 class Bookmark(models.Model):
@@ -139,12 +156,15 @@ class Device(models.Model):
     # status = models.CharField  # thinking a choice field here to say when the last time that a device was used
     device_id = models.AutoField(primary_key = True)
 
+    def __str__(self):
+        return str(self.name)
+
 # Do we need security model? Could probably just put it in settings
 
 # need to make sure this deletes when account gets deleted
 class Account_Preferences(models.Model):
-    name = models.CharField(default="test1", max_length=10)
-    home_page = models.OneToOneField(Site, on_delete=models.CASCADE)
+    name = models.CharField(default="Account Preferences", max_length=10)
+    home_page = models.OneToOneField(Site, on_delete=models.CASCADE, null= True, blank=True)
 
     # sync
     sync_enabled = models.BooleanField(default=True) # not sure if this is possible or useful
@@ -170,7 +190,7 @@ class Account_Preferences(models.Model):
         # Cookies
         # Popups
     def __str__(self):
-       return str(self.name) + "account preferences"
+       return str(self.name) + " " +str(self.id)
 
 # I don't know how to model a structured note
 #TODO add attributes to model a structured note
@@ -183,3 +203,5 @@ class Note(models.Model):
     lock = models.BooleanField(verbose_name="Is note password protected?" , default=False)
     password = models.CharField(max_length=40, blank=True)
 
+    def __str__(self):
+        return str(self.title)
