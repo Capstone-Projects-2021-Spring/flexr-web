@@ -38,9 +38,9 @@ class Account(models.Model):
     # not sure if next two should be foreignkeys
     # suggested_sites = models.ForeignKey()  # TODO need to make a method for suggested_tabs
     # current_tabs = models.ForeignKey() # TODO need a method for this
-    teams = models.ManyToManyField("Team", blank=True, null = True)
-    friends = models.ManyToManyField("Account", blank=True, null = True)
-    # devices = models.ForeignKey("Device", on_delete=models.CASCADE, blank=True, null = True)
+    teams = models.ManyToManyField("Team", blank=True, null = True) #I don't think this should be a manytomany field this should be a list of teams got by a method?
+    friends = models.ManyToManyField("Account", blank=True, null = True) # this probably needs to be another table
+    # devices = models.ForeignKey("Device", on_delete=models.CASCADE, blank=True, null = True) # this isn't needed here because Device is a foreign key
     account_preferences = models.OneToOneField("Account_Preferences", on_delete=models.CASCADE, blank=True, null = True)
     account_id = models.AutoField(primary_key=True)
 
@@ -71,7 +71,7 @@ class Team(models.Model):
 
 class SiteHistory(models.Model):
     site = models.ForeignKey("Site", on_delete=models.CASCADE, related_name="site_history")
-    account = models.ForeignKey("Account", on_delete=models.CASCADE, related_name="history")
+    account = models.ForeignKey("Account", on_delete=models.CASCADE, related_name="history") # don't do foreignkey here make it so that there is a method that gets the account from the site
     visit_datetime = models.DateTimeField()
     def __str__(self):
         return "User " + str(self.account.account_id)+ ": " + str(self.visit_datetime) + " " + str(self.site.url)
@@ -86,6 +86,7 @@ class Site(models.Model):
     last_visit = models.DateTimeField()
     recent_frequency = models.IntegerField()  # number of visits in the last week #TODO need to write a method for this
     number_of_visits = models.IntegerField()  # keeps track of number of visits
+    site_ranking = models.IntegerField() # uses a ranking algoithm to rank the sites
     open_tab = models.BooleanField(verbose_name="Is this site opened in a tab?")
     bookmarked = models.BooleanField(verbose_name="Is this site bookmarked?")
     def __str__(self):
@@ -95,7 +96,7 @@ class Site(models.Model):
 # may have to think about
 # this is used to keep track of all open tabs. User has option to easily close these tabs
 class Tab(models.Model):
-    account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="tabs")
+    account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="tabs") # use a method to get this fromt the site attribute
 
     # TODO add logic to add a site and create the tab from that site
     # should this be a one to many field?
@@ -118,7 +119,7 @@ class Tab(models.Model):
 # Should we have a window class? this would probably be handled by the android app
 
 class Bookmark(models.Model):
-    account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="bookmarks")
+    account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="bookmarks") # don't do foreignkey here make it so that there is a method that gets the account from the site
 #     Does a bookmark need to be attached to an account or can it be standalone and the account just attaches to the bookmark
 #     should a bookmark model be mapped to a tab?
     bookmark_name = models.CharField(verbose_name= "Bookmark name", max_length=50)
@@ -191,7 +192,7 @@ class Note(models.Model):
     # title = models.CharField(verbose_name="Note title", max_length=100, default="note_"+str(datetime.date()))
     title = models.CharField(verbose_name="Note title", max_length=100, default="note")
     created_date = models.DateTimeField()
-    content = models.TextField(verbose_name= "Note content")
+    content = models.TextField(verbose_name= "Note content") # https://pypi.org/project/django-richtextfield/#field-widget-settings
     lock = models.BooleanField(verbose_name="Is note password protected?" , default=False)
     password = models.CharField(max_length=40, blank=True)
 
