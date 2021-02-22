@@ -28,8 +28,6 @@ class AccountAdmin(admin.ModelAdmin):
 
 
 # Register your models here.
-# admin.site.register(User, UserAdmin)
-admin.site.register(User)
 admin.site.register(Account, AccountAdmin)
 admin.site.register(Team)
 admin.site.register(SiteHistory)
