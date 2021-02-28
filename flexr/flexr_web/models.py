@@ -69,10 +69,14 @@ class Team(models.Model):
         return str(self.team_name)
 
 
-class SiteHistory(models.Model):
+class History(models.Model):
     site = models.ForeignKey("Site", on_delete=models.CASCADE, related_name="site_history")
     account = models.ForeignKey("Account", on_delete=models.CASCADE, related_name="history") # don't do foreignkey here make it so that there is a method that gets the account from the site
     visit_datetime = models.DateTimeField()
+
+    class Meta:
+        verbose_name_plural = "histories"
+
     def __str__(self):
         return "User " + str(self.account.account_id)+ ": " + str(self.visit_datetime) + " " + str(self.site.url)
 
@@ -114,7 +118,6 @@ class Tab(models.Model):
 
     def __str__(self):
         return str(self.site.url)
-
 
 # Should we have a window class? this would probably be handled by the android app
 

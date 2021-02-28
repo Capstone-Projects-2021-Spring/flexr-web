@@ -6,8 +6,8 @@ from .models import *
 class TabInLine(admin.TabularInline):
     model = Tab
 
-class SiteHistoryInLine(admin.TabularInline):
-    model = SiteHistory
+class HistoryInLine(admin.TabularInline):
+    model = History
 
 class SiteInLine(admin.TabularInline):
     model = Site
@@ -23,14 +23,14 @@ class NoteInLine(admin.TabularInline):
 
 class AccountAdmin(admin.ModelAdmin):
     inlines = [
-        TabInLine, SiteHistoryInLine, SiteInLine, BookmarkInLine, DeviceInLine, NoteInLine,
+        TabInLine, HistoryInLine, SiteInLine, BookmarkInLine, DeviceInLine, NoteInLine,
     ]
 
 
 # Register your models here.
 admin.site.register(Account, AccountAdmin)
 admin.site.register(Team)
-admin.site.register(SiteHistory)
+admin.site.register(History)
 admin.site.register(Site)
 admin.site.register(Tab)
 admin.site.register(Bookmark)
