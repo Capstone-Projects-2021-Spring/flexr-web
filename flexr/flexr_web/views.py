@@ -459,13 +459,14 @@ def remove_all_bookmarks(request):
 
 ##################  Managing Account Preferences ##################
 
+
 def edit_account_preferences(request):
     """
        Edits account preferences for the account
                   Parameters:
-                      request
+                      request.PUT has a form for editing account preferences
                   Returns:
-                      JSONRequest with success or error message
+                      JSONRequest with success message and edited Account Preferences instance or error message
     """
     return None
 
@@ -473,9 +474,9 @@ def get_account_preferences(request):
     """
        Gets all account preferences for the account
                   Parameters:
-                      request
+                      request.GET has an id for account prefernces
                   Returns:
-                      JSONRequest with success or error message
+                      JSONRequest with success message and account preferences instance or error message
     """
     return None
 
@@ -486,9 +487,9 @@ def create_note(request):
     """
        Creates note for the account
                   Parameters:
-                      request
+                      request.PUT has a form for a new note
                   Returns:
-                      JSONRequest with success or error message
+                      JSONRequest with success message and Note instance or error message
     """
     return None
 
@@ -496,9 +497,9 @@ def delete_note(request):
     """
        Deletes note for the account
                   Parameters:
-                      request
+                      request.DELETE has an id for a note
                   Returns:
-                      JSONRequest with success or error message
+                      JSONRequest with success message or error message
     """
     return None
 
@@ -506,9 +507,9 @@ def edit_note(request):
     """
        Edit note for the account
                   Parameters:
-                      request
+                      request.PUT has a form for a Note
                   Returns:
-                      JSONRequest with success or error message
+                      JSONRequest with success message and the Note instance or error message
     """
     return None
 
@@ -516,9 +517,9 @@ def get_note(request):
     """
        Gets note for the account
                   Parameters:
-                      request
+                      request.GET has an id for a Note
                   Returns:
-                      JSONRequest with success or error message
+                      JSONRequest with success message and the Note instance or error message
     """
     return None
 
@@ -526,9 +527,9 @@ def get_all_notes(request):
     """
        Gets all notes for the account
                   Parameters:
-                      request
+                      request.GET
                   Returns:
-                      JSONRequest with success or error message
+                      JSONRequest with success message and all note instances or error message
     """
     return None
 
