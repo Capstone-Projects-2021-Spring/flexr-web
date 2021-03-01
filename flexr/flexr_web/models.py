@@ -89,6 +89,12 @@ class Site(models.Model):
     site_ranking = models.IntegerField() # uses a ranking algoithm to rank the sites
     open_tab = models.BooleanField(verbose_name="Is this site opened in a tab?")
     bookmarked = models.BooleanField(verbose_name="Is this site bookmarked?")
+    #Pseudocode for rankSite, a method that returns a number between 0 and 100, where the lower return value is the greater site ranking
+    def rankSite(self):
+        if (number_of_visits > recent_frequency):
+            return (recent_frequency/number_of_visits)*100 #TODO check the python logic, this was initially written as C++ psuedocode
+        else:
+            return 0 #Should never get to this point, but if there are more reecent visits than total visits, this must be the highest ranked site
     def __str__(self):
         return str(self.url)
 
@@ -172,6 +178,7 @@ class Account_Preferences(models.Model):
 
     # Display?
     #     Dark mode
+    is_dark_mode = models.BooleanField(default=True)
     #     font-size
 
     # syncing
