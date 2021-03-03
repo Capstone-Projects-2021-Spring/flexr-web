@@ -77,28 +77,31 @@ def devices_web(request):
     """
     Creates the User in the database, allowing them to sign in
             :param: request
-            :return: JSONRequest with success or error message
+            :return: JsonResponse with success or error message
     """
     return None
+
+################## REST API Endpoints ##################
+
 
 ################## Managing User  ##################
 
 def sign_up(request):
     """
     Creates the User in the database, allowing them to sign in
-          Parameters:
-              request
-          Returns:
-              JSONRequest with success or error message
+          :param:
+              request.POST that has the user information
+          :return:
+              JSONRequest with success and user data or error message
     """
     return None
 
 def login(request):
     """
     Takes in a form and checks the database against the provided username and password to provide access to the app
-          Parameters:
+          :param:
               request
-          Returns:
+          :return:
               JSONRequest with success or error message
     """
     return None
@@ -106,9 +109,9 @@ def login(request):
 def logout(request):
     """
     Logs the user out of flexr. Erases session data and does not allow access
-          Parameters:
+          :param:
               request
-          Returns:
+          :return:
               JSONRequest with success or error message
     """
     return None
@@ -116,10 +119,10 @@ def logout(request):
 def check_status(request):
     """
     Checks whether a user is logged in or not
-          Parameters:
+          :param:
               request
-          Returns:
-              JSONRequest with success or error message
+          :return:
+              JSONRequest with a logged in or logged out message
     """
 
 ##################  Managing Account ##################
@@ -129,18 +132,18 @@ def check_status(request):
 def get_account(request):
     """
     Adds an account to the user's profile
-          Parameters:
+          :param:
               request
-          Returns:
-              JSONRequest with success or error message
+          :return:
+              JSONRequest with requested account or an error message
     """
 
 def switch_account(request):
     """
     Switches the current account that the user is on. This data is stored in a django session key
-          Parameters:
+          :param:
               request
-          Returns:
+          :return:
               JSONRequest with success or error message
     """
     return None
@@ -148,9 +151,9 @@ def switch_account(request):
 def add_account(request):
     """
     Adds an account to the user's profile
-          Parameters:
-              request
-          Returns:
+           :param:
+              request.PUT has a form for a created account
+           :return:
               JSONRequest with success or error message
     """
     return None
@@ -158,9 +161,9 @@ def add_account(request):
 def edit_account(request):
     """
     Take in a form from the user that edits the information of the account
-          Parameters:
-              request
-          Returns:
+           :param:
+              request.PUT has an id for an account and the new account data
+           :return:
               JSONRequest with success or error message
     """
     return None
@@ -168,22 +171,42 @@ def edit_account(request):
 def delete_account(request):
     """
     Deletes an account from a user's profile
-              Parameters:
-                  request
-              Returns:
+               :param:
+                  request.DELETE has an id for an account
+              :return:
                   JSONRequest with success or error message
     """
     return None
 
 ##################  Managing tabs  ##################
 
+def get_all_tabs(request):
+    """
+      Gets all tabs from the current account (request.user.account.tabs.all())
+                :param:
+                    request.GET has a type that says all
+                :return:
+                    JSONRequest with all tab instances or error message
+    """
+    return None
+
+def get_tab(request):
+    """
+    Looks in the tab table for the instance. If it's not there then it deletes it
+              :param:
+                  request.GET has tab id or url
+              :return:
+                  JSONRequest with tab data
+    """
+    return None
+
 def open_tab(request):
     """
     Looks in the site table for an instance; uses that instance or creates a new one if one doesn't exist to
     create a tab instance in the tab table
-              Parameters:
-                  request
-              Returns:
+              :param:
+                  request.PUT has information for a tab like url
+              :return:
                   JSONRequest with success or error message
     """
     return None
@@ -191,9 +214,9 @@ def open_tab(request):
 def close_tab(request):
     """
     Closes a specifc tab, deletes from tab table
-              Parameters:
-                  request
-              Returns:
+              :param:
+                  request.DELETE has the tab id
+              :return:
                   JSONRequest with success or error message
     """
     return None
@@ -203,30 +226,30 @@ def close_tab(request):
 def get_all_shared_folders(request):
     """
     Gets all shared folders from the current account (request.user.account.sharedfolders.all())
-              Parameters:
-                  request
-              Returns:
-                  JSONRequest with success or error message
+              :param:
+                  request.GET has a type that says all
+              :return:
+                  JSONRequest with all shared folder instances or error message
     """
     return None
 
 def get_individual_shared_folder(request):
     """
     Creates a shared folder in the shared table. Adds all users to it along with any current objects
-              Parameters:
-                  request
-              Returns:
-                  JSONRequest with success or error message
+              :param:
+                  request.GET has an id for a shared folder
+              :return:
+                  JSONRequest with success message and folder object or error message
     """
     return None
 
 def create_shared_folder(request):
     """
     Creates a shared folder in the shared table. Adds all users to it along with any current objects
-              Parameters:
-                  request
-              Returns:
-                  JSONRequest with success or error message
+              :param:
+                  request.POST has form for a shared folder
+              :return:
+                  JSONRequest with success message and folder object or error message
     """
     return None
 
@@ -234,7 +257,7 @@ def add_account_to_shared_folder(request):
     """
     Creates a shared folder in the shared table. Adds all users to it along with any current objects
               Parameters:
-                  request
+                  request.PUT has an id for an account and an id for a shared folder
               Returns:
                   JSONRequest with success or error message
     """
@@ -244,9 +267,9 @@ def edit_shared_folder(request):
     """
     Edits a shared folder in the shared table
               Parameters:
-                  request
+                  request.PUT has an id for a shared folder and a form with new folder data
               Returns:
-                  JSONRequest with success or error message
+                  JSONRequest with success message and the new folder instance or error message
     """
     return None
 
@@ -254,7 +277,7 @@ def delete_shared_folder(request):
     """
     Deletes a shared folder in the shared table
                   Parameters:
-                      request
+                      request.DELETE has an id for a shared folder
                   Returns:
                       JSONRequest with success or error message
     """
@@ -264,7 +287,7 @@ def remove_account_from_shared_foler(request):
     """
         Removes a specific account from a shared folder in the shared table
                   Parameters:
-                      request
+                      request.PUT has an id for a shared folder and an id for an account
                   Returns:
                       JSONRequest with success or error message
     """
@@ -275,27 +298,30 @@ def add_tab_to_shared_folder(request):
     """
         Adds a specific tab to a shared folder in the shared table
                   Parameters:
-                      request
+                      request.PUT has an id for a shared folder and an id for a tab
                   Returns:
-                      JSONRequest with success or error message
+                      JSONRequest with success message and a tab instance or error message
     """
+
     return None
 
 def remove_tab_from_shared_folder(request):
     """
         Adds a specific note to a shared folder in the shared table
                   Parameters:
-                      request
+                      request.PUT has an id for a shared folder and an id for a tab
                   Returns:
-                      JSONRequest with success or error message
+                      JSONRequest with success message or error message
     """
     return None
 
+
+#  does a note get added to a shared folder
 def add_note_to_shared_folder(request):
     """
         Adds a specific note to a shared folder in the shared table
                   Parameters:
-                      request
+                      request.PUT has an id for a shared folder and an id for a note
                   Returns:
                       JSONRequest with success or error message
     """
@@ -305,7 +331,7 @@ def remove_note_from_shared_folder(request):
     """
         Removes a specific note from a shared folder in the shared table
                   Parameters:
-                      request
+                      request.PUT has an id for a shared folder and an id for a note
                   Returns:
                       JSONRequest with success or error message
     """
@@ -315,9 +341,9 @@ def add_bookmark_to_shared_folder(request):
     """
         Adds a specific bookmark to a shared folder in the shared table
                   Parameters:
-                      request
+                      request.PUT has an id for a shared folder and an id for a bookmark
                   Returns:
-                      JSONRequest with success or error message
+                      JSONRequest with success message and the bookmark instance or error message
     """
     return None
 
@@ -325,7 +351,7 @@ def remove_bookmark_from_shared_folder(request):
     """
         Removes a specific bookmark to a shared folder in the shared table
                   Parameters:
-                      request
+                      request.PUT has an id for a hsared folder and an id for a bookmark
                   Returns:
                       JSONRequest with success or error message
     """
@@ -341,9 +367,9 @@ def get_history(request):
     """
     Gets all site history from the current account
               Parameters:
-                  request
+                  request.GET has an id for a site history
               Returns:
-                  JSONRequest with success or error message
+                  JSONRequest with success message and the SiteHistory instance or error message
     """
     return None
 
@@ -351,9 +377,9 @@ def filter_history(request):
     """
     Returns filtered all site history from the current account
               Parameters:
-                  request
+                  request.GET has a JSON object that has the filter type and typed
               Returns:
-                  JSONRequest with success or error message
+                  JSONRequest with success message and the SiteHistory objects or error message
     """
     return None
 
@@ -361,9 +387,9 @@ def delete_history_range(request):
     """
     Deletes all history from a user within a given range
               Parameters:
-                  request
+                  request.DELETE has a JSON object that has a date range
               Returns:
-                  JSONRequest with success or error message
+                  JSONRequest with success message and the SiteHistory objects or error message
     """
     return None
 
@@ -371,9 +397,9 @@ def delete_all_history(request):
     """
     Deletes all history from a user
               Parameters:
-                  request
+                  request.DELETE
               Returns:
-                  JSONRequest with success or error message
+                  JSONRequest with success message or error message
     """
     return None
 
@@ -384,7 +410,7 @@ def add_bookmark(request):
     """
         Adds a bookmark to a bookmark table for the specific account
                   Parameters:
-                      request
+                      request.PUT has a form for data for a bookmark
                   Returns:
                       JSONRequest with success or error message
     """
@@ -394,7 +420,7 @@ def remove_bookmark(request):
     """
         Removes a bookmark from a bookmark table for the specific account
                   Parameters:
-                      request
+                      request.DELETE has an id for a bookmark
                   Returns:
                       JSONRequest with success or error message
     """
@@ -404,7 +430,7 @@ def edit_bookmark(request):
     """
         Edits a bookmark from a bookmark table for the specific account
                   Parameters:
-                      request
+                      request.PUT has a form for data for the edited bookmark
                   Returns:
                       JSONRequest with success or error message
     """
@@ -414,9 +440,9 @@ def get_bookmark(request):
     """
        Gets a specific bookmark from a bookmark table for the specific account
                   Parameters:
-                      request
+                      request.GET has an id for a bookmark
                   Returns:
-                      JSONRequest with success or error message
+                      JSONRequest with success message and a bookmark or error message
     """
     return None
 
@@ -424,7 +450,7 @@ def remove_all_bookmarks(request):
     """
        Removes all bookmark from a bookmark table for the specific account
                   Parameters:
-                      request
+                      request.DELETE has an id for a bookmark
                   Returns:
                       JSONRequest with success or error message
     """
@@ -433,13 +459,14 @@ def remove_all_bookmarks(request):
 
 ##################  Managing Account Preferences ##################
 
+
 def edit_account_preferences(request):
     """
        Edits account preferences for the account
                   Parameters:
-                      request
+                      request.PUT has a form for editing account preferences
                   Returns:
-                      JSONRequest with success or error message
+                      JSONRequest with success message and edited Account Preferences instance or error message
     """
     return None
 
@@ -447,9 +474,9 @@ def get_account_preferences(request):
     """
        Gets all account preferences for the account
                   Parameters:
-                      request
+                      request.GET has an id for account prefernces
                   Returns:
-                      JSONRequest with success or error message
+                      JSONRequest with success message and account preferences instance or error message
     """
     return None
 
@@ -460,9 +487,9 @@ def create_note(request):
     """
        Creates note for the account
                   Parameters:
-                      request
+                      request.PUT has a form for a new note
                   Returns:
-                      JSONRequest with success or error message
+                      JSONRequest with success message and Note instance or error message
     """
     return None
 
@@ -470,9 +497,9 @@ def delete_note(request):
     """
        Deletes note for the account
                   Parameters:
-                      request
+                      request.DELETE has an id for a note
                   Returns:
-                      JSONRequest with success or error message
+                      JSONRequest with success message or error message
     """
     return None
 
@@ -480,9 +507,9 @@ def edit_note(request):
     """
        Edit note for the account
                   Parameters:
-                      request
+                      request.PUT has a form for a Note
                   Returns:
-                      JSONRequest with success or error message
+                      JSONRequest with success message and the Note instance or error message
     """
     return None
 
@@ -490,9 +517,9 @@ def get_note(request):
     """
        Gets note for the account
                   Parameters:
-                      request
+                      request.GET has an id for a Note
                   Returns:
-                      JSONRequest with success or error message
+                      JSONRequest with success message and the Note instance or error message
     """
     return None
 
@@ -500,9 +527,9 @@ def get_all_notes(request):
     """
        Gets all notes for the account
                   Parameters:
-                      request
+                      request.GET
                   Returns:
-                      JSONRequest with success or error message
+                      JSONRequest with success message and all note instances or error message
     """
     return None
 
