@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator  # used for phone number and email checks in regex
 from django.db import models
+
+from django.utils import timezone
 from datetime import datetime
 
 # Create your models here.
@@ -15,6 +17,8 @@ class Account(models.Model):
     # user.accounts.all() this is how you get all accounts within the user
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="accounts")  # not sure if this is how we do this
 
+    # add a username?
+
     # check the snytax on the email field
     email = models.EmailField(verbose_name="Email Address", max_length=50)  # can you add verification to a model field?
 
@@ -23,7 +27,8 @@ class Account(models.Model):
                                  message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
     phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True)  # validators should be a list
 
-    date_joined = models.DateTimeField()  # look up parameters
+    date_joined = models.DateTimeField(auto_now=True)
+
     type_of_account = models.CharField(verbose_name="Type of account", max_length=50,
                                        choices=(("Business", "Business"),
                                                 ("Personal", "Personal"),
@@ -86,13 +91,22 @@ class Site(models.Model):
     account = models.ForeignKey("Account", on_delete=models.CASCADE, related_name="sites") #this collection of sites is the history
     # maybe use validators instead?
     url = models.URLField()
-    first_visit = models.DateTimeField()
-    last_visit = models.DateTimeField()
-    recent_frequency = models.IntegerField()  # number of visits in the last week #TODO need to write a method for this
-    number_of_visits = models.IntegerField()  # keeps track of number of visits
-    site_ranking = models.IntegerField() # uses a ranking algoithm to rank the sites
-    open_tab = models.BooleanField(verbose_name="Is this site opened in a tab?")
-    bookmarked = models.BooleanField(verbose_name="Is this site bookmarked?")
+
+    first_visit = models.DateTimeField(auto_now=True) # need to put a method for this
+    last_visit = models.DateTimeField(auto_now=True) # need to put a method for this
+    recent_frequency = models.IntegerField(default=0)  # number of visits in the last week #TODO need to write a method for this
+    number_of_visits = models.IntegerField(default=1)  # keeps track of number of visits
+    site_ranking = models.IntegerField(default=0) # uses a ranking algoithm to rank the sites
+    open_tab = models.BooleanField(verbose_name="Is this site opened in a tab?", default=True)
+    bookmarked = models.BooleanField(verbose_name="Is this site bookmarked?", default = False)
+
+    #Pseudocode for rankSite, a method that returns a number between 0 and 100, where the lower return value is the greater site ranking
+    def rankSite(self):
+        if (number_of_visits > recent_frequency):
+            return (recent_frequency/number_of_visits)*100 #TODO check the python logic, this was initially written as C++ psuedocode
+        else:
+            return 0 #Should never get to this point, but if there are more reecent visits than total visits, this must be the highest ranked site
+
     def __str__(self):
         return str(self.url)
 
@@ -175,6 +189,7 @@ class Account_Preferences(models.Model):
 
     # Display?
     #     Dark mode
+    is_dark_mode = models.BooleanField(default=True)
     #     font-size
 
     # syncing
