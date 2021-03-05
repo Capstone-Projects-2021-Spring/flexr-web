@@ -23,10 +23,21 @@ def index(request):
     # print(history.site)
     # print(history.site.site_ranking)
     # return HttpResponse(account, sites, tab, history)
-    response = JsonResponse({'account': account, "sites": sites,
-                             "tab": tab, "history": history})
-    return HttpResponse("Hello, world. This is Flexr!")
-    # return response
+    # response = JsonResponse({'account': account, "sites": sites,
+    #                          "tab": tab, "history": history})
+    # return HttpResponse("Hello, world. This is Flexr!")
+    curr_user = request.user
+    accounts = []
+    sites = []
+    tabs = []
+    if request.user.is_authenticated:
+        curr_account = curr_user.accounts.all()[0]
+        print(curr_account)
+        accounts = curr_user.accounts.all()
+        sites = curr_account.sites.all()
+        tabs = curr_account.tabs.all()
+    print(curr_user)
+    return render(request, "flexr_web/index.html", {"Accounts": accounts, "Sites": sites, "Tabs": tabs})
 
 
 def login_web(request):

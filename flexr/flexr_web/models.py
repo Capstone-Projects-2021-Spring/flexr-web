@@ -91,6 +91,7 @@ class Site(models.Model):
     account = models.ForeignKey("Account", on_delete=models.CASCADE, related_name="sites") #this collection of sites is the history
     # maybe use validators instead?
     url = models.URLField()
+
     first_visit = models.DateTimeField(auto_now=True) # need to put a method for this
     last_visit = models.DateTimeField(auto_now=True) # need to put a method for this
     recent_frequency = models.IntegerField(default=0)  # number of visits in the last week #TODO need to write a method for this
@@ -98,6 +99,13 @@ class Site(models.Model):
     site_ranking = models.IntegerField(default=0) # uses a ranking algoithm to rank the sites
     open_tab = models.BooleanField(verbose_name="Is this site opened in a tab?", default=True)
     bookmarked = models.BooleanField(verbose_name="Is this site bookmarked?", default = False)
+
+    #Pseudocode for rankSite, a method that returns a number between 0 and 100, where the lower return value is the greater site ranking
+    def rankSite(self):
+        if (number_of_visits > recent_frequency):
+            return (recent_frequency/number_of_visits)*100 #TODO check the python logic, this was initially written as C++ psuedocode
+        else:
+            return 0 #Should never get to this point, but if there are more reecent visits than total visits, this must be the highest ranked site
 
     def __str__(self):
         return str(self.url)
@@ -181,6 +189,7 @@ class Account_Preferences(models.Model):
 
     # Display?
     #     Dark mode
+    is_dark_mode = models.BooleanField(default=True)
     #     font-size
 
     # syncing
