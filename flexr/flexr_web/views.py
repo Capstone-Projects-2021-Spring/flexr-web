@@ -1,8 +1,11 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
+from django.contrib.auth.forms import UserCreationForm
+from django.shortcuts import render, redirect
+from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
 from django.core import serializers
 from pydoc import *
+from .forms import registrationform
+from django.contrib.auth import authenticate, login
 
 from .models import *
 # Create your views here.
@@ -97,6 +100,20 @@ def devices_web(request):
 
 ################## Managing User  ##################
 
+def register(request):
+    if request.method == 'POST':
+        form = registrationform(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password1']
+            user = authenticate(username=username, password=password)
+            return redirect('login')
+    else:
+        form = registrationform
+    context = {'form' : form}
+    return render(request, 'registration/register.html', context)
+
 def sign_up(request):
     """
     Creates the User in the database, allowing them to sign in
@@ -107,7 +124,7 @@ def sign_up(request):
     """
     return None
 
-def login(request):
+def login(request): 
     """
     Takes in a form and checks the database against the provided username and password to provide access to the app
           :param:
@@ -125,7 +142,10 @@ def logout(request):
           :return:
               JSONRequest with success or error message
     """
-    return None
+    logout(request)
+    return redirect('login')
+
+    # return None
 
 def check_status(request):
     """
