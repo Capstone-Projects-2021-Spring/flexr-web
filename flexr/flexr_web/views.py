@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
 from django.core import serializers
 from pydoc import *
 from .forms import registrationform
@@ -111,7 +111,7 @@ def sign_up(request):
     """
     return None
 
-def login(request):
+def login(request): 
     """
     Takes in a form and checks the database against the provided username and password to provide access to the app
           Parameters:
@@ -129,7 +129,10 @@ def logout(request):
           Returns:
               JSONRequest with success or error message
     """
-    return None
+    logout(request)
+    return redirect('login')
+
+    # return None
 
 def check_status(request):
     """
