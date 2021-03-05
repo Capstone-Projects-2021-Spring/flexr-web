@@ -6,18 +6,26 @@
 </head>
 <body>
     <a href="/admin">Admin</a>
-    <h1>Hello {{user}}, I am flexr</h1>
-    <h2>These are your accounts</h2>
-    {%for acc in Accounts%}
-        <h3>{{acc}}</h3>
-    {%endfor%}
-    <h2>These are your sites</h2>
-    {%for site in Sites%}
-        <h3>{{site}}</h3>
-    {%endfor%}
-    <h2>These are your open tabs</h2>
-    {%for tab in Tabs%}
-        <h3>{{tab}}</h3>
-    {%endfor%}
+    {% if user.is_authenticated %}
+        <h1>Hello {{user}}, I am flexr</h1>
+         <h2>These are your accounts</h2>
+        {%for acc in Accounts%}
+            <h3>{{acc}}</h3>
+        {%endfor%}
+        <h2>These are your sites</h2>
+        {%for site in Sites%}
+            <h3>{{site}}</h3>
+        {%endfor%}
+        <h2>These are your open tabs</h2>
+        {%for tab in Tabs%}
+            <h3>{{tab}}</h3>
+        {%endfor%}
+        <p><a href='accounts/logout'>Logout</a></p>
+    {% else %}
+        <h2> You are not logged in.</h2>
+        <p> <a href='accounts/login'>Login</a></p>
+    {% endif %}
+
+
 </body>
 </html>
