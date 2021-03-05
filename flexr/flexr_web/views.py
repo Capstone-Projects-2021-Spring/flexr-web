@@ -1,8 +1,11 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from django.contrib.auth.forms import UserCreationForm
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.core import serializers
 from pydoc import *
+from .forms import registrationform
+from django.contrib.auth import authenticate, login
 
 from .models import *
 # Create your views here.
@@ -23,9 +26,10 @@ def index(request):
     # print(history.site)
     # print(history.site.site_ranking)
     # return HttpResponse(account, sites, tab, history)
-    response = JsonResponse({'account': account, "sites": sites,
-                             "tab": tab, "history": history})
-    return HttpResponse("Hello, world. This is Flexr!")
+    # response = JsonResponse({'account': account, "sites": sites,
+    #                          "tab": tab, "history": history})
+    # return HttpResponse("Hello, world. This is Flexr!")
+    return render(request, 'index.html')
     # return response
 
 
@@ -82,6 +86,20 @@ def devices_web(request):
     return None
 
 ################## Managing User  ##################
+
+def register(request):
+    if request.method == 'POST':
+        form = registrationform(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password1']
+            user = authenticate(username=username, password=password)
+            return redirect('login')
+    else:
+        form = registrationform
+    context = {'form' : form}
+    return render(request, 'registration/register.html', context)
 
 def sign_up(request):
     """
