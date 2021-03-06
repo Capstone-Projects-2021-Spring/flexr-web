@@ -1,0 +1,5 @@
+/.idea/
+/env/
+/flexr/flexr_web/migrations/
+/flexr/db.sqlite3
+__pycache__
