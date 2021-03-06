@@ -2,30 +2,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Home</title>
+    <title>Flexr | Home</title>
 </head>
 <body>
     <a href="/admin">Admin</a>
-    {% if user.is_authenticated %}
-        <h1>Hello {{user}}, I am flexr</h1>
-         <h2>These are your accounts</h2>
-        {%for acc in Accounts%}
-            <h3>{{acc}}</h3>
+    <a href="/profile">Profile</a>
+    <h1>Hello {{user}}, I am flexr</h1>
+     <h2>Accounts:</h2>
+    {%for acc in Accounts%}
+        <h3>{{acc}}</h3>
+    {%endfor%}
+    <h2>Devices:</h2>
+        {%for dev in Devices%}
+            <h3>{{dev}}</h3>
         {%endfor%}
-        <h2>These are your sites</h2>
-        {%for site in Sites%}
-            <h3>{{site}}</h3>
-        {%endfor%}
-        <h2>These are your open tabs</h2>
-        {%for tab in Tabs%}
-            <h3>{{tab}}</h3>
-        {%endfor%}
-        <p><a href='accounts/logout'>Logout</a></p>
-    {% else %}
-        <h2> You are not logged in.</h2>
-        <p> <a href='accounts/login'>Login</a></p>
-    {% endif %}
-
-
+    <h2>Sites:</h2>
+    {%for site in Sites%}
+        <h3>{{site}}</h3>
+    {%endfor%}
+    <h2>Open tabs:</h2>
+    {%for tab in Tabs%}
+        <h3>{{tab}}</h3>
+    {%endfor%}
+    <h2>Site history:</h2>
+    {%for hist in History%}
+        <h3>{{hist}}</h3>
+    {%endfor%}
+    <p><a href='accounts/logout'>Logout</a></p>
 </body>
 </html>

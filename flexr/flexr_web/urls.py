@@ -4,6 +4,6 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('register', views.register, name='register'),
-    # path('flexr_login', views.flexr_login, name='flexr_login')
+    path('register', views.register_web, name='register'),
+    path('profile/', views.profile_web, name='register'),
 ]

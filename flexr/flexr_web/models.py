@@ -182,14 +182,14 @@ class Account_Preferences(models.Model):
     searchable_profile = models.BooleanField(default=True)
     # security
     cookies_enabled = models.BooleanField(default=True)
-    popus_enabled = models.BooleanField(default=True)
+    popups_enabled = models.BooleanField(default=True)
     # maybe split into device preferences too?
     # Misc
     #   home page
 
     # Display?
     #     Dark mode
-    is_dark_mode = models.BooleanField(default=True)
+    is_dark_mode = models.BooleanField(default=False)
     #     font-size
 
     # syncing
