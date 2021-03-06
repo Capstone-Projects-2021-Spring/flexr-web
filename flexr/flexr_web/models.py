@@ -120,10 +120,10 @@ class Tab(models.Model):
     # should this be a one to many field?
     # I'm not sure if site is mapped here correctly
     site = models.ForeignKey(Site, on_delete=models.CASCADE, related_name="tabs") # you can have several tabs of the same site open
-    created_date = models.DateTimeField()
+    created_date = models.DateTimeField(auto_now = True)
     # the next two attributes are to suggest a closing of the tab
     # TODO we should implement a setting to have tabs automatically deleted after a certain amount of time
-    last_visited = models.DateTimeField() #maybe add auto now to this
+    last_visited = models.DateTimeField(auto_now = True) #maybe add auto now to this
     # TODO research if there is a way to make choice field more strict
     # TODO Have this be a choice field
     # TODO make the status of a tab calculated using a method
@@ -140,12 +140,12 @@ class Bookmark(models.Model):
 #     Does a bookmark need to be attached to an account or can it be standalone and the account just attaches to the bookmark
 #     should a bookmark model be mapped to a tab?
     bookmark_name = models.CharField(verbose_name= "Bookmark name", max_length=50)
-    created_date = models.DateTimeField() #keeps track of creation date
+    created_date = models.DateTimeField(auto_now = True) #keeps track of creation date
     # TODO research if the bookmark gets deleted if the site will then be deleted
     site = models.OneToOneField(Site, on_delete=models.CASCADE) #if the site gets deleted the bookmark gets deleted
-    last_visited = models.DateTimeField() #keeps track of last visited date
-    recent_frequency = models.IntegerField() # number of visits in the last week
-    number_of_visits = models.IntegerField()# keeps track of number of visits
+    last_visited = models.DateTimeField(auto_now = True) #keeps track of last visited date
+    recent_frequency = models.IntegerField(default=1) # number of visits in the last week
+    number_of_visits = models.IntegerField(default=1)# keeps track of number of visits
 
     def __str__(self):
         return str(self.bookmark_name)
@@ -161,7 +161,7 @@ class Device(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="devices")
     name = models.CharField(verbose_name= "Device name", max_length=25)
     # This could help with security?
-    date_added = models.DateTimeField()
+    date_added = models.DateTimeField(auto_now = True)
     # type_of_device #thinking an option for desktop, mobile, tablet? don't know how this would be useful?
     # status = models.CharField  # thinking a choice field here to say when the last time that a device was used
     device_id = models.AutoField(primary_key = True)

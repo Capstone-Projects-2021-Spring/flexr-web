@@ -126,7 +126,7 @@ class DeviceTestCase(TestCase):
         self.assertEqual(test_device.name, "Bob's Device")
 
     def test_device_deleted(self):
-        test_device = Device.objects.get(name = "Bob's Device")
+        test_device = Device.objects.get(name = "Test Device")
         test_device.delete()
         test_device.save()
         test_acc = Account.objects.get(email="anon@gmail.com")
@@ -161,14 +161,14 @@ class BookmarkTestCase(TestCase):
         self.assertEqual(bookmark_count, 2, "Bookmark count is 2")
 
     def test_bookmark_edit(self):
-        test_bookmark = Bookmark.objects.get(name = "Google")
-        test_bookmark.name = "Gmail"
+        test_bookmark = Bookmark.objects.get(bookmark_name = "Google")
+        test_bookmark.bookmark_name = "Gmail"
         test_bookmark.save()
-        self.assertEqual(test_bookmark.name, "Gmail")
+        self.assertEqual(test_bookmark.bookmark_name, "Gmail")
 
     def test_bookmark_deleted(self):
         test_acc = Account.objects.get(email="anon@gmail.com")
-        test_bookmark = Bookmark.objects.get(name = "Gmail")
+        test_bookmark = Bookmark.objects.get(bookmark_name = "Google")
         test_bookmark.delete()
         test_bookmark.save()
         bookmark_count = test_acc.bookmarks.all().count()
