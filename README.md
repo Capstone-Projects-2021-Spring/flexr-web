@@ -1,4 +1,4 @@
-# Running Django
+# Running Django with macOS
 
 1. git clone
 2. cd flexr-web
