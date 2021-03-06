@@ -15,6 +15,14 @@
 13. go to http://127.0.0.1:8000/ to go to home page
 14. go to http://127.0.0.1:8000/admin to go to the django admin pannel
 
+
+# Steps to pull
+1. pull from dev
+2. branch off with new feature branch
+3. run pip3 install -r requirements.txt
+4. If you make changes to requirements run pip3 freeze >> requirements.txt
+
+
 # Creating a View method
 1. Define the endpoint in /flexr/flex_web/urls.py
 2. If you're making a webpage
