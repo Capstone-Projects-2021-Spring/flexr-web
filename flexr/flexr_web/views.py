@@ -53,7 +53,9 @@ def register_web(request):
             username = form.cleaned_data['username']
             password = form.cleaned_data['password1']
             user = authenticate(username=username, password=password)
-            return redirect('login')
+            new_account = Account.objects.create(user=self.user, email=self.user.email)
+            new_account.save()
+            return redirect('/')
     else:
         form = registrationform
     context = {'form' : form}

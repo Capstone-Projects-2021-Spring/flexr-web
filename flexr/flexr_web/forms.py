@@ -1,5 +1,6 @@
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from .models import *
 from django import forms
 from django.core.exceptions import ValidationError
 
@@ -25,3 +26,4 @@ class registrationform(UserCreationForm):
         if r.count():
             raise  ValidationError("Email already exists")
         return email
+

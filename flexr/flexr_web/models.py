@@ -63,9 +63,11 @@ class Account(models.Model):
 class Team(models.Model):
     team_name = models.CharField(verbose_name="Team name", max_length=50)
     created_date = models.DateTimeField()
-    status = models.CharField(verbose_name="Status of team", max_length=50, choices=(("Active", "Active"), ("Inactive", "Inactive")))
+    status = models.CharField(verbose_name="Status of team", max_length=50, choices=(("Active", "Active"),
+                                                                                     ("Inactive", "Inactive")))
     # The type of team offers different levels
-    type_of_team = models.CharField(verbose_name="Type of team", max_length=50, choices=(("Parental guidance", "Parental guidance"),
+    type_of_team = models.CharField(verbose_name="Type of team", max_length=50, choices=(
+                                                                            ("Parental guidance", "Parental guidance"),
                                                                           ("Friends/Family", "Friends/Family"),
                                                                           ("Work", "Work")))
     members = models.ManyToManyField(Account) #map this to accounts
