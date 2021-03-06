@@ -8,16 +8,18 @@
         <h1>Registration Page</h1>
         <form method = "post" action="{% url 'register' %}">
             {% csrf_token %}
-            <p>First name: {{ form.first_name }}</p>
-            <p>Last name: {{ form.last_name }}</p> 
-            <p>Username: {{ form.username }}</p>
-            <p>Email: {{ form.email }}</p> 
-            <p>Password: {{ form.password1 }}</p> 
-            <p>Confirm Password: {{ form.password2 }}</p> 
-
-            {% if form.errors %}
-            <p>There are errors in the form!</p>
-            {% endif %}
+            {% for field in form %}
+                <p>
+                    {{ field.label_tag }}<br>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <small style="color: grey">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <p style="color: red">{{ error }}</p>
+                    {% endfor %}
+                </p>
+            {% endfor %}
 
             <!-- {{ form }} -->
             <input type="submit" value="Register">
