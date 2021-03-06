@@ -17,7 +17,7 @@
 
 
 # Steps to pull
-1. pull from dev
+1. pull from dev branch
 2. branch off with new feature branch
 3. run pip3 install -r requirements.txt
 4. If you make changes to requirements run pip3 freeze >> requirements.txt
