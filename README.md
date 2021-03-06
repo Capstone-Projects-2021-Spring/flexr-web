@@ -21,6 +21,8 @@
 2. branch off with new feature branch
 3. run pip3 install -r requirements.txt
 4. If you make changes to requirements run pip3 freeze >> requirements.txt
+5. python3 manage.py makemigrations
+6. python3 manage.py migrate
 
 
 # Creating a View method
