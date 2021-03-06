@@ -11,10 +11,8 @@ from .models import *
 # Create your views here.
 
 ################## Managing Website Pages ##################
-
+@login_required()
 def index(request):
-
-
     # account = serializers.serialize("json", Account.objects.all() )
     # print("Account: ", account)
     # sites = serializers.serialize("json", account.sites.all())
@@ -28,20 +26,18 @@ def index(request):
     # return HttpResponse(account, sites, tab, history)
     # response = JsonResponse({'account': account, "sites": sites,
     #                          "tab": tab, "history": history})
-    # return HttpResponse("Hello, world. This is Flexr!")
     curr_user = request.user
-    accounts = []
-    sites = []
-    tabs = []
-    if request.user.is_authenticated:
-        curr_account = curr_user.accounts.all()[0]
-        print(curr_account)
-        accounts = curr_user.accounts.all()
-        sites = curr_account.sites.all()
-        tabs = curr_account.tabs.all()
-    print(curr_user)
-    return render(request, "flexr_web/index.html", {"Accounts": accounts, "Sites": sites, "Tabs": tabs})
+    curr_account = curr_user.accounts.all()[0]
+    accounts = curr_user.accounts.all()
+    history = curr_account.history.all()
+    sites = curr_account.sites.all()
+    tabs = curr_account.tabs.all()
+    bookmarks = curr_account.bookmarks.all()
+    devices = curr_account.devices.all()
 
+    print(curr_user)
+    return render(request, "flexr_web/index.html", {"Accounts": accounts, "Sites": sites, "Tabs": tabs,
+                                                    "History":history, "Bookmarks":bookmarks, "Devices":devices})
 
 def login_web(request):
     return None
@@ -49,9 +45,32 @@ def login_web(request):
 def signup_web(request):
     return None
 
+def register_web(request):
+    if request.method == 'POST':
+        form = registrationform(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password1']
+            user = authenticate(username=username, password=password)
+            return redirect('login')
+    else:
+        form = registrationform
+    context = {'form' : form}
+    return render(request, 'registration/register.html', context)
+
 @login_required
 def profile_web(request):
-    return None
+    curr_user = request.user
+    curr_account = curr_user.accounts.all()[0]
+    accounts = curr_user.accounts.all()
+    devices = curr_account.devices.all()
+    acc_pref = curr_account.account_preferences
+    site = curr_account.sites.all()[0]
+    acc_pref.home_page = site
+    acc_pref.save()
+    print(acc_pref)
+    return render(request, "flexr_web/profile.html", {"Accounts": accounts, "Devices": devices, "Preferences":acc_pref})
 
 @login_required
 def shared_folders_web(request):
@@ -99,20 +118,6 @@ def devices_web(request):
 
 
 ################## Managing User  ##################
-
-def register(request):
-    if request.method == 'POST':
-        form = registrationform(request.POST)
-        if form.is_valid():
-            form.save()
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password1']
-            user = authenticate(username=username, password=password)
-            return redirect('login')
-    else:
-        form = registrationform
-    context = {'form' : form}
-    return render(request, 'registration/register.html', context)
 
 def sign_up(request):
     """
