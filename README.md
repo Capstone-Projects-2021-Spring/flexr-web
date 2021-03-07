@@ -24,7 +24,6 @@
 5. python3 manage.py makemigrations
 6. python3 manage.py migrate
 
-
 # Creating a View method
 1. Look to see if there is a class for the method
 2. If there isn't, make one
