@@ -24,7 +24,6 @@
 5. python3 manage.py makemigrations
 6. python3 manage.py migrate
 
-
 # Creating a View method
 1. Define the endpoint in /flexr/flex_web/urls.py
 2. If you're making a webpage

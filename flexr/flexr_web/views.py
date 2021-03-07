@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
@@ -11,6 +12,7 @@ from django.http import QueryDict
 from .forms import registrationform
 from django.contrib.auth import authenticate, login
 from django.views import View
+
 
 from .models import *
 # Create your views here.
@@ -43,7 +45,34 @@ class IndexView(LoginRequiredMixin, View):
 
         print(curr_user)
         return render(self.request, "flexr_web/index.html", {"Accounts": accounts, "Sites": sites, "Tabs": tabs,
-                                                    "History":history, "Bookmarks":bookmarks, "Devices":devices})
+
+@login_required()
+def index(request):
+    # account = serializers.serialize("json", Account.objects.all() )
+    # print("Account: ", account)
+    # sites = serializers.serialize("json", account.sites.all())
+    # print("Sites: ", sites)
+    # tab = serializers.serialize("json", account.tabs.all())
+    # print("Tabs: ", tab)
+    # history = account.history.all()[0] #serializers.serialize("json", account.history.all()[0])
+    # print(history)
+    # print(history.site)
+    # print(history.site.site_ranking)
+    # return HttpResponse(account, sites, tab, history)
+    # response = JsonResponse({'account': account, "sites": sites,
+    #                          "tab": tab, "history": history})
+    curr_user = request.user
+    curr_account = curr_user.accounts.all()[0]
+    accounts = curr_user.accounts.all()
+    history = curr_account.history.all()
+    sites = curr_account.sites.all()
+    tabs = curr_account.tabs.all()
+    bookmarks = curr_account.bookmarks.all()
+    devices = curr_account.devices.all()
+
+    print(curr_user)
+    return render(request, "flexr_web/index.html", {"Accounts": accounts, "Sites": sites, "Tabs": tabs,
+                                    "History":history, "Bookmarks":bookmarks, "Devices":devices})
 
 def login_web(request):
     return None
@@ -70,6 +99,7 @@ def register_web(request):
 @login_required
 def profile_web(request):
     curr_user = request.user
+
     print(curr_user)
     curr_account = curr_user.accounts.all()[0]
     print(curr_account)
