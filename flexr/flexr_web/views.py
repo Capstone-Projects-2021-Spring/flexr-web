@@ -1,11 +1,16 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
-from django.shortcuts import render, redirect
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
 from django.core import serializers
 from pydoc import *
+import json
+from django.views.generic import *
+from django.http import QueryDict
 from .forms import registrationform
 from django.contrib.auth import authenticate, login
+from django.views import View
 
 from .models import *
 # Create your views here.
@@ -53,7 +58,7 @@ def register_web(request):
             username = form.cleaned_data['username']
             password = form.cleaned_data['password1']
             user = authenticate(username=username, password=password)
-            new_account = Account.objects.create(user=self.user, email=self.user.email)
+            new_account = Account.objects.create(user=user, email=user.email)
             new_account.save()
             return redirect('/')
     else:
@@ -64,12 +69,14 @@ def register_web(request):
 @login_required
 def profile_web(request):
     curr_user = request.user
+    print(curr_user)
     curr_account = curr_user.accounts.all()[0]
+    print(curr_account)
     accounts = curr_user.accounts.all()
     devices = curr_account.devices.all()
     acc_pref = curr_account.account_preferences
-    site = curr_account.sites.all()[0]
-    acc_pref.home_page = site
+    # site = curr_account.sites.all()[0]
+    # acc_pref.home_page = site
     acc_pref.save()
     print(acc_pref)
     return render(request, "flexr_web/profile.html", {"Accounts": accounts, "Devices": devices, "Preferences":acc_pref})
@@ -165,99 +172,131 @@ def check_status(request):
 
 ##################  Managing Account ##################
 
+#TODO This needs to be turned into a class based view like the TabViews
+
 # def account_manager(request): # we should use these
+class AccountView(LoginRequiredMixin, DetailView):
+    def get(self, *args, **kwargs):
+        """
+        Adds an account to the user's profile
+              :param:
+                  request
+              :return:
+                  JSONRequest with requested account or an error message
+        """
 
-def get_account(request):
-    """
-    Adds an account to the user's profile
-          :param:
-              request
-          :return:
-              JSONRequest with requested account or an error message
-    """
-
-def switch_account(request):
-    """
-    Switches the current account that the user is on. This data is stored in a django session key
-          :param:
-              request
-          :return:
-              JSONRequest with success or error message
-    """
-    return None
-
-def add_account(request):
-    """
-    Adds an account to the user's profile
-           :param:
-              request.PUT has a form for a created account
-           :return:
-              JSONRequest with success or error message
-    """
-    return None
-
-def edit_account(request):
-    """
-    Take in a form from the user that edits the information of the account
-           :param:
-              request.PUT has an id for an account and the new account data
-           :return:
-              JSONRequest with success or error message
-    """
-    return None
-
-def delete_account(request):
-    """
-    Deletes an account from a user's profile
-               :param:
-                  request.DELETE has an id for an account
+    def switch_account(request):
+        """
+        Switches the current account that the user is on. This data is stored in a django session key
+              :param:
+                  request
               :return:
                   JSONRequest with success or error message
-    """
-    return None
+        """
+        return None
+
+    def add_account(request):
+        """
+        Adds an account to the user's profile
+               :param:
+                  request.PUT has a form for a created account
+               :return:
+                  JSONRequest with success or error message
+        """
+        return None
+
+    def edit_account(request):
+        """
+        Take in a form from the user that edits the information of the account
+               :param:
+                  request.PUT has an id for an account and the new account data
+               :return:
+                  JSONRequest with success or error message
+        """
+        return None
+
+    def delete_account(request):
+        """
+        Deletes an account from a user's profile
+                   :param:
+                      request.DELETE has an id for an account
+                  :return:
+                      JSONRequest with success or error message
+        """
+        return None
 
 ##################  Managing tabs  ##################
 
-def get_all_tabs(request):
-    """
-      Gets all tabs from the current account (request.user.account.tabs.all())
-                :param:
-                    request.GET has a type that says all
-                :return:
-                    JSONRequest with all tab instances or error message
-    """
-    return None
+class AllTabsView(LoginRequiredMixin, ListView):
 
-def get_tab(request):
-    """
-    Looks in the tab table for the instance. If it's not there then it deletes it
-              :param:
-                  request.GET has tab id or url
-              :return:
-                  JSONRequest with tab data
-    """
-    return None
+    def get_queryset(self):
+        curr_account = Account.objects.filter(user = self.request.user)[0]
+        return Tab.objects.filter(account = curr_account)
 
-def open_tab(request):
-    """
-    Looks in the site table for an instance; uses that instance or creates a new one if one doesn't exist to
-    create a tab instance in the tab table
-              :param:
-                  request.PUT has information for a tab like url
-              :return:
-                  JSONRequest with success or error message
-    """
-    return None
+    def get(self, *args, **kwargs):
+        """
+              Gets all tabs from the current account (request.user.account.tabs.all())
+                        :param:
+                            request.GET has a type that says all
+                        :return:
+                            JSONRequest with all tab instances or error message
+        """
+        tabs = self.get_queryset()
+        tab_list = list(tabs)
+        # print(tab_list)
+        return HttpResponse(tabs)
 
-def close_tab(request):
-    """
-    Closes a specifc tab, deletes from tab table
-              :param:
-                  request.DELETE has the tab id
-              :return:
-                  JSONRequest with success or error message
-    """
-    return None
+
+class TabView(LoginRequiredMixin, DetailView):
+
+    def get_queryset(self):
+        curr_account = Account.objects.filter(user = self.request.user)[0]
+        return Tab.objects.filter(account = curr_account)
+
+    # This method is used to get a single tab
+    def get(self, *args, **kwargs):
+        """
+        Looks in the tab table for the instance. If it's not there then it deletes it
+                  :param:
+                      request.GET has tab id or url
+                  :return:
+                      JSONRequest with tab data
+        """
+        tab = self.get_queryset().filter(pk = kwargs["id"])[0]
+        # print(self.tab)
+        curr_account = Account.objects.filter(user = self.request.user)[0]
+        message = Tab.visit_tab(kwargs["id"], curr_account)
+        return HttpResponse(tab)
+
+    # This method is used to close a tab
+    def delete(self, *args, **kwargs):
+        """
+        Closes a specifc tab, deletes from tab table
+                  :param:
+                      request.DELETE has the tab id
+                  :return:
+                      JSONRequest with success or error message
+        """
+        tab = self.get_queryset().filter(pk = kwargs["id"])[0]
+        tab.delete()
+        return HttpResponse("worked")
+
+    def post(self, request, *args, **kwargs):
+        """
+       Looks in the site table for an instance; uses that instance or creates a new one if one doesn't exist to
+       create a tab instance in the tab table
+                 :param:
+                     request.PUT has information for a tab like url
+                 :return:
+                     JSONRequest with success or error message
+       """
+        curr_account = Account.objects.filter(user = self.request.user)[0]
+        # curr_account = self.request.session["current_account"] # need to implement this later
+        message = ""
+        site_url = request.POST.get("url")
+        message = Tab.open_tab(site_url = site_url, curr_account= curr_account)
+        return HttpResponse(message)
+
 
 ################## Managing shared folders ##################
 

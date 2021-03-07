@@ -1,5 +1,5 @@
 from django.test import TestCase
-from .models import *
+from flexr_web.models import *
 # Create your tests here.
 
 class UserTestCase(TestCase):
@@ -7,6 +7,7 @@ class UserTestCase(TestCase):
     def setUp(self):
         test_user = User.objects.create(first_name = "Al", last_name = "Annon", username="annon1234", email = "anon@gmail.com")
         test_user.save()
+
     def test_user_created(self):
         user_count = User.objects.all().count()
         self.assertEqual(user_count, 1, "User count is 1")
