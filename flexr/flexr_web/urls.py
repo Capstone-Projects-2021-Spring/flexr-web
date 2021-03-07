@@ -8,5 +8,6 @@ urlpatterns = [
     path('register', views.register_web, name='register'),
     path('profile/', views.profile_web, name='profile'),
     path('api/tabs/', AllTabsView.as_view()),
-    path('api/tab/<id>', TabView.as_view())
+    path('api/tab/<id>', TabView.as_view()),
+    path('api/tab/', TabView.as_view()),
 ]
