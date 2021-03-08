@@ -145,7 +145,13 @@ def browsing_history_web(request):
 
 @login_required
 def active_tabs_web(request):
-    return None
+    curr_user = request.user
+    print(curr_user)
+    curr_account = curr_user.accounts.all()[0]
+    print(curr_account)
+    accounts = curr_user.accounts.all()
+    tabs = curr_account.tabs.all()
+    return render(request, "flexr_web/open_tabs.html", {"Tabs":tabs, "Accounts": accounts})
 
 @login_required
 def devices_web(request):
