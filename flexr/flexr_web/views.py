@@ -147,7 +147,13 @@ def bookmark_individual_web(request):
 
 @login_required
 def browsing_history_web(request):
-    return None
+    curr_user = request.user
+    print(curr_user)
+    curr_account = curr_user.accounts.all()[0]
+    print(curr_account)
+    accounts = curr_user.accounts.all()
+    history = curr_account.history.all()
+    return render(request, "flexr_web/browsing_history.html", {"History": history, "Accounts": accounts})
 
 @login_required
 def active_tabs_web(request):
