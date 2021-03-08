@@ -124,7 +124,13 @@ def shared_folder_individual_web(request):
 
 @login_required
 def notes_hub_web(request):
-    return None
+    curr_user = request.user
+    print(curr_user)
+    curr_account = curr_user.accounts.all()[0]
+    print(curr_account)
+    accounts = curr_user.accounts.all()
+    notes = curr_account.notes.all()
+    return render(request, "flexr_web/notes.html", {"Notes": notes, "Accounts": accounts})
 
 # need args
 @login_required
