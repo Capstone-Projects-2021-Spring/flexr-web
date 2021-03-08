@@ -218,7 +218,15 @@ class AccountView(LoginRequiredMixin, DetailView):
                   JSONRequest with requested account or an error message
         """
 
-    def switch_account(request):
+        account = self.get_queryset().filter(pk = kwargs["id"])[0]
+
+        if account:
+            return HttpResponse(account)
+
+        return HttpResponse("User not found.")
+        
+
+    def switch_account(self, request):
         """
         Switches the current account that the user is on. This data is stored in a django session key
               :param:
@@ -228,7 +236,7 @@ class AccountView(LoginRequiredMixin, DetailView):
         """
         return None
 
-    def add_account(request):
+    def add_account(self, request):
         """
         Adds an account to the user's profile
                :param:
@@ -236,9 +244,19 @@ class AccountView(LoginRequiredMixin, DetailView):
                :return:
                   JSONRequest with success or error message
         """
-        return None
 
-    def edit_account(request):
+        if request.method == "PUT":
+            form = registrationform(request.PUT)
+
+            if form.is_valid():
+                form.save()
+
+                return HttpResponse("Account created.")
+
+
+        return HttpResponse("Error occurred.")
+
+    def edit_account(self, request):
         """
         Take in a form from the user that edits the information of the account
                :param:
@@ -248,7 +266,7 @@ class AccountView(LoginRequiredMixin, DetailView):
         """
         return None
 
-    def delete_account(request):
+    def delete_account(self, request):
         """
         Deletes an account from a user's profile
                    :param:
@@ -256,7 +274,10 @@ class AccountView(LoginRequiredMixin, DetailView):
                   :return:
                       JSONRequest with success or error message
         """
-        return None
+
+        Account.objects.filter(pk=request.DELETE).delete()
+
+        return HttpResponse(f"Deleted account with id: {request.DELETE}")
 
 ##################  Managing tabs  ##################
 
