@@ -1,0 +1,20 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flexr | Note</title>
+</head>
+<body>
+    <!-- TODO: verify Note.(something) will be work the way Preferences.(something) works in profile.html  --> 
+    <h1>Title: {{Note.title}} </h1>
+    <h2>Created: {{Note.created_date}}</h2>
+    {%if Note.lock%}
+        <h2>LOCKED.</h2>
+    {% endif%}
+    <h2>Content: </h2>
+    <h3>{{Note.content}}</h3>
+
+
+</body>
+</html>
