@@ -217,24 +217,23 @@ class AccountView(LoginRequiredMixin, DetailView):
               :return:
                   JSONRequest with requested account or an error message
         """
-
-        account = Account.objects.get(pk = kwargs["id"])
-        #account_dict = {'username': account.username}
-        result = HttpResponse('test')
-
-        #a = Account(email='qwer')
-        #print(account.__dict__)
-        #print(account.user)
-        #print(account.email)
         
+        acc = request.user.accounts.get(pk = kwargs["id"])
+    
+        # we ignore _state attr (pointer object)
+        # convert datetime to string, cannot directly JSONify it
+        data = {key:acc.__dict__[key] for key in acc.__dict__ if key != '_state'}
+        data['date_joined'] = str(data['date_joined'])
 
-        if account:
-            return HttpResponse(account.__dict__)
+        if acc:
+            # send account attributes
+            return HttpResponse(json.dumps(data))
 
         return HttpResponse("User not found.")
         
-
-    def switch(self, request, *args, **kwargs):
+    # TODO: Gerald
+    # Session keys
+    def patch(self, request, *args, **kwargs):
         """
         Switches the current account that the user is on. This data is stored in a django session key
               :param:
@@ -242,7 +241,12 @@ class AccountView(LoginRequiredMixin, DetailView):
               :return:
                   JSONRequest with success or error message
         """
-        return None
+
+        #print(request.user.__dict__)
+        #print(request.session)
+
+
+        return HttpResponse('TODO')
 
 
     def post(self, request, *args, **kwargs):
@@ -253,12 +257,13 @@ class AccountView(LoginRequiredMixin, DetailView):
                :return:
                   JSONRequest with success or error message
         """
-
-
-        acc = Account.objects.create(user = request.user,  **kwargs)
-
-
-        return HttpResponse("Account created.")
+        data = request.POST.dict()
+        acc = Account.objects.create(user = request.user,  **data)
+        
+        if acc:
+            return HttpResponse("Account created.")
+        else:
+            return HttpResponse("Error occurred.")
 
     def put(self, request, *args, **kwargs):
         """
@@ -268,7 +273,14 @@ class AccountView(LoginRequiredMixin, DetailView):
                :return:
                   JSONRequest with success or error message
         """
-        return HttpResponse('TODO')
+       
+        data = json.loads(request.body)
+        result = request.user.accounts.filter(pk = kwargs["id"]).update(**data)
+        
+        if result:
+            return HttpResponse(f"Updated account with id: {kwargs['id']}")
+        else:
+            return HttpResponse(f"Account with id: {kwargs['id']} not found")
 
     def delete(self, request, *args, **kwargs):
         """
@@ -279,7 +291,7 @@ class AccountView(LoginRequiredMixin, DetailView):
                       JSONRequest with success or error message
         """
 
-        result = Account.objects.filter(pk=kwargs["id"]).delete()
+        result = request.user.accounts.get(pk = kwargs["id"]).delete()
        
         if result:
             return HttpResponse(f"Deleted account with id: {kwargs['id']}")
