@@ -209,7 +209,7 @@ def check_status(request):
 
 # def account_manager(request): # we should use these
 class AccountView(LoginRequiredMixin, DetailView):
-    def get(self, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         """
         Adds an account to the user's profile
               :param:
@@ -218,15 +218,23 @@ class AccountView(LoginRequiredMixin, DetailView):
                   JSONRequest with requested account or an error message
         """
 
-        account = self.get_queryset().filter(pk = kwargs["id"])[0]
+        account = Account.objects.get(pk = kwargs["id"])
+        #account_dict = {'username': account.username}
+        result = HttpResponse('test')
+
+        #a = Account(email='qwer')
+        #print(account.__dict__)
+        #print(account.user)
+        #print(account.email)
+        
 
         if account:
-            return HttpResponse(account)
+            return HttpResponse(account.__dict__)
 
         return HttpResponse("User not found.")
         
 
-    def switch_account(self, request):
+    def switch(self, request, *args, **kwargs):
         """
         Switches the current account that the user is on. This data is stored in a django session key
               :param:
@@ -236,7 +244,8 @@ class AccountView(LoginRequiredMixin, DetailView):
         """
         return None
 
-    def add_account(self, request):
+
+    def post(self, request, *args, **kwargs):
         """
         Adds an account to the user's profile
                :param:
@@ -245,18 +254,13 @@ class AccountView(LoginRequiredMixin, DetailView):
                   JSONRequest with success or error message
         """
 
-        if request.method == "PUT":
-            form = registrationform(request.PUT)
 
-            if form.is_valid():
-                form.save()
-
-                return HttpResponse("Account created.")
+        acc = Account.objects.create(user = request.user,  **kwargs)
 
 
-        return HttpResponse("Error occurred.")
+        return HttpResponse("Account created.")
 
-    def edit_account(self, request):
+    def put(self, request, *args, **kwargs):
         """
         Take in a form from the user that edits the information of the account
                :param:
@@ -264,9 +268,9 @@ class AccountView(LoginRequiredMixin, DetailView):
                :return:
                   JSONRequest with success or error message
         """
-        return None
+        return HttpResponse('TODO')
 
-    def delete_account(self, request):
+    def delete(self, request, *args, **kwargs):
         """
         Deletes an account from a user's profile
                    :param:
@@ -275,9 +279,12 @@ class AccountView(LoginRequiredMixin, DetailView):
                       JSONRequest with success or error message
         """
 
-        Account.objects.filter(pk=request.DELETE).delete()
-
-        return HttpResponse(f"Deleted account with id: {request.DELETE}")
+        result = Account.objects.filter(pk=kwargs["id"]).delete()
+       
+        if result:
+            return HttpResponse(f"Deleted account with id: {kwargs['id']}")
+        else:
+            return HttpResponse(f"Account with id: {kwargs['id']} not found")
 
 ##################  Managing tabs  ##################
 
