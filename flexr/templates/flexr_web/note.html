@@ -7,6 +7,7 @@
 </head>
 <body>
     <!-- TODO: verify Note.(something) will be work the way Preferences.(something) works in profile.html  --> 
+    {% include "flexr_web/navbar.html" %}
     <h1>Title: {{Note.title}} </h1>
     <h2>Created: {{Note.created_date}}</h2>
     {%if Note.lock%}
