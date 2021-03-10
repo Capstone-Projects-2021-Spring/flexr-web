@@ -26,13 +26,15 @@ class AccountAdmin(admin.ModelAdmin):
         TabInLine, HistoryInLine, SiteInLine, BookmarkInLine, DeviceInLine, NoteInLine,
     ]
 
+class TabAdmin(admin.ModelAdmin):
+    readonly_fields = ('id',)
 
 # Register your models here.
 admin.site.register(Account, AccountAdmin)
 admin.site.register(Team)
 admin.site.register(History)
 admin.site.register(Site)
-admin.site.register(Tab)
+admin.site.register(Tab, TabAdmin)
 admin.site.register(Bookmark)
 admin.site.register(Device)
 admin.site.register(Account_Preferences)

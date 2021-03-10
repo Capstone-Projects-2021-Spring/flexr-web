@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator  # used for phone number and email checks in regex
 from django.db import models
-
+from datetime import datetime
 from django.utils import timezone
 from datetime import datetime
 
@@ -63,9 +63,11 @@ class Account(models.Model):
 class Team(models.Model):
     team_name = models.CharField(verbose_name="Team name", max_length=50)
     created_date = models.DateTimeField()
-    status = models.CharField(verbose_name="Status of team", max_length=50, choices=(("Active", "Active"), ("Inactive", "Inactive")))
+    status = models.CharField(verbose_name="Status of team", max_length=50, choices=(("Active", "Active"),
+                                                                                     ("Inactive", "Inactive")))
     # The type of team offers different levels
-    type_of_team = models.CharField(verbose_name="Type of team", max_length=50, choices=(("Parental guidance", "Parental guidance"),
+    type_of_team = models.CharField(verbose_name="Type of team", max_length=50, choices=(
+                                                                            ("Parental guidance", "Parental guidance"),
                                                                           ("Friends/Family", "Friends/Family"),
                                                                           ("Work", "Work")))
     members = models.ManyToManyField(Account) #map this to accounts
@@ -77,7 +79,7 @@ class Team(models.Model):
 class History(models.Model):
     site = models.ForeignKey("Site", on_delete=models.CASCADE, related_name="site_history")
     account = models.ForeignKey("Account", on_delete=models.CASCADE, related_name="history") # don't do foreignkey here make it so that there is a method that gets the account from the site
-    visit_datetime = models.DateTimeField()
+    visit_datetime = models.DateTimeField(auto_now= True)
 
     class Meta:
         verbose_name_plural = "histories"
@@ -100,10 +102,14 @@ class Site(models.Model):
     open_tab = models.BooleanField(verbose_name="Is this site opened in a tab?", default=True)
     bookmarked = models.BooleanField(verbose_name="Is this site bookmarked?", default = False)
 
+    def visited(self):
+        self.last_visit = datetime.now()
+        # site_ranking = # update site ranking here
+
     #Pseudocode for rankSite, a method that returns a number between 0 and 100, where the lower return value is the greater site ranking
     def rankSite(self):
-        if (number_of_visits > recent_frequency):
-            return (recent_frequency/number_of_visits)*100 #TODO check the python logic, this was initially written as C++ psuedocode
+        if (self.number_of_visits > self.recent_frequency):
+            return (self.recent_frequency/self.number_of_visits)*100 #TODO check the python logic, this was initially written as C++ psuedocode
         else:
             return 0 #Should never get to this point, but if there are more reecent visits than total visits, this must be the highest ranked site
 
@@ -129,6 +135,48 @@ class Tab(models.Model):
     # TODO make the status of a tab calculated using a method
     status = models.CharField(verbose_name= "Status of the tab", max_length=50) # once tab becomes inactive a notification gets sent to close or it autmatically closes?
     # TODO change tab status in the Site model on save
+
+    @classmethod
+    def open_tab(cls, site_url,curr_account):
+        try: # checks to see if the site already exists and opens tab
+            site =  Site.objects.filter(account = curr_account).get(url = site_url)[0]
+            site.visited()
+            tab = Tab.objects.create(account = curr_account, site = site, status = "open" )
+            tab.save()
+            history = History.objects.create(account = curr_account, site = site)
+            history.save()
+            return "successful"
+        except: # if site doesn't exist create it and create tab
+            site = Site.objects.create(account = curr_account , url = site_url)
+            tab = Tab.objects.create(account = curr_account, site = site, status = "open" )
+            tab.save()
+            history = History.objects.create(account=curr_account, site=site)
+            history.save()
+            return "successful"
+
+    @classmethod
+    def close_tab(cls, tabID, curr_account):
+        try:
+            tab = Tab.objects.filter(account = curr_account).get(pk = tabID)[0]
+            tab.delete()
+            return "successful"
+        except:
+            return "Tab doesn't exist for the current user"
+
+    @classmethod
+    def visit_tab(cls, tabID, curr_account):
+        try:
+            tab = Tab.objects.filter(account = curr_account).get(pk = tabID)[0]
+            tab.last_visited = datetime.now()
+            status = "active"
+            tab.save()
+            try:
+                site = Site.objects.filter(account = curr_account).get(url = tab.url)[0]
+            except:
+                return "Site instance doesn't exist for the current user"
+            return "successful"
+        except:
+            return "Tab instance doesn't exist for the current user"
 
     def __str__(self):
         return str(self.site.url)
@@ -213,6 +261,16 @@ class Note(models.Model):
     content = models.TextField(verbose_name= "Note content") # https://pypi.org/project/django-richtextfield/#field-widget-settings
     lock = models.BooleanField(verbose_name="Is note password protected?" , default=False)
     password = models.CharField(max_length=40, blank=True)
+
+    def __str__(self):
+        return str(self.title)
+
+#UNFINISHED
+class sharedFolder(models.Model):
+    #ownerAccount 
+    #Title was going to have a CharField in place of Textfield, but I got the following error:
+    #AttributeError: module 'django.db.models' has no attribute 'charField'
+    title = models.TextField(verbose_name="Shared Folder Title", max_length=100, default="sharedFolder")
 
     def __str__(self):
         return str(self.title)

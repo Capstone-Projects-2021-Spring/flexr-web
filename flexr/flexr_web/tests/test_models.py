@@ -1,5 +1,5 @@
 from django.test import TestCase
-from .models import *
+from flexr_web.models import *
 # Create your tests here.
 
 class UserTestCase(TestCase):
@@ -7,6 +7,7 @@ class UserTestCase(TestCase):
     def setUp(self):
         test_user = User.objects.create(first_name = "Al", last_name = "Annon", username="annon1234", email = "anon@gmail.com")
         test_user.save()
+
     def test_user_created(self):
         user_count = User.objects.all().count()
         self.assertEqual(user_count, 1, "User count is 1")
@@ -209,3 +210,43 @@ class TabTestCase(TestCase):
         test_tab.save()
         tab_count = test_acc.tabs.all().count()
         self.assertEqual(tab_count, 1, "Tab count is 1")
+
+class AccountPreferencesTestCase(TestCase):
+
+    def setUp(self):
+        test_user = User.objects.create(first_name = "Al", last_name = "Annon", username="annon1234", email = "anon@gmail.com")
+        test_user.save()
+        test_acc = Account.objects.create(user=test_user, email=test_user.email, phone_number="5704600704",
+                                          type_of_account="Business")
+        test_acc.save()
+        test_site = Site.objects.create(account = test_acc, url = "www.google.com")
+        test_site.save()
+        test_account_preferences = Account_Preferences.objects.create(name = "Annon Pref1", home_page = test_site)
+        test_account_preferences.save()
+
+    def test_account_preferences_created(self):
+        #test_acc = Account.objects.get(email="anon@gmail.com")
+        account_preferences_count = Account_Preferences.objects.all().count()
+        self.assertEqual(account_preferences_count, 2, "Account Preferences count is 1")
+
+    def test_create_another_account_preferences(self):
+        test_acc = Account.objects.get(email="anon@gmail.com")
+        test_site2 = Site.objects.create(account=test_acc, url="www.reddit.com")
+        test_site2.save()
+        test_account_preferences = Account_Preferences.objects.create(name = "Annon Pref2", home_page = test_site2)
+        test_account_preferences.save()
+        account_preferences_count = Account_Preferences.objects.all().count()
+        self.assertEqual(account_preferences_count, 3, "Account Preferences count is 2")
+
+    def test_account_preferences_edit(self):
+        test_account_preferences = Account_Preferences.objects.get(name="Annon Pref1")
+        test_account_preferences.name = "Backup Pref"
+        test_account_preferences.save()
+        self.assertEqual(test_account_preferences.name, "Backup Pref")
+
+    def test_account_preferences_deleted(self):
+        test_account_preferences = Account_Preferences.objects.get(name="Annon Pref1")
+        test_account_preferences.delete()
+        test_account_preferences.save()
+        account_preferences_count = Account_Preferences.objects.all().count()
+        self.assertEqual(account_preferences_count, 2, "Account Preferences count is 1")

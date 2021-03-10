@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flexr | Open Tabs</title>
+</head>
+<body>
+    {% include "flexr_web/navbar.html" %}
+    <h1>{{user.first_name}}&nbsp{{user.last_name}}</h1>
+    <h1>{{user.email}}</h1>
+    <h2>{{Accounts.0}}</h2>
+
+    <hr>
+    <h3>Open Tabs:</h3>
+    {%for tab in Tabs%}
+        <p>Tab: {{tab.site.url}}</p>
+        <p>Created Date: {{tab.created_date}}</p>
+        <p>Last Visited: {{tab.last_visited}}</p>
+        <p>Status: {{tab.status}}</p>
+        <br>
+    {%endfor%}
+    <hr>
+
+</body>
+</html>

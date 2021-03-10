@@ -5,8 +5,8 @@
     <title>Flexr | Home</title>
 </head>
 <body>
-    <a href="/admin">Admin</a>
-    <a href="/profile">Profile</a>
+    {% include "flexr_web/navbar.html" %}
+
     <h1>Hello {{user}}, I am flexr</h1>
      <h2>Accounts:</h2>
     {%for acc in Accounts%}
