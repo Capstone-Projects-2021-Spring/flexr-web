@@ -227,7 +227,7 @@ def check_status(request):
 
 # def account_manager(request): # we should use these
 class AccountView(LoginRequiredMixin, DetailView):
-    def get(self, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         """
         Adds an account to the user's profile
               :param:
@@ -235,8 +235,23 @@ class AccountView(LoginRequiredMixin, DetailView):
               :return:
                   JSONRequest with requested account or an error message
         """
+        
+        acc = request.user.accounts.get(pk = kwargs["id"])
+    
+        # we ignore _state attr (pointer object)
+        # convert datetime to string, cannot directly JSONify it
+        data = {key:acc.__dict__[key] for key in acc.__dict__ if key != '_state'}
+        data['date_joined'] = str(data['date_joined'])
 
-    def switch_account(request):
+        if acc:
+            # send account attributes
+            return HttpResponse(json.dumps(data))
+
+        return HttpResponse("User not found.")
+        
+    # TODO: Gerald
+    # Session keys
+    def patch(self, request, *args, **kwargs):
         """
         Switches the current account that the user is on. This data is stored in a django session key
               :param:
@@ -244,9 +259,15 @@ class AccountView(LoginRequiredMixin, DetailView):
               :return:
                   JSONRequest with success or error message
         """
-        return None
 
-    def add_account(request):
+        #print(request.user.__dict__)
+        #print(request.session)
+
+
+        return HttpResponse('TODO')
+
+
+    def post(self, request, *args, **kwargs):
         """
         Adds an account to the user's profile
                :param:
@@ -254,9 +275,15 @@ class AccountView(LoginRequiredMixin, DetailView):
                :return:
                   JSONRequest with success or error message
         """
-        return None
+        data = request.POST.dict()
+        acc = Account.objects.create(user = request.user,  **data)
+        
+        if acc:
+            return HttpResponse("Account created.")
+        else:
+            return HttpResponse("Error occurred.")
 
-    def edit_account(request):
+    def put(self, request, *args, **kwargs):
         """
         Take in a form from the user that edits the information of the account
                :param:
@@ -264,9 +291,16 @@ class AccountView(LoginRequiredMixin, DetailView):
                :return:
                   JSONRequest with success or error message
         """
-        return None
+       
+        data = json.loads(request.body)
+        result = request.user.accounts.filter(pk = kwargs["id"]).update(**data)
+        
+        if result:
+            return HttpResponse(f"Updated account with id: {kwargs['id']}")
+        else:
+            return HttpResponse(f"Account with id: {kwargs['id']} not found")
 
-    def delete_account(request):
+    def delete(self, request, *args, **kwargs):
         """
         Deletes an account from a user's profile
                    :param:
@@ -274,7 +308,13 @@ class AccountView(LoginRequiredMixin, DetailView):
                   :return:
                       JSONRequest with success or error message
         """
-        return None
+
+        result = request.user.accounts.get(pk = kwargs["id"]).delete()
+       
+        if result:
+            return HttpResponse(f"Deleted account with id: {kwargs['id']}")
+        else:
+            return HttpResponse(f"Account with id: {kwargs['id']} not found")
 
 ##################  Managing tabs  ##################
 
