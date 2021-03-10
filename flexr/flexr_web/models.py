@@ -264,3 +264,13 @@ class Note(models.Model):
 
     def __str__(self):
         return str(self.title)
+
+#UNFINISHED
+class sharedFolder(models.Model):
+    #ownerAccount 
+    #Title was going to have a CharField in place of Textfield, but I got the following error:
+    #AttributeError: module 'django.db.models' has no attribute 'charField'
+    title = models.TextField(verbose_name="Shared Folder Title", max_length=100, default="sharedFolder")
+
+    def __str__(self):
+        return str(self.title)
