@@ -546,45 +546,84 @@ def remove_bookmark_from_shared_folder(request):
 # filtering on andriod side
 # need filtering for webclient also
 
-def get_history(request):
-    """
-    Gets all site history from the current account
-              Parameters:
-                  request.GET has an id for a site history
-              Returns:
-                  JSONRequest with success message and the SiteHistory instance or error message
-    """
-    return None
+class HistoryView(LoginRequiredMixin, DetailView):
 
-def filter_history(request):
-    """
-    Returns filtered all site history from the current account
-              Parameters:
-                  request.GET has a JSON object that has the filter type and typed
-              Returns:
-                  JSONRequest with success message and the SiteHistory objects or error message
-    """
-    return None
+    def get(self, request, *args, **kwargs):
+        url = request.path.split('/')
 
-def delete_history_range(request):
-    """
-    Deletes all history from a user within a given range
-              Parameters:
-                  request.DELETE has a JSON object that has a date range
-              Returns:
-                  JSONRequest with success message and the SiteHistory objects or error message
-    """
-    return None
+        if url[-1] == 'filter':
+            return self.filter_history(request, *args, **kwargs)
+        else:
+            return self.get_history(request, *args, **kwargs)
 
-def delete_all_history(request):
-    """
-    Deletes all history from a user
-              Parameters:
-                  request.DELETE
-              Returns:
-                  JSONRequest with success message or error message
-    """
-    return None
+
+
+    def get_history(self, request, *args, **kwargs):
+        """
+        Gets all site history from the current account
+                Parameters:
+                    request.GET has an id for a site history
+                Returns:
+                    JSONRequest with success message and the SiteHistory instance or error message
+        """
+        #print('test')
+        history = History.objects.filter(account = kwargs["id"])
+        data = HistorySerializer(history, many=True)
+        return JsonResponse(data.data, safe=False)
+
+    def filter_history(self, request, *args, **kwargs):
+        """
+        Returns filtered all site history from the current account
+                Parameters:
+                    request.GET has a JSON object that has the filter type and typed
+                Returns:
+                    JSONRequest with success message and the SiteHistory objects or error message
+        """
+
+        payload = request.GET.dict()
+        history = History.objects.filter(
+            account = kwargs["id"],
+            visit_datetime__gte=payload['datetime_from'],
+            visit_datetime__lte=payload['datetime_to'])
+        data = HistorySerializer(history, many=True)
+        return JsonResponse(data.data, safe=False)
+
+    def delete(self, request, *args, **kwargs):
+        url = request.path.split('/')
+
+        if url[-1] == 'filter':
+            return self.delete_history_range(request, *args, **kwargs)
+        else:
+            return self.delete_all_history(request, *args, **kwargs)
+
+    def delete_history_range(self, request, *args, **kwargs):
+        """
+        Deletes all history from a user within a given range
+                Parameters:
+                    request.DELETE has a JSON object that has a date range
+                Returns:
+                    JSONRequest with success message and the SiteHistory objects or error message
+        """
+        payload = json.loads(request.body)
+        history = History.objects.filter(
+            account = kwargs["id"],
+            visit_datetime__gte=payload['datetime_from'],
+            visit_datetime__lte=payload['datetime_to']).delete()
+
+        return HttpResponse(f'{history} History objects removed')
+
+    def delete_all_history(self, request, *args, **kwargs):
+        """
+        Deletes all history from a user
+                Parameters:
+                    request.DELETE
+                Returns:
+                    JSONRequest with success message or error message
+        """
+
+        history = History.objects.all().delete()
+
+        return HttpResponse(f'{history} History objects removed')
 
 
 ##################  Managing Bookmarks ##################
