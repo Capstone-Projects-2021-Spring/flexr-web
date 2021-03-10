@@ -14,7 +14,8 @@ urlpatterns = [
     path('api/tab/<id>', TabView.as_view()),
     path('api/tab/', TabView.as_view()),
     path('api/account/<id>', AccountView.as_view()),
-    path('api/account/', AccountView.as_view())
+    path('api/account/', AccountView.as_view()),
+    path('switch_account/<id>', views.switch_account, name = "switch account" )
     #path('shared_folder/', ) TODO 
     # TODO For note.html
 ]
