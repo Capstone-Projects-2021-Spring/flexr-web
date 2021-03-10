@@ -30,7 +30,7 @@ class AccountPreferencesSerializer(serializers.ModelSerializer):
         fields = ['name', 'home_page', 'sync_enabled', 'searchable_profile ', 
         'cookies_enabled ', 'popups_enabled ', 'is_dark_mode ']
 
-### These models need to be finalized
+### TODO: These models need to be finalized
 class NoteSerializer(serializers.ModelSerializer):
     class Meta:
         pass
