@@ -3,15 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <title>Flexr | Home</title>
+    <script>
+        async function switch_account(id){
+            let csrftoken = getCookie('csrftoken');
+            const resp = await fetch('http://127.0.0.1:8000/switch_account/'+id, {
+                method : "POST",
+                body: "hello",
+                headers : {"X-CSRFToken" : csrftoken},
+            });
+            window.location.reload();
+        }
+        // The following function are copying from
+        // https://docs.djangoproject.com/en/dev/ref/csrf/#ajax
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
 </head>
 <body>
     {% include "flexr_web/navbar.html" %}
-
+    <div id = "welcome">
     <h1>Hello {{user}}, I am flexr</h1>
-     <h2>Accounts:</h2>
-    {%for acc in Accounts%}
-        <h3>{{acc}}</h3>
-    {%endfor%}
+    </div>
+    <h2>Current Account: {{curr_acc}}</h2>
+    <hr>
+    <div id = "accounts">
+        <h2>Accounts:</h2>
+        {%for acc in Accounts%}
+            <h3 id = "account" onclick="switch_account({{acc.account_id}})">{{acc}}</h3>
+        {%endfor%}
+    </div>
     <h2>Devices:</h2>
         {%for dev in Devices%}
             <h3>{{dev}}</h3>
