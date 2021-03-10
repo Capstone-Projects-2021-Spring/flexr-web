@@ -16,6 +16,7 @@ from django.views import View
 
 from django.views.decorators.csrf import csrf_exempt
 from .models import *
+from .serializers import *
 # Create your views here.
 
 ################## Managing Website Pages ##################
@@ -238,8 +239,6 @@ def check_status(request):
 
 ##################  Managing Account ##################
 
-#TODO This needs to be turned into a class based view like the TabViews
-
 # def account_manager(request): # we should use these
 class AccountView(LoginRequiredMixin, DetailView):
     def get(self, request, *args, **kwargs):
@@ -251,18 +250,15 @@ class AccountView(LoginRequiredMixin, DetailView):
                   JSONRequest with requested account or an error message
         """
         
-        acc = request.user.accounts.get(pk = kwargs["id"])
-    
-        # we ignore _state attr (pointer object)
-        # convert datetime to string, cannot directly JSONify it
-        data = {key:acc.__dict__[key] for key in acc.__dict__ if key != '_state'}
-        data['date_joined'] = str(data['date_joined'])
+        account = request.user.accounts.filter(pk = kwargs["id"])
 
-        if acc:
-            # send account attributes
-            return HttpResponse(json.dumps(data))
+        # if empty
+        if not account:
+            return HttpResponse(f'Account with id={kwargs["id"]} not found.', status=404)
 
-        return HttpResponse("User not found.")
+        data = AccountSerializer(account[0])
+        return JsonResponse(data.data, safe=False)
+
         
     # TODO: Gerald
     # Session keys
@@ -275,11 +271,16 @@ class AccountView(LoginRequiredMixin, DetailView):
                   JSONRequest with success or error message
         """
 
-        #print(request.user.__dict__)
-        #print(request.session)
 
+        account = request.user.accounts.filter(pk = kwargs["id"])
 
-        return HttpResponse('TODO')
+        # if empty
+        if not account:
+            return HttpResponse(f'Account with id={kwargs["id"]} not found.', status=404)
+
+        request.session["account_id"] = kwargs["id"]
+
+        return HttpResponse(f'Switched to Account {kwargs["id"]}')
 
 
     def post(self, request, *args, **kwargs):
@@ -296,7 +297,7 @@ class AccountView(LoginRequiredMixin, DetailView):
         if acc:
             return HttpResponse("Account created.")
         else:
-            return HttpResponse("Error occurred.")
+            return HttpResponse("Error occurred.", status=404)
 
     def put(self, request, *args, **kwargs):
         """
@@ -306,14 +307,13 @@ class AccountView(LoginRequiredMixin, DetailView):
                :return:
                   JSONRequest with success or error message
         """
-       
         data = json.loads(request.body)
         result = request.user.accounts.filter(pk = kwargs["id"]).update(**data)
         
         if result:
             return HttpResponse(f"Updated account with id: {kwargs['id']}")
         else:
-            return HttpResponse(f"Account with id: {kwargs['id']} not found")
+            return HttpResponse(f"Account with id: {kwargs['id']} not found", status=404)
 
     def delete(self, request, *args, **kwargs):
         """
@@ -329,7 +329,7 @@ class AccountView(LoginRequiredMixin, DetailView):
         if result:
             return HttpResponse(f"Deleted account with id: {kwargs['id']}")
         else:
-            return HttpResponse(f"Account with id: {kwargs['id']} not found")
+            return HttpResponse(f"Account with id: {kwargs['id']} not found", status=404)
 
 ##################  Managing tabs  ##################
 

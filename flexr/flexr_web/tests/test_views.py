@@ -2,7 +2,9 @@ from django.test import TestCase
 from django.test import Client
 from flexr_web.views import *
 from flexr_web.models import *
+from django.utils import timezone
 
+import datetime
 import json
 
 class TabTestCase(TestCase):
@@ -39,33 +41,78 @@ class TabTestCase(TestCase):
 class AccountTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        c = Client()
         cls.curr_user = User.objects.create_user('foo', 'myemail@test.com', 'bar')
         cls.curr_user.save()
         cls.curr_user = authenticate(username='foo', password='bar')
-        cls.acc = Account.objects.create(user = cls.curr_user, email = "test@me.com", type_of_account = "Business")
+        cls.now = datetime.datetime.now(tz=timezone.utc)
+
+        cls.acc = Account.objects.create(user = cls.curr_user, email = "test@me.com",
+         type_of_account = "Business", date_joined=cls.now)
+
 
     def test_get_account(self):
         c = Client()
         c.login(username='foo', password='bar')
         result = c.get(path ="/api/account/1")
-
-        data_expected = {key:self.acc.__dict__[key] for key in self.acc.__dict__ if key != '_state'}
-        data_expected['date_joined'] = str(data_expected['date_joined'])
         data = json.loads(result.content)
-        
-        # check attribute dicts are equal
+
+        # remove timezone and then append 'Z' to match format
+        # hack to remove warning
+        data_expected = {
+            'user': 1,
+            'email': 'test@me.com',
+            'type_of_account': 'Business',
+            'date_joined': self.now.isoformat()[:-6] + 'Z', 
+            'account_id': 1,
+            'phone_number': '',
+            'teams': [],
+            'friends': [],
+            'account_preferences': 1
+        }
+
+ 
+        # check that all fields are equal
+        # simply checking equality on models only checks primary keys
         self.assertEqual(data, data_expected)
 
-    # TODO: Gerald
-    # Session keys
+    def test_get_account_404(self):
+        c = Client()
+        c.login(username='foo', password='bar')
+        result = c.get(path ="/api/account/3") # out of range
+
+        #
+        data = result.status_code
+        data_expected = 404
+        
+        self.assertEquals(data, data_expected)
+
     def test_switch_account(self):
         c = Client()
         c.login(username='foo', password='bar')
 
-        acc = Account.objects.create(user = self.curr_user, email = "email@site.com", type_of_account = "Personal")
+        Account.objects.create(user = self.curr_user, email = "email@site.com", 
+        type_of_account = "Personal")
 
-        c.patch(path="/api/account/2")
+        result = c.patch(path="/api/account/2")
+        data = result.status_code
+        data_expected = 200
+        
+
+        self.assertEqual(data, data_expected)
+
+    def test_switch_account_404(self):
+        c = Client()
+        c.login(username='foo', password='bar')
+
+        Account.objects.create(user = self.curr_user, email = "email@site.com", 
+        type_of_account = "Personal")
+
+        result = c.patch(path="/api/account/1337") #out of range
+        data = result.status_code
+        data_expected = 404
+        
+
+        self.assertEqual(data, data_expected)
 
     def test_add_account(self):
         c = Client()
@@ -75,7 +122,7 @@ class AccountTestCase(TestCase):
         'email': "email@site.com" ,
         'type_of_account': "Personal"
         }
-        c.post(path="/api/account/", data=data)
+        result = c.post(path="/api/account/", data=data)
         
         acc_count = Account.objects.all().count()
         acc = Account.objects.all()[1]
