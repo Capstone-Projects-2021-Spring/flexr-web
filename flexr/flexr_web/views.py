@@ -1,7 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 
-
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
@@ -14,8 +13,9 @@ from .forms import registrationform
 from django.contrib.auth import authenticate, login
 from django.views import View
 
-from django.views.decorators.csrf import csrf_exempt
+
 from .models import *
+from .serializers import *
 # Create your views here.
 
 ################## Managing Website Pages ##################
@@ -37,6 +37,7 @@ class IndexView(LoginRequiredMixin, View):
         #                          "tab": tab, "history": history})
         curr_user = self.request.user
 
+
         try:
             print("IndexView curr_user")
             curr_account = curr_user.accounts.get(account_id = self.request.session['account_id'])
@@ -45,8 +46,6 @@ class IndexView(LoginRequiredMixin, View):
             curr_account = curr_user.accounts.all()[0]
             self.request.session['account_id'] = curr_account.account_id
             print("IndexView: Account initialized:" )
-
-
         accounts = curr_user.accounts.all()
         history = curr_account.history.all()
         sites = curr_account.sites.all()
@@ -55,7 +54,7 @@ class IndexView(LoginRequiredMixin, View):
         devices = curr_account.devices.all()
         # suggested_sites = curr_account.suggested_sites()
         print(curr_user)
-        return render(self.request, "flexr_web/index.html", {"curr_acc": curr_account, "Accounts": accounts, "Sites": sites, "Tabs": tabs,
+        return render(self.request, "flexr_web/index.html", {"Accounts": accounts, "Sites": sites, "Tabs": tabs,
                                                              "History": history, "Bookmarks": bookmarks,
                                                              "Devices": devices})
 
@@ -87,11 +86,6 @@ class IndexView(LoginRequiredMixin, View):
 #     return render(request, "flexr_web/index.html", {"Accounts": accounts, "Sites": sites, "Tabs": tabs,
 #
 
-@csrf_exempt
-def switch_account(request,*args, **kwargs):
-    request.session['account_id'] = kwargs["id"]
-    return redirect('/')
-
 def login_web(request):
     return None
 
@@ -108,7 +102,10 @@ def register_web(request):
             user = authenticate(username=username, password=password)
             new_account = Account.objects.create(user=user, email=user.email, username = user.username)
             new_account.save()
+
             request.session['account_id'] = new_account.account_id
+
+
             return redirect('/')
     else:
         form = registrationform
@@ -120,6 +117,7 @@ def profile_web(request):
     curr_user = request.user
 
     print(curr_user)
+
     curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
     print(curr_account)
     accounts = curr_user.accounts.all()
@@ -144,6 +142,7 @@ def notes_hub_web(request):
     curr_user = request.user
     print(curr_user)
     curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+
     print(curr_account)
     accounts = curr_user.accounts.all()
     notes = curr_account.notes.all()
@@ -166,7 +165,9 @@ def bookmark_individual_web(request):
 def browsing_history_web(request):
     curr_user = request.user
     print(curr_user)
+
     curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+
     print(curr_account)
     accounts = curr_user.accounts.all()
     history = curr_account.history.all()
@@ -176,6 +177,7 @@ def browsing_history_web(request):
 def active_tabs_web(request):
     curr_user = request.user
     print(curr_user)
+
     curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
     print(curr_account)
     accounts = curr_user.accounts.all()
@@ -240,8 +242,6 @@ def check_status(request):
 
 ##################  Managing Account ##################
 
-#TODO This needs to be turned into a class based view like the TabViews
-
 # def account_manager(request): # we should use these
 class AccountView(LoginRequiredMixin, DetailView):
     def get(self, request, *args, **kwargs):
@@ -253,6 +253,7 @@ class AccountView(LoginRequiredMixin, DetailView):
                   JSONRequest with requested account or an error message
         """
 
+
         acc = request.user.accounts.get(account_id = request.session['account_id'])
     
         # we ignore _state attr (pointer object)
@@ -260,11 +261,16 @@ class AccountView(LoginRequiredMixin, DetailView):
         data = {key:acc.__dict__[key] for key in acc.__dict__ if key != '_state'}
         data['date_joined'] = str(data['date_joined'])
 
-        if acc:
-            # send account attributes
-            return HttpResponse(json.dumps(data))
+        
+        account = request.user.accounts.filter(pk = kwargs["id"])
 
-        return HttpResponse("User not found.")
+        # if empty
+        if not account:
+            return HttpResponse(f'Account with id={kwargs["id"]} not found.', status=404)
+
+        data = AccountSerializer(account[0])
+        return JsonResponse(data.data, safe=False)
+
         
     # TODO: Gerald
     # Session keys
@@ -277,11 +283,16 @@ class AccountView(LoginRequiredMixin, DetailView):
                   JSONRequest with success or error message
         """
 
-        #print(request.user.__dict__)
-        #print(request.session)
 
+        account = request.user.accounts.filter(pk = kwargs["id"])
 
-        return HttpResponse('TODO')
+        # if empty
+        if not account:
+            return HttpResponse(f'Account with id={kwargs["id"]} not found.', status=404)
+
+        request.session["account_id"] = kwargs["id"]
+
+        return HttpResponse(f'Switched to Account {kwargs["id"]}')
 
 
     def post(self, request, *args, **kwargs):
@@ -298,7 +309,7 @@ class AccountView(LoginRequiredMixin, DetailView):
         if acc:
             return HttpResponse("Account created.")
         else:
-            return HttpResponse("Error occurred.")
+            return HttpResponse("Error occurred.", status=404)
 
     def put(self, request, *args, **kwargs):
         """
@@ -308,14 +319,13 @@ class AccountView(LoginRequiredMixin, DetailView):
                :return:
                   JSONRequest with success or error message
         """
-       
         data = json.loads(request.body)
         result = request.user.accounts.filter(pk = kwargs["id"]).update(**data)
         
         if result:
             return HttpResponse(f"Updated account with id: {kwargs['id']}")
         else:
-            return HttpResponse(f"Account with id: {kwargs['id']} not found")
+            return HttpResponse(f"Account with id: {kwargs['id']} not found", status=404)
 
     def delete(self, request, *args, **kwargs):
         """
@@ -331,7 +341,7 @@ class AccountView(LoginRequiredMixin, DetailView):
         if result:
             return HttpResponse(f"Deleted account with id: {kwargs['id']}")
         else:
-            return HttpResponse(f"Account with id: {kwargs['id']} not found")
+            return HttpResponse(f"Account with id: {kwargs['id']} not found", status=404)
 
 ##################  Managing tabs  ##################
 
@@ -550,45 +560,84 @@ def remove_bookmark_from_shared_folder(request):
 # filtering on andriod side
 # need filtering for webclient also
 
-def get_history(request):
-    """
-    Gets all site history from the current account
-              Parameters:
-                  request.GET has an id for a site history
-              Returns:
-                  JSONRequest with success message and the SiteHistory instance or error message
-    """
-    return None
+class HistoryView(LoginRequiredMixin, DetailView):
 
-def filter_history(request):
-    """
-    Returns filtered all site history from the current account
-              Parameters:
-                  request.GET has a JSON object that has the filter type and typed
-              Returns:
-                  JSONRequest with success message and the SiteHistory objects or error message
-    """
-    return None
+    def get(self, request, *args, **kwargs):
+        url = request.path.split('/')
 
-def delete_history_range(request):
-    """
-    Deletes all history from a user within a given range
-              Parameters:
-                  request.DELETE has a JSON object that has a date range
-              Returns:
-                  JSONRequest with success message and the SiteHistory objects or error message
-    """
-    return None
+        if url[-1] == 'filter':
+            return self.filter_history(request, *args, **kwargs)
+        else:
+            return self.get_history(request, *args, **kwargs)
 
-def delete_all_history(request):
-    """
-    Deletes all history from a user
-              Parameters:
-                  request.DELETE
-              Returns:
-                  JSONRequest with success message or error message
-    """
-    return None
+
+
+    def get_history(self, request, *args, **kwargs):
+        """
+        Gets all site history from the current account
+                Parameters:
+                    request.GET has an id for a site history
+                Returns:
+                    JSONRequest with success message and the SiteHistory instance or error message
+        """
+        #print('test')
+        history = History.objects.filter(account = kwargs["id"])
+        data = HistorySerializer(history, many=True)
+        return JsonResponse(data.data, safe=False)
+
+    def filter_history(self, request, *args, **kwargs):
+        """
+        Returns filtered all site history from the current account
+                Parameters:
+                    request.GET has a JSON object that has the filter type and typed
+                Returns:
+                    JSONRequest with success message and the SiteHistory objects or error message
+        """
+
+        payload = request.GET.dict()
+        history = History.objects.filter(
+            account = kwargs["id"],
+            visit_datetime__gte=payload['datetime_from'],
+            visit_datetime__lte=payload['datetime_to'])
+        data = HistorySerializer(history, many=True)
+        return JsonResponse(data.data, safe=False)
+
+    def delete(self, request, *args, **kwargs):
+        url = request.path.split('/')
+
+        if url[-1] == 'filter':
+            return self.delete_history_range(request, *args, **kwargs)
+        else:
+            return self.delete_all_history(request, *args, **kwargs)
+
+    def delete_history_range(self, request, *args, **kwargs):
+        """
+        Deletes all history from a user within a given range
+                Parameters:
+                    request.DELETE has a JSON object that has a date range
+                Returns:
+                    JSONRequest with success message and the SiteHistory objects or error message
+        """
+        payload = json.loads(request.body)
+        history = History.objects.filter(
+            account = kwargs["id"],
+            visit_datetime__gte=payload['datetime_from'],
+            visit_datetime__lte=payload['datetime_to']).delete()
+
+        return HttpResponse(f'{history} History objects removed')
+
+    def delete_all_history(self, request, *args, **kwargs):
+        """
+        Deletes all history from a user
+                Parameters:
+                    request.DELETE
+                Returns:
+                    JSONRequest with success message or error message
+        """
+
+        history = History.objects.all().delete()
+
+        return HttpResponse(f'{history} History objects removed')
 
 
 ##################  Managing Bookmarks ##################
