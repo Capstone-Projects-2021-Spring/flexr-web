@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <title>Flexr | Home</title>
     <script>
@@ -31,36 +32,113 @@
             return cookieValue;
         }
     </script>
+    <style>
+        body {
+            padding: 5%;
+        }
+        #plus-icon:hover{
+            height: 1%;
+            width: 1%;
+            cursor: pointer;
+            stroke: white;
+        }
+        #account, #tab{
+            text-align:center;
+            margin: 1%;
+        }
+        #account:hover, #tab:hover{
+            text-align:center;
+            border: 2px solid black;
+            cursor: pointer;
+        }
+    </style>
 </head>
+
 <body>
     {% include "flexr_web/navbar.html" %}
     <div id = "welcome">
-    <h1>Hello {{user}}, I am flexr</h1>
+    <h1>Welcome to Flexr {{user}}!</h1>
     </div>
     <h2>Current Account: {{curr_acc}}</h2>
     <hr>
+
     <div id = "accounts">
-        <h2>Accounts:</h2>
-        {%for acc in Accounts%}
-            <h3 id = "account" onclick="switch_account({{acc.account_id}})">{{acc}}</h3>
+        <h2 style="display:inline;" >Accounts:</h2> <img id="plus-icon" data-toggle="modal" data-target="#exampleModal" src="{% static 'icons/plus-square.svg' %}">
+        <div class = "row">
+            {%for acc in Accounts%}
+                <div id = "account" class = "card col-lg-3" onclick="switch_account({{acc.account_id}})">
+                    <h3  >{{acc}}</h3>
+                </div>
+            {%endfor%}
+        </div>
+    </div>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Add an account!</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <form>
+                  <label for = "username">Username</label>
+                  <input id = "username" type = "text">
+                  <br>
+                  <label for = "email">Email</label>
+                  <input id = "email" type = "email">
+                  <br>
+                  <label for = "phone">Phone Number</label>
+                  <input type="tel" id="phone" name="phone"
+                   pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+                   required>
+                  <br>
+                  <label for = "type">Type of account</label>
+                  <select id = "type">
+                      <option>Hello</option>
+                  </select>
+                  <br>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Create account</button>
+                  </div>
+
+              </form>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class = "tabs">
+        <h2>Open tabs:</h2>
+        <div class = "row">
+            {%for tab in Tabs%}
+                <div id = "tab" class = "card col-lg-3"  onclick="window.open('{{tab.site.url}}')">
+                    <h3 >{{tab}}</h3>
+                </div>
+            {%endfor%}
+        </div>
+    </div>
+    <div class = "notes">
+        <h2>Recent Notes:</h2>
+        {%for note in Notes%}
+            <h3>{{note}</h3>
         {%endfor%}
     </div>
-    <h2>Devices:</h2>
-        {%for dev in Devices%}
-            <h3>{{dev}}</h3>
+    <div class = "history">
+        <h2>Recent Site history:</h2>
+        {%for hist in History%}
+            <h3>{{hist}}</h3>
         {%endfor%}
-    <h2>Sites:</h2>
-    {%for site in Sites%}
-        <h3>{{site}}</h3>
-    {%endfor%}
-    <h2>Open tabs:</h2>
-    {%for tab in Tabs%}
-        <h3>{{tab}}</h3>
-    {%endfor%}
-    <h2>Site history:</h2>
-    {%for hist in History%}
-        <h3>{{hist}}</h3>
-    {%endfor%}
-    <p><a href='accounts/logout'>Logout</a></p>
+    </div>
+    <div clas = "suggest_sites">
+        <h2>Suggest Sites:</h2>
+    </div>
+
+
+
+
 </body>
 </html>

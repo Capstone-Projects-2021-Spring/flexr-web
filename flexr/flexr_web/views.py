@@ -37,13 +37,15 @@ class IndexView(LoginRequiredMixin, View):
         #                          "tab": tab, "history": history})
         curr_user = self.request.user
 
-        # try:
-        curr_account = curr_user.accounts.get(account_id = self.request.session['account_id'])
-        print("IndexView: Account Successfully Switched: "+ str(curr_account))
-        # except:
-        #     curr_account = curr_user.accounts.all()[0]
-        #     self.request.session['account_id'] = curr_account.account_id
-        #     print("IndexView: Account initialized:" )
+        try:
+            print("IndexView curr_user")
+            curr_account = curr_user.accounts.get(account_id = self.request.session['account_id'])
+            print("IndexView: Account Successfully Switched: "+ str(curr_account))
+        except:
+            curr_account = curr_user.accounts.all()[0]
+            self.request.session['account_id'] = curr_account.account_id
+            print("IndexView: Account initialized:" )
+
 
         accounts = curr_user.accounts.all()
         history = curr_account.history.all()
@@ -51,7 +53,7 @@ class IndexView(LoginRequiredMixin, View):
         tabs = curr_account.tabs.all()
         bookmarks = curr_account.bookmarks.all()
         devices = curr_account.devices.all()
-
+        # suggested_sites = curr_account.suggested_sites()
         print(curr_user)
         return render(self.request, "flexr_web/index.html", {"curr_acc": curr_account, "Accounts": accounts, "Sites": sites, "Tabs": tabs,
                                                              "History": history, "Bookmarks": bookmarks,
@@ -104,9 +106,9 @@ def register_web(request):
             username = form.cleaned_data['username']
             password = form.cleaned_data['password1']
             user = authenticate(username=username, password=password)
-            new_account = Account.objects.create(user=user, email=user.email)
+            new_account = Account.objects.create(user=user, email=user.email, username = user.username)
             new_account.save()
-            request.session['account'] = new_account
+            request.session['account_id'] = new_account.account_id
             return redirect('/')
     else:
         form = registrationform
@@ -118,7 +120,7 @@ def profile_web(request):
     curr_user = request.user
 
     print(curr_user)
-    curr_account = request.session['account']
+    curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
     print(curr_account)
     accounts = curr_user.accounts.all()
     devices = curr_account.devices.all()
@@ -141,7 +143,7 @@ def shared_folder_individual_web(request):
 def notes_hub_web(request):
     curr_user = request.user
     print(curr_user)
-    curr_account = request.session['account']
+    curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
     print(curr_account)
     accounts = curr_user.accounts.all()
     notes = curr_account.notes.all()
@@ -164,7 +166,7 @@ def bookmark_individual_web(request):
 def browsing_history_web(request):
     curr_user = request.user
     print(curr_user)
-    curr_account = request.session['account']
+    curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
     print(curr_account)
     accounts = curr_user.accounts.all()
     history = curr_account.history.all()
@@ -174,7 +176,7 @@ def browsing_history_web(request):
 def active_tabs_web(request):
     curr_user = request.user
     print(curr_user)
-    curr_account = request.session['account']
+    curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
     print(curr_account)
     accounts = curr_user.accounts.all()
     tabs = curr_account.tabs.all()
@@ -250,8 +252,8 @@ class AccountView(LoginRequiredMixin, DetailView):
               :return:
                   JSONRequest with requested account or an error message
         """
-        
-        acc = request.user.accounts.get(pk = kwargs["id"])
+
+        acc = request.user.accounts.get(account_id = request.session['account_id'])
     
         # we ignore _state attr (pointer object)
         # convert datetime to string, cannot directly JSONify it
@@ -292,7 +294,7 @@ class AccountView(LoginRequiredMixin, DetailView):
         """
         data = request.POST.dict()
         acc = Account.objects.create(user = request.user,  **data)
-        
+        self.request.session['account_id'] = acc.account_id
         if acc:
             return HttpResponse("Account created.")
         else:
@@ -336,7 +338,8 @@ class AccountView(LoginRequiredMixin, DetailView):
 class AllTabsView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
-        curr_account = Account.objects.filter(user = self.request.user)[0]
+        curr_user = self.request.user
+        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
         return Tab.objects.filter(account = curr_account)
 
     def get(self, *args, **kwargs):
@@ -356,7 +359,8 @@ class AllTabsView(LoginRequiredMixin, ListView):
 class TabView(LoginRequiredMixin, DetailView):
 
     def get_queryset(self):
-        curr_account = Account.objects.filter(user = self.request.user)[0]
+        curr_user = self.request.user
+        curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
         return Tab.objects.filter(account = curr_account)
 
     # This method is used to get a single tab
@@ -396,8 +400,8 @@ class TabView(LoginRequiredMixin, DetailView):
                  :return:
                      JSONRequest with success or error message
        """
-        curr_account = Account.objects.filter(user = self.request.user)[0]
-        # curr_account = self.request.session["current_account"] # need to implement this later
+        curr_user = self.request.user
+        curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
         message = ""
         site_url = request.POST.get("url")
         message = Tab.open_tab(site_url = site_url, curr_account= curr_account)
