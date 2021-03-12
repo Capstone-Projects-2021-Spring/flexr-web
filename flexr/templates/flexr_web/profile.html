@@ -9,7 +9,63 @@
     {% include "flexr_web/navbar.html" %}
     <h1>{{user.first_name}}&nbsp{{user.last_name}}&nbsp@{{user}}</h1>
     <h1>{{user.email}}</h1>
-    <h2>{{Accounts.0}}</h2>
+    <h2 style="display:inline">{{current_account}}</h2><button style="display:inline;" data-toggle="modal" data-target="#view_account">Edit</button>
+
+    <div class="modal fade" id="view_account" tabindex="-1" role="dialog" aria-labelledby="view_accountLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="view_accountLabel">Edit your account</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <form method="post" action="/edit_account/">
+                   {% csrf_token %}
+                    <p>
+                        <label for="id_username">Username:</label><br>
+                        <input value = "{{current_account.username}}"type="text" name="username" class="form-control" required="" id="id_username">
+                    </p>
+
+                    <p>
+                        <label for="id_email">Email:</label><br>
+                        <input type="email" value = "{{current_account.email}}" name="email" class="form-control" required="" id="id_email">
+                    </p>
+
+                    <p>
+                        <label for="id_phone_number">Phone number:</label><br>
+                        <input type="text" value="{{current_account.phone_number}}" name="phone_number" class="form-control" required="" id="id_phone_number">
+                    </p>
+
+                    <p>
+                        <label for="id_type_of_account">Type of account:</label><br>
+                        <select name="type_of_account" value = "{{current_account.type_of_account}}"class="form-control" id="id_type_of_account">
+                          <option value="Business">Business</option>
+
+                          <option value="Personal">Personal</option>
+
+                          <option value="Kids">Kids</option>
+
+                          <option value="Private">Private</option>
+
+                          <option value="Other">Other</option>
+
+                        </select>
+                    </p>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+<!--                    <button type="button" class="btn btn-danger" onclick="delete_account()">Delete</button>-->
+                    <button type="submit" class="btn btn-primary">Edit account</button>
+                </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <hr>
     <h3>Devices:</h3>
     {%for dev in Devices%}
