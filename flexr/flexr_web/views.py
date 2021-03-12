@@ -134,11 +134,10 @@ def notes_hub_web(request):
     return render(request, "flexr_web/notes.html", {"Notes": notes, "Accounts": accounts})
 
 # need args
-# @login_required
-class note_individual_web(DetailView):
-    model = Note
-    template_name = 'flexr_web/note.html'
-
+@login_required
+def note_individual_web(request, pk):
+    obj = Note.objects.get(pk=pk)
+    return render(request, "flexr_web/note.html", {"object": obj})
 
 @login_required
 def bookmarks_hub_web(request):
@@ -633,7 +632,11 @@ def create_note(request):
     """
     return None
 
-def delete_note(request):
+def delete_note(request, pk):
+    obj = Note.objects.get(pk=pk)
+    obj.delete()
+    return redirect('/notes')
+    return render(request, "flexr_web/notes.html")
     """
        Deletes note for the account
                   Parameters:
