@@ -41,7 +41,10 @@
                     <p>
                         <label for="id_type_of_account">Type of account:</label><br>
                         <select name="type_of_account" value = "{{current_account.type_of_account}}"class="form-control" id="id_type_of_account">
-                          <option value="Business">Business</option>
+
+                             <option value="--" disabled selected>--</option>
+
+                        <option value="Business">Business</option>
 
                           <option value="Personal">Personal</option>
 

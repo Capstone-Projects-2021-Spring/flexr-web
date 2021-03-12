@@ -165,7 +165,7 @@ def profile_web(request):
     # acc_pref.home_page = site
     acc_pref.save()
     print(acc_pref)
-    return render(request, "flexr_web/profile.html", {"Accounts": accounts, "Devices": devices, "Preferences":acc_pref})
+    return render(request, "flexr_web/profile.html", {"current_account":curr_account, "Accounts": accounts, "Devices": devices, "Preferences":acc_pref})
 
 @login_required
 def shared_folders_web(request):
