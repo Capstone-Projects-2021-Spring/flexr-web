@@ -179,7 +179,7 @@ def shared_folder_individual_web(request):
     #CHANGE THIS TO NOT USE THE SHARED FOLDERS COLLABORATORS, this was written this way for testing the view method
     collaborators = folder.collaborators
     
-    return render(request, "flexr_web/shared_folder.html", {"SharedFolder": shared_folder, "Collaborators": collaborators)
+    return render(request, "flexr_web/shared_folder.html", {"SharedFolder": shared_folder, "Collaborators": collaborators})
 
 @login_required
 def notes_hub_web(request):

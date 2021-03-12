@@ -273,7 +273,7 @@ class sharedFolder(models.Model):
     #AttributeError: module 'django.db.models' has no attribute 'charField'
     title = models.TextField(verbose_name="Shared Folder Title", max_length=100, default="sharedFolder")
     description = models.TextField(verbose_name="Shared Folder description")
-    created_date = models.DateTimeField()
+    created_date = models.DateTimeField(default= timezone.auto_now)
     owner = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="owner")
     collaborators = []
     collaborators.append(owner)
