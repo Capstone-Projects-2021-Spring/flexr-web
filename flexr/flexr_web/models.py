@@ -52,9 +52,10 @@ class Account(models.Model):
     account_id = models.AutoField(primary_key=True)
 
     def save(self,  *args, **kwargs):
+
         if self.pk is None: #new users
             self.account_preferences = Account_Preferences.objects.create()
-            super().save(*args, **kwargs)  # Call the "real" save() method.
+        super().save(*args, **kwargs)  # Call the "real" save() method.
 
     def __str__(self):
         return str(self.username) + " " + str(self.type_of_account)

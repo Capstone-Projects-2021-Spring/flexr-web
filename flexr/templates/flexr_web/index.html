@@ -37,10 +37,7 @@
             padding: 5%;
         }
         #plus-icon:hover{
-            height: 1%;
-            width: 1%;
             cursor: pointer;
-            stroke: white;
         }
         #account, #tab{
             text-align:center;
@@ -63,9 +60,10 @@
     <hr>
 
     <div id = "accounts">
-        <h2 style="display:inline;" >Accounts:</h2> <img id="plus-icon" data-toggle="modal" data-target="#exampleModal" src="{% static 'icons/plus-square.svg' %}">
+        <h2 style="display:inline;" >Accounts:</h2> <img id="plus-icon" data-toggle="modal" data-target="#add_account" src="{% static 'icons/plus-square.svg' %}">
         <div class = "row">
             {%for acc in Accounts%}
+
                 <div id = "account" class = "card col-lg-3" onclick="switch_account({{acc.account_id}})">
                     <h3  >{{acc}}</h3>
                 </div>
@@ -73,44 +71,42 @@
         </div>
     </div>
 
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="add_account" tabindex="-1" role="dialog" aria-labelledby="add_accountLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Add an account!</h5>
+            <h5 class="modal-title" id="add_accountLabel">Add an account!</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
-              <form>
-                  <label for = "username">Username</label>
-                  <input id = "username" type = "text">
-                  <br>
-                  <label for = "email">Email</label>
-                  <input id = "email" type = "email">
-                  <br>
-                  <label for = "phone">Phone Number</label>
-                  <input type="tel" id="phone" name="phone"
-                   pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
-                   required>
-                  <br>
-                  <label for = "type">Type of account</label>
-                  <select id = "type">
-                      <option>Hello</option>
-                  </select>
-                  <br>
-                  <div class="modal-footer">
+              <form method = "post" action="{% url 'add account' %}">
+                {% csrf_token %}
+                {% for field in form %}
+                    <p>
+                        {{ field.label_tag }}<br>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <small style="color: grey">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <p style="color: red">{{ error }}</p>
+                        {% endfor %}
+                    </p>
+                {% endfor %}
+
+                <!-- {{ form }} -->
+                <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary">Create account</button>
-                  </div>
-
-              </form>
+                </div>
+            </form>
           </div>
-
         </div>
       </div>
     </div>
+
     <div class = "tabs">
         <h2>Open tabs:</h2>
         <div class = "row">
