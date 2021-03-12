@@ -13,6 +13,10 @@ urlpatterns = [
     path('api/tabs/', AllTabsView.as_view()),
     path('api/tab/<id>', TabView.as_view()),
     path('api/tab/', TabView.as_view()),
+    path('create_note', create_note, name='create_note'),
+    path('opennote/<int:pk>/', note_individual_web.as_view(), name='note-detail'),
+
+
     #path('shared_folder/', ) TODO 
     # TODO For note.html
 ]
