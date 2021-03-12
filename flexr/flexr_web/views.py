@@ -16,6 +16,7 @@ from django.views import View
 
 
 from .models import *
+from .serializers import *
 # Create your views here.
 
 ################## Managing Website Pages ##################
@@ -226,11 +227,9 @@ def check_status(request):
 
 ##################  Managing Account ##################
 
-#TODO This needs to be turned into a class based view like the TabViews
-
 # def account_manager(request): # we should use these
 class AccountView(LoginRequiredMixin, DetailView):
-    def get(self, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         """
         Adds an account to the user's profile
               :param:
@@ -238,8 +237,20 @@ class AccountView(LoginRequiredMixin, DetailView):
               :return:
                   JSONRequest with requested account or an error message
         """
+        
+        account = request.user.accounts.filter(pk = kwargs["id"])
 
-    def switch_account(request):
+        # if empty
+        if not account:
+            return HttpResponse(f'Account with id={kwargs["id"]} not found.', status=404)
+
+        data = AccountSerializer(account[0])
+        return JsonResponse(data.data, safe=False)
+
+        
+    # TODO: Gerald
+    # Session keys
+    def patch(self, request, *args, **kwargs):
         """
         Switches the current account that the user is on. This data is stored in a django session key
               :param:
@@ -247,9 +258,20 @@ class AccountView(LoginRequiredMixin, DetailView):
               :return:
                   JSONRequest with success or error message
         """
-        return None
 
-    def add_account(request):
+
+        account = request.user.accounts.filter(pk = kwargs["id"])
+
+        # if empty
+        if not account:
+            return HttpResponse(f'Account with id={kwargs["id"]} not found.', status=404)
+
+        request.session["account_id"] = kwargs["id"]
+
+        return HttpResponse(f'Switched to Account {kwargs["id"]}')
+
+
+    def post(self, request, *args, **kwargs):
         """
         Adds an account to the user's profile
                :param:
@@ -257,9 +279,15 @@ class AccountView(LoginRequiredMixin, DetailView):
                :return:
                   JSONRequest with success or error message
         """
-        return None
+        data = request.POST.dict()
+        acc = Account.objects.create(user = request.user,  **data)
+        
+        if acc:
+            return HttpResponse("Account created.")
+        else:
+            return HttpResponse("Error occurred.", status=404)
 
-    def edit_account(request):
+    def put(self, request, *args, **kwargs):
         """
         Take in a form from the user that edits the information of the account
                :param:
@@ -267,9 +295,15 @@ class AccountView(LoginRequiredMixin, DetailView):
                :return:
                   JSONRequest with success or error message
         """
-        return None
+        data = json.loads(request.body)
+        result = request.user.accounts.filter(pk = kwargs["id"]).update(**data)
+        
+        if result:
+            return HttpResponse(f"Updated account with id: {kwargs['id']}")
+        else:
+            return HttpResponse(f"Account with id: {kwargs['id']} not found", status=404)
 
-    def delete_account(request):
+    def delete(self, request, *args, **kwargs):
         """
         Deletes an account from a user's profile
                    :param:
@@ -277,7 +311,13 @@ class AccountView(LoginRequiredMixin, DetailView):
                   :return:
                       JSONRequest with success or error message
         """
-        return None
+
+        result = request.user.accounts.get(pk = kwargs["id"]).delete()
+       
+        if result:
+            return HttpResponse(f"Deleted account with id: {kwargs['id']}")
+        else:
+            return HttpResponse(f"Account with id: {kwargs['id']} not found", status=404)
 
 ##################  Managing tabs  ##################
 
@@ -494,45 +534,84 @@ def remove_bookmark_from_shared_folder(request):
 # filtering on andriod side
 # need filtering for webclient also
 
-def get_history(request):
-    """
-    Gets all site history from the current account
-              Parameters:
-                  request.GET has an id for a site history
-              Returns:
-                  JSONRequest with success message and the SiteHistory instance or error message
-    """
-    return None
+class HistoryView(LoginRequiredMixin, DetailView):
 
-def filter_history(request):
-    """
-    Returns filtered all site history from the current account
-              Parameters:
-                  request.GET has a JSON object that has the filter type and typed
-              Returns:
-                  JSONRequest with success message and the SiteHistory objects or error message
-    """
-    return None
+    def get(self, request, *args, **kwargs):
+        url = request.path.split('/')
 
-def delete_history_range(request):
-    """
-    Deletes all history from a user within a given range
-              Parameters:
-                  request.DELETE has a JSON object that has a date range
-              Returns:
-                  JSONRequest with success message and the SiteHistory objects or error message
-    """
-    return None
+        if url[-1] == 'filter':
+            return self.filter_history(request, *args, **kwargs)
+        else:
+            return self.get_history(request, *args, **kwargs)
 
-def delete_all_history(request):
-    """
-    Deletes all history from a user
-              Parameters:
-                  request.DELETE
-              Returns:
-                  JSONRequest with success message or error message
-    """
-    return None
+
+
+    def get_history(self, request, *args, **kwargs):
+        """
+        Gets all site history from the current account
+                Parameters:
+                    request.GET has an id for a site history
+                Returns:
+                    JSONRequest with success message and the SiteHistory instance or error message
+        """
+        #print('test')
+        history = History.objects.filter(account = kwargs["id"])
+        data = HistorySerializer(history, many=True)
+        return JsonResponse(data.data, safe=False)
+
+    def filter_history(self, request, *args, **kwargs):
+        """
+        Returns filtered all site history from the current account
+                Parameters:
+                    request.GET has a JSON object that has the filter type and typed
+                Returns:
+                    JSONRequest with success message and the SiteHistory objects or error message
+        """
+
+        payload = request.GET.dict()
+        history = History.objects.filter(
+            account = kwargs["id"],
+            visit_datetime__gte=payload['datetime_from'],
+            visit_datetime__lte=payload['datetime_to'])
+        data = HistorySerializer(history, many=True)
+        return JsonResponse(data.data, safe=False)
+
+    def delete(self, request, *args, **kwargs):
+        url = request.path.split('/')
+
+        if url[-1] == 'filter':
+            return self.delete_history_range(request, *args, **kwargs)
+        else:
+            return self.delete_all_history(request, *args, **kwargs)
+
+    def delete_history_range(self, request, *args, **kwargs):
+        """
+        Deletes all history from a user within a given range
+                Parameters:
+                    request.DELETE has a JSON object that has a date range
+                Returns:
+                    JSONRequest with success message and the SiteHistory objects or error message
+        """
+        payload = json.loads(request.body)
+        history = History.objects.filter(
+            account = kwargs["id"],
+            visit_datetime__gte=payload['datetime_from'],
+            visit_datetime__lte=payload['datetime_to']).delete()
+
+        return HttpResponse(f'{history} History objects removed')
+
+    def delete_all_history(self, request, *args, **kwargs):
+        """
+        Deletes all history from a user
+                Parameters:
+                    request.DELETE
+                Returns:
+                    JSONRequest with success message or error message
+        """
+
+        history = History.objects.all().delete()
+
+        return HttpResponse(f'{history} History objects removed')
 
 
 ##################  Managing Bookmarks ##################
