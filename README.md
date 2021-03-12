@@ -47,4 +47,4 @@
 
 # Troubleshooting
 1. Django: OperationalError No Such Table
-   Fix: python manage.py migrate --run-syncdb
+      * Fix: python manage.py migrate --run-syncdb
