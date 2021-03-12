@@ -17,6 +17,7 @@ class Account(models.Model):
     # user.accounts.all() this is how you get all accounts within the user
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="accounts")  # not sure if this is how we do this
 
+    username = models.CharField(verbose_name="Username",max_length=15)
     # add a username?
 
     # check the snytax on the email field
@@ -34,14 +35,15 @@ class Account(models.Model):
                                                 ("Personal", "Personal"),
                                                 ("Kids", "Kids"),
                                                 ("Private", "Private"),
-                                                ("Other", "Other")))
+                                                ("Other", "Other")),
+                                        default = "Personal")
 
     # TODO add a default profile picture
     # profile_picture = models.ImageField(default="/static/img/profile_pic.jpg") # not sure if this is the correct path
     #TODO research what on_delete = models.CASCADE does
     #
     # not sure if next two should be foreignkeys
-    # suggested_sites = models.ForeignKey()  # TODO need to make a method for suggested_tabs
+    # suggested_sites = models.ForeignKey("Site", on_delete=models.CASCADE, related_name="suggested_sites", null = True)  # TODO need to make a method for suggested_tabs
     # current_tabs = models.ForeignKey() # TODO need a method for this
     teams = models.ManyToManyField("Team", blank=True, null = True) #I don't think this should be a manytomany field this should be a list of teams got by a method?
     friends = models.ManyToManyField("Account", blank=True, null = True) # this probably needs to be another table
@@ -50,14 +52,13 @@ class Account(models.Model):
     account_id = models.AutoField(primary_key=True)
 
     def save(self,  *args, **kwargs):
+
         if self.pk is None: #new users
             self.account_preferences = Account_Preferences.objects.create()
-            super().save(*args, **kwargs)  # Call the "real" save() method.
+        super().save(*args, **kwargs)  # Call the "real" save() method.
 
     def __str__(self):
-        return "UserID:" + str(self.user.id) + "." + str(self.account_id)+ " " + str(self.user.username) + " " + str(self.type_of_account)
-    # def __str__(self):
-    #     return str(self.user.first_name) + " " + str(self.user.last_name) + ": " + str(self.type_of_account)
+        return str(self.username) + " " + str(self.type_of_account)
 
 
 class Team(models.Model):
