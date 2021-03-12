@@ -39,12 +39,10 @@
     * more instructions to come once the Class based views are in place
 7. Test!!!
 
-
+# Troubleshooting
+1. Django: OperationalError No Such Table
+      * Fix: python manage.py migrate --run-syncdb
 
 # Project overview
 
 # Contributors
-
-# Troubleshooting
-1. Django: OperationalError No Such Table
-      * Fix: python manage.py migrate --run-syncdb
