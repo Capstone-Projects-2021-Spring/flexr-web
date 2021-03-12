@@ -16,7 +16,11 @@ urlpatterns = [
     path('create_note', create_note, name='create_note'),
     path('opennote/<int:pk>/', views.note_individual_web, name='note-detail'),
     path('delete-note/<int:pk>/', delete_note, name='delete_note'),
-
-    #path('shared_folder/', ) TODO 
+    path('api/account/<id>', AccountView.as_view()),
+    path('api/account/', AccountView.as_view()),
+    path('switch_account/<id>', views.switch_account, name = "switch account" ),
+    path('add_account/', views.add_account_web, name = "add account"),
+    path('edit_account/', views.edit_account_web, name="add account")
+    #path('shared_folder/', ) TODO
     # TODO For note.html
 ]
