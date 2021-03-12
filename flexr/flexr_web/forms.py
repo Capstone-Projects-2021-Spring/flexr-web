@@ -29,20 +29,3 @@ class registrationform(UserCreationForm):
             raise  ValidationError("Email already exists")
         return email
 
-
-choices=(("Business", "Business"),
-        ("Personal", "Personal"),
-        ("Kids", "Kids"),
-        ("Private", "Private"),
-        ("Other", "Other"))
-
-class AccountForm(forms.Form):
-    username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
-    email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}))
-    phone_number = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}), error_messages={'incomplete': 'Enter a phone number.'},
-                validators=[RegexValidator(r'^[0-9]+$', 'Enter a valid phone number.')])
-    type_of_account = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}), choices = choices)
-
-    class Meta:
-        model = Account
-        fields = ('username', 'email', 'phone_number', 'type_of_account')
