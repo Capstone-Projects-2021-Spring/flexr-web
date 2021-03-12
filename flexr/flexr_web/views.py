@@ -10,7 +10,7 @@ from pydoc import *
 import json
 from django.views.generic import *
 from django.http import QueryDict
-from .forms import registrationform
+from .forms import *
 from django.contrib.auth import authenticate, login
 from django.views import View
 
@@ -55,10 +55,13 @@ class IndexView(LoginRequiredMixin, View):
         devices = curr_account.devices.all()
         # suggested_sites = curr_account.suggested_sites()
         print(curr_user)
-        return render(self.request, "flexr_web/index.html", {"curr_acc": curr_account, "Accounts": accounts, "Sites": sites, "Tabs": tabs,
-                                                             "History": history, "Bookmarks": bookmarks,
-                                                             "Devices": devices})
 
+        form = AccountForm
+
+        return render(self.request, "flexr_web/index.html",
+                      {"curr_acc": curr_account, "Accounts": accounts, "Sites": sites, "Tabs": tabs,
+                       "History": history, "Bookmarks": bookmarks,
+                       "Devices": devices, "form": form})
 # @login_required()
 # def index(request):
 #     # account = serializers.serialize("json", Account.objects.all() )
@@ -114,6 +117,39 @@ def register_web(request):
         form = registrationform
     context = {'form' : form}
     return render(request, 'registration/register.html', context)
+
+def add_account_web(request):
+    if request.method == 'POST':
+        form = AccountForm(request.POST)
+        if form.is_valid():
+            username = request.POST.get('username')
+            print(username)
+            email = request.POST.get('email')
+            phone_number = request.POST.get('phone_number')
+            type_of_account = request.POST.get("type_of_account")
+
+            new_account = Account.objects.create(user=request.user, email=email, username = username, phone_number = phone_number, type_of_account = type_of_account)
+            new_account.save()
+            request.session['account_id'] = new_account.account_id
+            return redirect('/')
+
+def edit_account_web(request):
+    if request.method == 'POST':
+        form = AccountForm(request.POST)
+        if form.is_valid():
+            username = request.POST.get('username')
+            email = request.POST.get('email')
+            phone_number = request.POST.get('phone_number')
+            type_of_account = request.POST.get("type_of_account")
+            account = Account.objects.get(account_id = request.session['account_id'])
+            print(account)
+            account.username = username
+            account.email=email
+            account.phone_number = phone_number
+            account.type_of_account = type_of_account
+            account.save()
+
+            return redirect('/profile')
 
 @login_required
 def profile_web(request):
