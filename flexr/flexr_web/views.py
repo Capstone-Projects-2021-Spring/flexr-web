@@ -10,7 +10,7 @@ from pydoc import *
 import json
 from django.views.generic import *
 from django.http import QueryDict
-from .forms import registrationform
+from .forms import *
 from .note_form import notef
 from django.contrib.auth import authenticate, login
 from django.views import View
@@ -718,7 +718,7 @@ def create_note(request):
         form = notef(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('/')
+            return redirect('/notes')
     else:
         form = notef
     context = {'form' : form}
