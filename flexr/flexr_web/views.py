@@ -140,9 +140,6 @@ class note_individual_web(DetailView):
     template_name = 'flexr_web/note.html'
 
 
-    # return render(request, "flexr_web/note.html", )
-    
-
 @login_required
 def bookmarks_hub_web(request):
     return None
