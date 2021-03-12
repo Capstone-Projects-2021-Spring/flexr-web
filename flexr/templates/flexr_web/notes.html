@@ -13,11 +13,13 @@
     <hr>
     <h3>Notes:</h3>
     {%for note in Notes%}
-        <p>Title: {{note.title}}</p>
+        <p>title: <a href="{% url 'note-detail' note.pk%}"> 
+        {{note.title}}</a>
         <p>Created Date: {{note.created_date}}</p>
-        <p>Content: {{note.content}}</p>
+        <!-- <p>Content: {{note.content}}</p> -->
         <br>
     {%endfor%}
+    <a href="/create_note">create_note</a>
     <hr>
 
 </body>
