@@ -4,6 +4,7 @@
     {% load static %}
     <meta charset="UTF-8">
     <title>Flexr | Home</title>
+
     <script>
         async function switch_account(id){
             let csrftoken = getCookie('csrftoken');
@@ -127,6 +128,15 @@
         <h2>Recent Site history:</h2>
         {%for hist in History%}
             <h3>{{hist}}</h3>
+
+    <h1>Hello {{user}}, I am flexr</h1>
+     <h2>Accounts:</h2>
+    {%for acc in Accounts%}
+        <h3>{{acc}}</h3>
+    {%endfor%}
+    <h2>Devices:</h2>
+        {%for dev in Devices%}
+            <h3>{{dev}}</h3>
         {%endfor%}
     </div>
     <div clas = "suggest_sites">

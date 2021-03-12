@@ -28,7 +28,7 @@ class Account(models.Model):
                                  message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
     phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True)  # validators should be a list
 
-    date_joined = models.DateTimeField(auto_now=True)
+    date_joined = models.DateTimeField(default=timezone.now)
 
     type_of_account = models.CharField(verbose_name="Type of account", max_length=50,
                                        choices=(("Business", "Business"),
@@ -80,7 +80,7 @@ class Team(models.Model):
 class History(models.Model):
     site = models.ForeignKey("Site", on_delete=models.CASCADE, related_name="site_history")
     account = models.ForeignKey("Account", on_delete=models.CASCADE, related_name="history") # don't do foreignkey here make it so that there is a method that gets the account from the site
-    visit_datetime = models.DateTimeField(auto_now= True)
+    visit_datetime = models.DateTimeField(default=timezone.now)
 
     class Meta:
         verbose_name_plural = "histories"
@@ -95,8 +95,8 @@ class Site(models.Model):
     # maybe use validators instead?
     url = models.URLField()
 
-    first_visit = models.DateTimeField(auto_now=True) # need to put a method for this
-    last_visit = models.DateTimeField(auto_now=True) # need to put a method for this
+    first_visit = models.DateTimeField(default=timezone.now) # need to put a method for this
+    last_visit = models.DateTimeField(default=timezone.now) # need to put a method for this
     recent_frequency = models.IntegerField(default=0)  # number of visits in the last week #TODO need to write a method for this
     number_of_visits = models.IntegerField(default=1)  # keeps track of number of visits
     site_ranking = models.IntegerField(default=0) # uses a ranking algoithm to rank the sites
@@ -127,10 +127,10 @@ class Tab(models.Model):
     # should this be a one to many field?
     # I'm not sure if site is mapped here correctly
     site = models.ForeignKey(Site, on_delete=models.CASCADE, related_name="tabs") # you can have several tabs of the same site open
-    created_date = models.DateTimeField(auto_now = True)
+    created_date = models.DateTimeField(default=timezone.now)
     # the next two attributes are to suggest a closing of the tab
     # TODO we should implement a setting to have tabs automatically deleted after a certain amount of time
-    last_visited = models.DateTimeField(auto_now = True) #maybe add auto now to this
+    last_visited = models.DateTimeField(default=timezone.now) #maybe add auto now to this
     # TODO research if there is a way to make choice field more strict
     # TODO Have this be a choice field
     # TODO make the status of a tab calculated using a method
@@ -189,10 +189,10 @@ class Bookmark(models.Model):
 #     Does a bookmark need to be attached to an account or can it be standalone and the account just attaches to the bookmark
 #     should a bookmark model be mapped to a tab?
     bookmark_name = models.CharField(verbose_name= "Bookmark name", max_length=50)
-    created_date = models.DateTimeField(auto_now = True) #keeps track of creation date
+    created_date = models.DateTimeField(default=timezone.now) #keeps track of creation date
     # TODO research if the bookmark gets deleted if the site will then be deleted
     site = models.OneToOneField(Site, on_delete=models.CASCADE) #if the site gets deleted the bookmark gets deleted
-    last_visited = models.DateTimeField(auto_now = True) #keeps track of last visited date
+    last_visited = models.DateTimeField(default=timezone.now) #keeps track of last visited date
     recent_frequency = models.IntegerField(default=1) # number of visits in the last week
     number_of_visits = models.IntegerField(default=1)# keeps track of number of visits
 
