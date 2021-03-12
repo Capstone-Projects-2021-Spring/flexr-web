@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,13 +7,13 @@
 <body>
     <!-- TODO: verify Note.(something) will be work the way Preferences.(something) works in profile.html  --> 
     {% include "flexr_web/navbar.html" %}
-    <h1>Title: {{Note.title}} </h1>
-    <h2>Created: {{Note.created_date}}</h2>
-    {%if Note.lock%}
+    <h1>Title: {{object.title}} </h1>
+    <h2>Created: {{object.created_date}}</h2>
+    <!-- {%if Note.lock%}
         <h2>LOCKED.</h2>
-    {% endif%}
+    {% endif%} -->
     <h2>Content: </h2>
-    <h3>{{Note.content}}</h3>
+    <h3>{{object.content}}</h3>
 
 
 </body>

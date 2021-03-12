@@ -13,6 +13,8 @@ urlpatterns = [
     path('api/tabs/', AllTabsView.as_view()),
     path('api/tab/<id>', TabView.as_view()),
     path('api/tab/', TabView.as_view()),
+    path('create_note', create_note, name='create_note'),
+    path('opennote/<int:pk>/', note_individual_web.as_view(), name='note-detail'),
     path('api/account/<id>', AccountView.as_view()),
     path('api/account/', AccountView.as_view()),
     path('switch_account/<id>', views.switch_account, name = "switch account" ),

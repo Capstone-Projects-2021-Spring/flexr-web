@@ -10,7 +10,8 @@ from pydoc import *
 import json
 from django.views.generic import *
 from django.http import QueryDict
-from .forms import *
+from .forms import registrationform
+from .note_form import notef
 from django.contrib.auth import authenticate, login
 from django.views import View
 
@@ -186,9 +187,11 @@ def notes_hub_web(request):
     return render(request, "flexr_web/notes.html", {"Notes": notes, "Accounts": accounts})
 
 # need args
-@login_required
-def note_individual_web(request):
-    return None
+# @login_required
+class note_individual_web(DetailView):
+    model = Note
+    template_name = 'flexr_web/note.html'
+
 
 @login_required
 def bookmarks_hub_web(request):
@@ -707,6 +710,15 @@ def get_account_preferences(request):
 ##################  Managing Notes ##################
 
 def create_note(request):
+    if request.method == 'POST':
+        form = notef(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('/')
+    else:
+        form = notef
+    context = {'form' : form}
+    return render(request, 'flexr_web/add_note.html', context)
     """
        Creates note for the account
                   Parameters:
