@@ -15,15 +15,12 @@ class SiteInLine(admin.TabularInline):
 class BookmarkInLine(admin.TabularInline):
     model = Bookmark
 
-class DeviceInLine(admin.TabularInline):
-    model = Device
-
 class NoteInLine(admin.TabularInline):
     model = Note
 
 class AccountAdmin(admin.ModelAdmin):
     inlines = [
-        TabInLine, HistoryInLine, SiteInLine, BookmarkInLine, DeviceInLine, NoteInLine,
+        TabInLine, HistoryInLine, SiteInLine, BookmarkInLine, NoteInLine,
     ]
 
 class TabAdmin(admin.ModelAdmin):
@@ -36,6 +33,5 @@ admin.site.register(History)
 admin.site.register(Site)
 admin.site.register(Tab, TabAdmin)
 admin.site.register(Bookmark)
-admin.site.register(Device)
 admin.site.register(Account_Preferences)
 admin.site.register(Note)

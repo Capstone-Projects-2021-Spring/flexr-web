@@ -1,5 +1,6 @@
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django.forms import ModelForm
 
 from .models import *
 
@@ -32,8 +33,9 @@ class registrationform(UserCreationForm):
 
 choices=(("Business", "Business"),
         ("Personal", "Personal"),
-        ("Kids", "Kids"),
+        ("School", "School"),
         ("Private", "Private"),
+        ("Kids", "Kids"),
         ("Other", "Other"))
 
 class AccountForm(forms.Form):
@@ -46,3 +48,10 @@ class AccountForm(forms.Form):
     class Meta:
         model = Account
         fields = ('username', 'email', 'phone_number', 'type_of_account')
+
+
+class PreferencesForm(ModelForm):
+    class Meta:
+        model = Account_Preferences
+        # Make homepage a url field? may need to apppend https://www.
+        fields = ('home_page', 'sync_enabled', 'searchable_profile', 'cookies_enabled', 'popups_enabled', 'is_dark_mode')
