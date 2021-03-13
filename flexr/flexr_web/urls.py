@@ -21,8 +21,10 @@ urlpatterns = [
     path('switch_account/<id>', views.switch_account, name = "switch account" ),
     path('add_account/', views.add_account_web, name = "add account"),
     path('edit_account/', views.edit_account_web, name="add account"),
+    path('edit_preferences/', views.edit_account_preferences_web, name = "edit account preferences"),
     path('api/history/<id>', HistoryView.as_view()),
     path('api/history/<id>/filter', HistoryView.as_view()),
+
     #path('shared_folder/', ) TODO
     # TODO For note.html
 ]
