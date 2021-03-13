@@ -21,9 +21,10 @@
     <h3>Notes:</h3>
     {%for note in Notes%}
         <p>title: <a href="{% url 'note-detail' note.pk%}"> 
-        {{note.title}}</a>
+        {{note.title}}</a></p>
         <p>Created Date: {{note.created_date}}</p>
         <!-- <p>Content: {{note.content}}</p> -->
+        <a href="{% url 'delete_note' note.pk%}"><p>Delete Note</p> </a>
         <br>
     {%endfor%}
     Create Note <img id="plus-icon" data-toggle="modal" data-target="#add_note" src="{% static 'icons/plus-square.svg' %}">
