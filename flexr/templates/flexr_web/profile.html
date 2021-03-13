@@ -2,14 +2,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <title>Flexr | Profile</title>
+    <style>
+        #edit:hover{
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
     {% include "flexr_web/navbar.html" %}
     <h1>{{user.first_name}}&nbsp{{user.last_name}}&nbsp@{{user}}</h1>
     <h1>{{user.email}}</h1>
-    <h2 style="display:inline">{{current_account}}</h2><button style="display:inline;" data-toggle="modal" data-target="#view_account">Edit</button>
+    <h2 style="display:inline">{{current_account}}</h2><img id = "edit" src="{% static 'icons/pencil-square.svg'%}" data-toggle="modal" data-target="#view_account">
 
     <div class="modal fade" id="view_account" tabindex="-1" role="dialog" aria-labelledby="view_accountLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
@@ -44,7 +50,7 @@
 
                              <option value="--" disabled selected>--</option>
 
-                        <option value="Business">Business</option>
+                            <option value="Business">Business</option>
 
                           <option value="Personal">Personal</option>
 

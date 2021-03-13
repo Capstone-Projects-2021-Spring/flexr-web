@@ -10,7 +10,7 @@ from pydoc import *
 import json
 from django.views.generic import *
 from django.http import QueryDict
-from .forms import registrationform
+from .forms import *
 from .note_form import notef
 from django.contrib.auth import authenticate, login
 from django.views import View
@@ -54,13 +54,14 @@ class IndexView(LoginRequiredMixin, View):
         tabs = curr_account.tabs.all()
         bookmarks = curr_account.bookmarks.all()
         devices = curr_account.devices.all()
+        notes = curr_account.notes.all()
         # suggested_sites = curr_account.suggested_sites()
         print(curr_user)
 
         form = AccountForm
 
         return render(self.request, "flexr_web/index.html",
-                      {"curr_acc": curr_account, "Accounts": accounts, "Sites": sites, "Tabs": tabs,
+                      {"curr_acc": curr_account, "Accounts": accounts, "Sites": sites, "Tabs": tabs, "Notes": notes,
                        "History": history, "Bookmarks": bookmarks,
                        "Devices": devices, "form": form})
 # @login_required()
@@ -119,6 +120,7 @@ def register_web(request):
     context = {'form' : form}
     return render(request, 'registration/register.html', context)
 
+@login_required
 def add_account_web(request):
     if request.method == 'POST':
         form = AccountForm(request.POST)
@@ -134,6 +136,7 @@ def add_account_web(request):
             request.session['account_id'] = new_account.account_id
             return redirect('/')
 
+@login_required
 def edit_account_web(request):
     if request.method == 'POST':
         form = AccountForm(request.POST)
@@ -149,7 +152,7 @@ def edit_account_web(request):
             account.phone_number = phone_number
             account.type_of_account = type_of_account
             account.save()
-
+            # messages.add_message(request, , 'A serious error occurred.')
             return redirect('/profile')
 
 @login_required

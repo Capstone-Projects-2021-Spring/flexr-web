@@ -34,21 +34,40 @@
         }
     </script>
     <style>
+                /* The sidebar menu */
+        .sidenav {
+          text-align:center;
+          height: 100%; /* Full-height: remove this if you want "auto" height */
+          width: 13%; /* Set the width of the sidebar */
+          padding:1%;
+          position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+          z-index: 1; /* Stay on top */
+          top: 0; /* Stay at the top */
+          left: 0;
+          background-color: #d9d9d9; /* Black */
+          overflow-x: hidden; /* Disable horizontal scroll */
+          padding-top: 20px;
+        }
+
+    </style>
+    <style>
         body {
-            padding: 5%;
+            padding-left: 15%;
+            padding-right: 15%;
         }
         #plus-icon:hover{
             cursor: pointer;
         }
-        #account, #tab{
+        #account, #tab, #note, #site, #history {
             text-align:center;
             margin: 1%;
         }
-        #account:hover, #tab:hover{
+        #account:hover, #tab:hover, #note:hover, #site:hover, #history:hover{
             text-align:center;
-            border: 2px solid black;
+            border: 1px solid black;
             cursor: pointer;
         }
+
     </style>
 </head>
 
@@ -59,7 +78,6 @@
     </div>
     <h2>Current Account: {{curr_acc}}</h2>
     <hr>
-
     <div id = "accounts">
         <h2 style="display:inline;" >Accounts:</h2> <img id="plus-icon" data-toggle="modal" data-target="#add_account" src="{% static 'icons/plus-square.svg' %}">
         <div class = "row">
@@ -112,7 +130,7 @@
         <h2>Open tabs:</h2>
         <div class = "row">
             {%for tab in Tabs%}
-                <div id = "tab" class = "card col-lg-3"  onclick="window.open('{{tab.site.url}}')">
+                <div id = "tab" class = "card col-lg-4"  onclick="window.open('{{tab.site.url}}')">
                     <h3 >{{tab}}</h3>
                 </div>
             {%endfor%}
@@ -120,17 +138,39 @@
     </div>
     <div class = "notes">
         <h2>Recent Notes:</h2>
-        {%for note in Notes%}
-            <h3>{{note}</h3>
-        {%endfor%}
+        <div class = "row">
+            {%for note in Notes%}
+                <div id = "note" class = "card col-lg-3"  onclick="window.location.href = '/opennote/{{note.id}}'">
+                        <h3 >{{note}}</h3>
+                </div>
+            {%endfor%}
+        </div>
     </div>
     <div class = "history">
         <h2>Recent Site history:</h2>
         {%for hist in History%}
-            <h3>{{hist}}</h3>
+                <div id = "history" class = "card col-lg-4"  onclick="window.open('{{hist.site.url}}')">
+                        <h3 >{{hist.site.url}}</h3>
+                </div>
         {%endfor%}
     </div>
+    <div class = "suggested sidenav">
+        <h2>Suggested Sites:</h2>
+        {%for site in Sites%}
+                <div id = "site" class = "card col-lg-12"  onclick="window.open('{{site.url}}')">
+                        <p>{{site.url}}</p>
+                </div>
+            {%endfor%}
+    </div>
 
+     <div class = "shared_folders">
+        <h2>Shared folders:</h2>
+        {%for sf in Shared_folders%}
+                <div id = "sf" class = "card col-lg-3"  onclick="window.location.href = '/'">
+                        <p>{{sf}}</p>
+                </div>
+            {%endfor%}
+    </div>
 
 
 </body>
