@@ -58,11 +58,11 @@
         #plus-icon:hover{
             cursor: pointer;
         }
-        #account, #tab, #note, #site, #history {
+        #account, #tab, #note, #site, #history, #bookmark {
             text-align:center;
             margin: 1%;
         }
-        #account:hover, #tab:hover, #note:hover, #site:hover, #history:hover{
+        #account:hover, #tab:hover, #note:hover, #site:hover, #history:hover, #bookmark:hover{
             text-align:center;
             border: 1px solid black;
             cursor: pointer;
@@ -134,6 +134,16 @@
             {%for tab in Tabs%}
                 <div id = "tab" class = "card col-lg-4"  onclick="window.open('{{tab.site.url}}')">
                     <h3 >{{tab}}</h3>
+                </div>
+            {%endfor%}
+        </div>
+    </div>
+    <div class = "bookmarks">
+        <h2>Bookmarks:</h2>
+        <div class = "row">
+            {%for bm in Bookmarks%}
+                <div id = "bookmark" class = "card col-lg-4"  onclick="window.open('{{bm.site.url}}')">
+                    <h3 >{{bm}}</h3>
                 </div>
             {%endfor%}
         </div>

@@ -32,8 +32,9 @@ class registrationform(UserCreationForm):
 
 choices=(("Business", "Business"),
         ("Personal", "Personal"),
-        ("Kids", "Kids"),
+        ("School", "School"),
         ("Private", "Private"),
+        ("Kids", "Kids"),
         ("Other", "Other"))
 
 class AccountForm(forms.Form):

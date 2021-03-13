@@ -33,8 +33,9 @@ class Account(models.Model):
     type_of_account = models.CharField(verbose_name="Type of account", max_length=50,
                                        choices=(("Business", "Business"),
                                                 ("Personal", "Personal"),
-                                                ("Kids", "Kids"),
+                                                ("School", "School"),
                                                 ("Private", "Private"),
+                                                ("Kids", "Kids"),
                                                 ("Other", "Other")),
                                         default = "Personal")
 
