@@ -166,7 +166,27 @@ def profile_web(request):
     # acc_pref.home_page = site
     acc_pref.save()
     print(acc_pref)
-    return render(request, "flexr_web/profile.html", {"current_account":curr_account, "Accounts": accounts, "Preferences":acc_pref})
+    initial_dict = {
+        "home_page": curr_account.account_preferences.home_page,
+    }
+    pref_form = PreferencesForm(initial=initial_dict)
+    print(pref_form)
+    return render(request, "flexr_web/profile.html", {"current_account":curr_account, "Accounts": accounts, "Preferences":acc_pref, "pref_form": pref_form})
+
+def edit_account_preferences_web(request):
+    """
+       Edits account preferences for the account
+                  Parameters:
+                      request.PUT has a form for editing account preferences
+                  Returns:
+                      JSONRequest with success message and edited Account Preferences instance or error message
+    """
+    if request.method == 'POST':
+        form = PreferencesForm(request.POST)
+        if form.is_valid():
+            form.save()
+
+    return redirect('/profile')
 
 @login_required
 def shared_folders_web(request):
@@ -712,6 +732,7 @@ def create_note(request):
         form = notef(request.POST)
         print("Note made")
         if form.is_valid():
+            curr_acc = request.user.accounts.get(account_id = request.session['account_id'])
             form.save()
     return redirect('/notes')
     """

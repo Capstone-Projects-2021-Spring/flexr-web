@@ -166,10 +166,10 @@
                 </div>
         {%endfor%}
     </div>
-    <div class = "suggested sidenav">
+    <div class = "suggested">
         <h2>Suggested Sites:</h2>
         {%for site in Sites%}
-                <div id = "site" class = "card col-lg-12"  onclick="window.open('{{site.url}}')">
+                <div id = "site" class = "card col-lg-3"  onclick="window.open('{{site.url}}')">
                         <p>{{site.url}}</p>
                 </div>
             {%endfor%}

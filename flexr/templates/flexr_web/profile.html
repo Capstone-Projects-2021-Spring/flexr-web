@@ -76,16 +76,25 @@
         </div>
       </div>
     </div>
+    <hr>
 
-    <hr>
-    <hr>
     <h3>Account Preferences:</h3>
-    <p>Homepage: {{Preferences.home_page}}</p>
-    <p>Sync enabled: {{Preferences.sync_enabled}}</p>
-    <p>Searchable profile: {{Preferences.searchable_profile}}</p>
-    <p>Cookies enabled: {{Preferences.sync_enabled}}</p>
-    <p>Popups enabled: {{Preferences.popups_enabled}}</p>
-    <p>Darkmode enabled: {{Preferences.is_dark_mode}}</p>
-
+    <form method = "post" action="{% url 'edit account preferences' %}">
+                {% csrf_token %}
+                {% for field in pref_form %}
+                    <p>
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.help_text %}
+                            <small style="color: grey">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <p style="color: red">{{ error }}</p>
+                        {% endfor %}
+                    </p>
+                {% endfor %}
+                 <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
 </body>
 </html>
