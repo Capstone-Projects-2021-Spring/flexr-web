@@ -53,7 +53,6 @@ class IndexView(LoginRequiredMixin, View):
         sites = curr_account.sites.all()
         tabs = curr_account.tabs.all()
         bookmarks = curr_account.bookmarks.all()
-        devices = curr_account.devices.all()
         notes = curr_account.notes.all()
         # suggested_sites = curr_account.suggested_sites()
         print(curr_user)
@@ -63,7 +62,7 @@ class IndexView(LoginRequiredMixin, View):
         return render(self.request, "flexr_web/index.html",
                       {"curr_acc": curr_account, "Accounts": accounts, "Sites": sites, "Tabs": tabs, "Notes": notes,
                        "History": history, "Bookmarks": bookmarks,
-                       "Devices": devices, "form": form})
+                       "form": form})
 # @login_required()
 # def index(request):
 #     # account = serializers.serialize("json", Account.objects.all() )
@@ -86,7 +85,6 @@ class IndexView(LoginRequiredMixin, View):
 #     sites = curr_account.sites.all()
 #     tabs = curr_account.tabs.all()
 #     bookmarks = curr_account.bookmarks.all()
-#     devices = curr_account.devices.all()
 #
 #     print(curr_user)
 #     return render(request, "flexr_web/index.html", {"Accounts": accounts, "Sites": sites, "Tabs": tabs,
@@ -163,13 +161,12 @@ def profile_web(request):
     curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
     print(curr_account)
     accounts = curr_user.accounts.all()
-    devices = curr_account.devices.all()
     acc_pref = curr_account.account_preferences
     # site = curr_account.sites.all()[0]
     # acc_pref.home_page = site
     acc_pref.save()
     print(acc_pref)
-    return render(request, "flexr_web/profile.html", {"current_account":curr_account, "Accounts": accounts, "Devices": devices, "Preferences":acc_pref})
+    return render(request, "flexr_web/profile.html", {"current_account":curr_account, "Accounts": accounts, "Preferences":acc_pref})
 
 @login_required
 def shared_folders_web(request):
@@ -192,7 +189,9 @@ def notes_hub_web(request):
     print(curr_account)
     accounts = curr_user.accounts.all()
     notes = curr_account.notes.all()
-    return render(request, "flexr_web/notes.html", {"Notes": notes, "Accounts": accounts})
+    form = notef
+
+    return render(request, "flexr_web/notes.html", {"Notes": notes, "Accounts": accounts, 'form': form})
 
 # need args
 # @login_required
@@ -229,14 +228,6 @@ def active_tabs_web(request):
     tabs = curr_account.tabs.all()
     return render(request, "flexr_web/open_tabs.html", {"Tabs":tabs, "Accounts": accounts})
 
-@login_required
-def devices_web(request):
-    """
-    Creates the User in the database, allowing them to sign in
-            :param: request
-            :return: JsonResponse with success or error message
-    """
-    return None
 
 ################## REST API Endpoints ##################
 
@@ -720,13 +711,12 @@ def get_account_preferences(request):
 def create_note(request):
     if request.method == 'POST':
         form = notef(request.POST)
+        print("Note made")
         if form.is_valid():
             form.save()
-            return redirect('/')
-    else:
-        form = notef
-    context = {'form' : form}
-    return render(request, 'flexr_web/add_note.html', context)
+
+    return redirect('/')
+
     """
        Creates note for the account
                   Parameters:

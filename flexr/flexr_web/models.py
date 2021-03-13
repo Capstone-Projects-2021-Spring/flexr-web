@@ -205,20 +205,6 @@ class Bookmark(models.Model):
 #
 # What is the message handler?
 
-# this class may be pointless
-
-class Device(models.Model):
-    account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="devices")
-    name = models.CharField(verbose_name= "Device name", max_length=25)
-    # This could help with security?
-    date_added = models.DateTimeField(auto_now = True)
-    # type_of_device #thinking an option for desktop, mobile, tablet? don't know how this would be useful?
-    # status = models.CharField  # thinking a choice field here to say when the last time that a device was used
-    device_id = models.AutoField(primary_key = True)
-
-    def __str__(self):
-        return str(self.name)
-
 # Do we need security model? Could probably just put it in settings
 
 # need to make sure this deletes when account gets deleted
