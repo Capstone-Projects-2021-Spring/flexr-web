@@ -19,7 +19,7 @@ urlpatterns = [
     path('api/account/', AccountView.as_view()),
     path('switch_account/<id>', views.switch_account, name = "switch account" ),
     path('add_account/', views.add_account_web, name = "add account"),
-    path('edit_account/', views.edit_account_web, name="add account")
+    path('edit_account/', views.edit_account_web, name="edit account")
     #path('shared_folder/', ) TODO
     # TODO For note.html
 ]
