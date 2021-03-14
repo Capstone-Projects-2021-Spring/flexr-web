@@ -65,8 +65,6 @@ class AccountTestCase(TestCase):
             'date_joined': self.now.isoformat()[:-6] + 'Z', 
             'account_id': 1,
             'phone_number': '',
-            'teams': [],
-            'friends': [],
             'account_preferences': 1
         }
 

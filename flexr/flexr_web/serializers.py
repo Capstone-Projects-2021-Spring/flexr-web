@@ -6,7 +6,7 @@ class AccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
         fields = ['user', 'email', 'phone_number', 'date_joined', 'type_of_account', 
-        'teams', 'friends', 'account_preferences', 'account_id']
+        'account_preferences', 'account_id']
 
 class TabSerializer(serializers.ModelSerializer):
     class Meta:
