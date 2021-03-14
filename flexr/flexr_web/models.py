@@ -136,22 +136,31 @@ class Tab(models.Model):
 
     #TODO Check the functionality of the methods below. Should have been tested but double check
     @classmethod
-    def open_tab(cls, site_url,curr_account):
+    def open_tab(cls, site_url, curr_account, first_visit=None, last_visit=None, toSave=True):
+        if not first_visit:
+            first_visit = timezone.now()
+        if not last_visit:
+            last_visit = timezone.now()
+
+
         try: # checks to see if the site already exists and opens tab
-            site =  Site.objects.filter(account = curr_account).get(url = site_url)[0]
+            site =  Site.objects.filter(account = curr_account).get(url = site_url)
             site.visited()
-            tab = Tab.objects.create(account = curr_account, site = site, status = "open" )
-            tab.save()
-            history = History.objects.create(account = curr_account, site = site)
+            tab = Tab(account = curr_account, site = site, status = "open")
+            history = History.objects.create(account = curr_account, site = site, visit_datetime=last_visit)
             history.save()
-            return "successful"
+            
         except: # if site doesn't exist create it and create tab
-            site = Site.objects.create(account = curr_account , url = site_url)
-            tab = Tab.objects.create(account = curr_account, site = site, status = "open" )
-            tab.save()
-            history = History.objects.create(account=curr_account, site=site)
+            site = Site.objects.create(account = curr_account , url = site_url, 
+                first_visit=first_visit, last_visit=last_visit)
+            tab = Tab(account = curr_account, site = site, status = "open")
+            history = History.objects.create(account=curr_account, site=site, visit_datetime=last_visit)
             history.save()
-            return "successful"
+
+        if toSave:
+            super(Tab, tab).save()
+            
+        return tab
 
     @classmethod
     def close_tab(cls, tabID, curr_account):
@@ -180,6 +189,19 @@ class Tab(models.Model):
     def __str__(self):
         return str(self.site.url)
 
+    
+    def save(self, *args, **kwargs):
+        # call super method to create Tab entry
+        account = Account.objects.filter(pk = self.account_id)[0]
+        site =  Site.objects.filter(pk = self.site_id)[0]
+        tab = Tab.open_tab(site.url, account, self.created_date, self.last_visited, toSave=False)
+        super(Tab, self).save(*args, **kwargs)
+
+        # create corresponding site object
+
+
+
+        
 
 
 class Bookmark(models.Model):
@@ -237,7 +259,7 @@ class Note(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="notes")
     # title = models.CharField(verbose_name="Note title", max_length=100, default="note_"+str(datetime.date()))
     title = models.CharField(verbose_name="Note title", max_length=100, default="note")
-    created_date = models.DateTimeField(default= timezone.now())
+    created_date = models.DateTimeField(default= timezone.now)
     content = models.TextField(verbose_name= "Note content") # https://pypi.org/project/django-richtextfield/#field-widget-settings
     lock = models.BooleanField(verbose_name="Is note password protected?" , default=False)
     password = models.CharField(max_length=40, blank=True)

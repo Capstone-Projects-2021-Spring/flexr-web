@@ -15,18 +15,36 @@ class TabTestCase(TestCase):
         curr_user = User.objects.create_user('foo', 'myemail@test.com', 'bar')
         curr_user.save()
         curr_user = authenticate(username='foo', password='bar')
+        cls.now = datetime.datetime.now(tz=timezone.utc)
         acc = Account.objects.create(user = curr_user, email = "test@me.com", type_of_account = "Business")
         site = Site.objects.create(account = acc, url = "www.google.com")
-        tab = Tab.objects.create(account = acc, site = site, status = "Open")
+        tab = Tab.objects.create(account = acc, site = site, status = "Open", 
+            created_date = cls.now, last_visited = cls.now)
+
 
     def test_get_tab(self):
         c = Client()
         c.login(username='foo', password='bar')
-        c.get(path ="/api/tab/1")
+        c.get(path='/switch_account/1') # force account switch
+        result = c.get(path ="/api/tab/1")
+        data = json.loads(result.content)
+        
+        # remove timezone and then append 'Z' to match format
+        # hack to remove warning
+        data_expected = {
+            'account': 1, 
+            'site': 1, 
+            'created_date': self.now.isoformat()[:-6] + 'Z', 
+            'last_visited': self.now.isoformat()[:-6] + 'Z', 
+            'status': 'Open'
+        }
+
+        self.assertEqual(data, data_expected)
 
     def test_delete_tab(self):
         c = Client()
         c.login(username='foo', password='bar')
+        c.get(path='/switch_account/1') # force account switch
         c.delete(path = "/api/tab/1")
         tab_count = Tab.objects.all().count()
         self.assertEqual(tab_count, 0)
@@ -34,6 +52,7 @@ class TabTestCase(TestCase):
     def test_open_tab(self):
         c = Client()
         c.login(username='foo', password='bar')
+        c.get(path='/switch_account/1') # force account switch
         c.post("/api/tab/-1", {"url": "www.facebook.com"})
         tab_count = Tab.objects.all().count()
         self.assertEqual(tab_count, 2)
@@ -65,8 +84,6 @@ class AccountTestCase(TestCase):
             'date_joined': self.now.isoformat()[:-6] + 'Z', 
             'account_id': 1,
             'phone_number': '',
-            'teams': [],
-            'friends': [],
             'account_preferences': 1
         }
 
