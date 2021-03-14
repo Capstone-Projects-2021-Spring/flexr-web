@@ -327,6 +327,35 @@ def active_tabs_web(request):
     tabs = curr_account.tabs.all()
     return render(request, "flexr_web/open_tabs.html", {"Tabs":tabs, "Accounts": accounts})
 
+@login_required
+def add_bookmark_web(request, id):
+    curr_user = request.user
+    curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+    accounts = curr_user.accounts.all()
+    tabs = curr_account.tabs.all()
+
+    tab = curr_account.tabs.get(pk = id)
+    Bookmark.create_bookmark(tab, curr_account)
+
+    return render(request, "flexr_web/open_tabs.html", {"Tabs":tabs, "Accounts": accounts})
+
+def delete_bookmark_web(request, id):
+    curr_user = request.user
+    curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+    Bookmark.delete_bookmark(id)
+    bookmarks = curr_account.bookmarks.all()
+    return render(request, "flexr_web/bookmarks.html", {"Bookmarks": bookmarks})
+
+
+@login_required
+def bookmarks_web(request):
+    curr_user = request.user
+    curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+    bookmarks = curr_account.bookmarks.all()
+    return render(request, "flexr_web/bookmarks.html", {"Bookmarks": bookmarks})
+
+
+
 
 ################## REST API Endpoints ##################
 
