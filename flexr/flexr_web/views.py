@@ -147,7 +147,10 @@ def add_account_web(request):
 def edit_account_web(request):
     if request.method == 'POST':
         form = AccountForm(request.POST)
+        print(form.errors)
+
         if form.is_valid():
+
             username = request.POST.get('username')
             email = request.POST.get('email')
             phone_number = request.POST.get('phone_number')
@@ -160,6 +163,8 @@ def edit_account_web(request):
             account.type_of_account = type_of_account
             account.save()
             # messages.add_message(request, , 'A serious error occurred.')
+            #TODO make sure that we error check everything
+
             return redirect('/profile')
 
 @login_required
@@ -174,13 +179,26 @@ def profile_web(request):
     # site = curr_account.sites.all()[0]
     # acc_pref.home_page = site
     acc_pref.save()
-    print(acc_pref)
-    initial_dict = {
-        "home_page": curr_account.account_preferences.home_page,
-    }
-    pref_form = PreferencesForm(initial=initial_dict)
-    print(pref_form)
-    return render(request, "flexr_web/profile.html", {"current_account":curr_account, "Accounts": accounts, "Preferences":acc_pref, "pref_form": pref_form})
+    # print(acc_pref)
+    pref_form = PreferencesForm()
+    if(curr_account.account_preferences.home_page is not None):
+        pref_form.fields['home_page'].initial = curr_account.account_preferences.home_page
+        print(pref_form.fields['home_page'])
+    else:
+        pref_form.fields['home_page'].initial = Site.objects.all()[0]
+    pref_form.fields['home_page'].queryset = curr_account.sites.all() # have to be sure to only show that user's sites!
+
+    pref_form.fields['sync_enabled'].initial = curr_account.account_preferences.sync_enabled
+    pref_form.fields['searchable_profile'].initial = curr_account.account_preferences.searchable_profile
+    pref_form.fields['cookies_enabled'].initial = curr_account.account_preferences.cookies_enabled
+    pref_form.fields['popups_enabled'].initial = curr_account.account_preferences.popups_enabled
+    pref_form.fields['is_dark_mode'].initial = curr_account.account_preferences.is_dark_mode
+    account_form = AccountForm()
+    account_form.fields['username'].initial = curr_account.username
+    account_form.fields['email'].initial = curr_account.email
+    account_form.fields['phone_number'].initial = curr_account.phone_number
+    account_form.fields['type_of_account'].initial = curr_account.type_of_account
+    return render(request, "flexr_web/profile.html", {"current_account":curr_account, "Accounts": accounts, "Preferences":acc_pref, "pref_form": pref_form, "account_form": account_form})
 
 def edit_account_preferences_web(request):
     """
@@ -192,9 +210,23 @@ def edit_account_preferences_web(request):
     """
     if request.method == 'POST':
         form = PreferencesForm(request.POST)
-        if form.is_valid():
-            form.save()
 
+        # acc_pref.home_page = home_page
+        acc_pref.save()
+        print("acc_pref", acc_pref)
+        if form.is_valid():
+            home_page = request.POST.get('home_page')
+            acc =  request.user.accounts.get(account_id = request.session['account_id'])
+            acc_pref = acc.account_preferences
+            home_page = request.POST.get('home_page')
+            home_page = acc.sites.get(id=home_page)
+            acc_pref.sync_enabled = request.POST.get('sync_enabled')
+            acc_pref.searchable_profile = request.POST.get('searchable_profile')
+            acc_pref.cookies_enabled = request.POST.get('cookies_enabled')
+            acc_pref.popups_enabled = request.POST.get('popups_enabled')
+            acc_pref.is_dark_mode = request.POST.get('is_dark_mode')
+            acc_pref.save()
+            print("acc_pref", acc_pref)
     return redirect('/profile')
 
 @login_required

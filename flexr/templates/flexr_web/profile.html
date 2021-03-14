@@ -29,41 +29,19 @@
           <div class="modal-body">
               <form method="post" action="/edit_account/">
                    {% csrf_token %}
-                    <p>
-                        <label for="id_username">Username:</label><br>
-                        <input value = "{{current_account.username}}"type="text" name="username" class="form-control" required="" id="id_username">
-                    </p>
-
-                    <p>
-                        <label for="id_email">Email:</label><br>
-                        <input type="email" value = "{{current_account.email}}" name="email" class="form-control" required="" id="id_email">
-                    </p>
-
-                    <p>
-                        <label for="id_phone_number">Phone number:</label><br>
-                        <input type="text" value="{{current_account.phone_number}}" name="phone_number" class="form-control" required="" id="id_phone_number">
-                    </p>
-
-                    <p>
-                        <label for="id_type_of_account">Type of account:</label><br>
-                        <select name="type_of_account" value = "{{current_account.type_of_account}}"class="form-control" id="id_type_of_account">
-
-                             <option value="--" disabled selected>--</option>
-
-                            <option value="Business">Business</option>
-
-                          <option value="Personal">Personal</option>
-
-                          <option value="School">School</option>
-
-                          <option value="Private">Private</option>
-
-                            <option value="Kids">Kids</option>
-
-                          <option value="Other">Other</option>
-
-                        </select>
-                    </p>
+                          {% for field in account_form %}
+                        <p>
+                            {{ field.label_tag }}<br>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <small style="color: grey">{{ field.help_text }}</small>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <p style="color: red">{{ error }}</p>
+                            {% endfor %}
+                        </p>
+                    {% endfor %}
+<!--
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -80,21 +58,20 @@
 
     <h3>Account Preferences:</h3>
     <form method = "post" action="{% url 'edit account preferences' %}">
-                {% csrf_token %}
-                {% for field in pref_form %}
-                    <p>
-                        {{ field.label_tag }}
-                        {{ field }}
-                        {% if field.help_text %}
-                            <small style="color: grey">{{ field.help_text }}</small>
-                        {% endif %}
-                        {% for error in field.errors %}
-                            <p style="color: red">{{ error }}</p>
-                        {% endfor %}
-                    </p>
+        {% csrf_token %}
+        {% for field in pref_form %}
+            <p>
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.help_text %}
+                    <small style="color: grey">{{ field.help_text }}</small>
+                {% endif %}
+                {% for error in field.errors %}
+                    <p style="color: red">{{ error }}</p>
                 {% endfor %}
-                 <button type="submit" class="btn btn-primary">Save changes</button>
-                </div>
-            </form>
+            </p>
+        {% endfor %}
+         <button type="submit" class="btn btn-primary">Save changes</button>
+    </form>
 </body>
 </html>
