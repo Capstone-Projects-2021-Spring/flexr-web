@@ -856,15 +856,24 @@ def get_account_preferences(request):
 ##################  Managing Notes ##################
 
 def create_note(request):
+
     if request.method == 'POST':
         form = notef(request.POST)
-        print("Note made")
+        # print("Note made")
         if form.is_valid():
-            curr_acc = request.user.accounts.get(account_id = request.session['account_id'])
+            acc = request.user.accounts.get(account_id = request.session['account_id'])
+            tit = request.POST.get('title')
+            cont = request.POST.get('content')
+            lo = request.POST.get('lock')
+            if lo == 'on':
+                lo = True
+            else:
+                lo = False
+            passw = request.POST.get('password')
+            newnote = Note.objects.create(account=acc, title=tit, content=cont, lock=lo, password=passw)
+            newnote.save()
+            return redirect('/notes')
 
-            form.save()
-            request.session['message'] = "Note created"
-    return redirect('/notes')
     """
        Creates note for the account
                   Parameters:
