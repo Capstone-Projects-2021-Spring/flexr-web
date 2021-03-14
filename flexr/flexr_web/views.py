@@ -257,11 +257,11 @@ def notes_hub_web(request):
 # need args
 @login_required
 def note_individual_web(request, pk):
-    obj = Note.objects.get(pk=pk)
     curr_user = request.user
     print(curr_user)
     curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
     print(curr_account)
+    obj = curr_account.notes.get(pk=pk)
     accounts = curr_user.accounts.all()
     form = EditNoteForm()
     form.fields['title'].initial = obj.title
@@ -887,16 +887,20 @@ def delete_note(request, pk):
     return None
 
 def edit_note(request, pk):
-    obj = Note.objects.get(pk=pk)
     if request.method == 'POST':
         form = EditNoteForm(request.POST)
         print("Note edited")
         if form.is_valid():
-            curr_acc = request.user.accounts.get(account_id = request.session['account_id'])
-
-            form.save()
-    obj.save()
-    return redirect('/notes')
+            title = request.POST.get('title')
+            created_date = request.POST.get('created_date')
+            content = request.POST.get('content')
+            curr_acc = Account.objects.get(account_id = request.session['account_id'])
+            obj = curr_acc.notes.get(pk=pk)
+            obj.title = title
+            obj.created_date = created_date
+            obj.content = content
+            obj.save()
+    return redirect('/notes/')
     """
        Edit note for the account
                   Parameters:

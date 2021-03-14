@@ -38,7 +38,7 @@
             </button>
           </div>
           <div class="modal-body">
-                <form method = "POST" action="{% url 'create_note' %}">
+                <form method = "POST" action="{% url 'edit_note' object.pk%}">
                         {% csrf_token %}
                         {% for field in form %}
                         <p>
