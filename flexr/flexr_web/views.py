@@ -178,14 +178,14 @@ def profile_web(request):
     acc_pref = curr_account.account_preferences
     # site = curr_account.sites.all()[0]
     # acc_pref.home_page = site
-    acc_pref.save()
+
     # print(acc_pref)
     pref_form = PreferencesForm()
     if(curr_account.account_preferences.home_page is not None):
         pref_form.fields['home_page'].initial = curr_account.account_preferences.home_page
         print(pref_form.fields['home_page'])
     else:
-        pref_form.fields['home_page'].initial = Site.objects.all()[0]
+        pref_form.fields['home_page'].initial = Site.objects.all()[0] #This isn't good for a first time user
     pref_form.fields['home_page'].queryset = curr_account.sites.all() # have to be sure to only show that user's sites!
 
     pref_form.fields['sync_enabled'].initial = curr_account.account_preferences.sync_enabled
@@ -193,6 +193,7 @@ def profile_web(request):
     pref_form.fields['cookies_enabled'].initial = curr_account.account_preferences.cookies_enabled
     pref_form.fields['popups_enabled'].initial = curr_account.account_preferences.popups_enabled
     pref_form.fields['is_dark_mode'].initial = curr_account.account_preferences.is_dark_mode
+
     account_form = AccountForm()
     account_form.fields['username'].initial = curr_account.username
     account_form.fields['email'].initial = curr_account.email
@@ -210,21 +211,20 @@ def edit_account_preferences_web(request):
     """
     if request.method == 'POST':
         form = PreferencesForm(request.POST)
-
-        # acc_pref.home_page = home_page
-        acc_pref.save()
-        print("acc_pref", acc_pref)
+        # TODO add in checking for dashes!
+        print(form.errors) # TODO <ul class="errorlist"><li>home_page<ul class="errorlist"><li>Account_ preferences with this Home page already exists.</li></ul></li></ul>
         if form.is_valid():
             home_page = request.POST.get('home_page')
             acc =  request.user.accounts.get(account_id = request.session['account_id'])
             acc_pref = acc.account_preferences
             home_page = request.POST.get('home_page')
             home_page = acc.sites.get(id=home_page)
-            acc_pref.sync_enabled = request.POST.get('sync_enabled')
-            acc_pref.searchable_profile = request.POST.get('searchable_profile')
-            acc_pref.cookies_enabled = request.POST.get('cookies_enabled')
-            acc_pref.popups_enabled = request.POST.get('popups_enabled')
-            acc_pref.is_dark_mode = request.POST.get('is_dark_mode')
+            print(request.POST.get('sync_enabled'))
+            # acc_pref.sync_enabled = request.POST.get('sync_enabled')
+            # acc_pref.searchable_profile = request.POST.get('searchable_profile')
+            # acc_pref.cookies_enabled = request.POST.get('cookies_enabled')
+            # acc_pref.popups_enabled = request.POST.get('popups_enabled')
+            # acc_pref.is_dark_mode = request.POST.get('is_dark_mode')
             acc_pref.save()
             print("acc_pref", acc_pref)
     return redirect('/profile')
@@ -851,6 +851,7 @@ def create_note(request):
         print("Note made")
         if form.is_valid():
             curr_acc = request.user.accounts.get(account_id = request.session['account_id'])
+
             form.save()
     return redirect('/notes')
     """
