@@ -12,13 +12,17 @@
 
     <hr>
     <h3>Open Tabs:</h3>
-    {%for tab in Tabs%}
-        <p>Tab: <a href="{{tab.site.url}}">{{tab.site.url}}</a></p>
-        <p>Created Date: {{tab.created_date}}</p>
-        <p>Last Visited: {{tab.last_visited}}</p>
-        <p>Status: {{tab.status}}</p>
-        <br>
-    {%endfor%}
+    <div class = "row">
+        {%for tab in Tabs%}
+
+                <div class = "card col-lg-3">
+                    <p><a href="{{tab.site.url}}">{{tab.site.url}}</a></p>
+                    <p>Created Date: {{tab.created_date}}</p>
+                    <p>Last Visited: {{tab.last_visited}}</p>
+                </div>
+
+        {%endfor%}
+    </div>
     <hr>
 
 </body>
