@@ -55,3 +55,15 @@ class PreferencesForm(ModelForm):
         model = Account_Preferences
         # Make homepage a url field? may need to apppend https://www.
         fields = ('home_page', 'sync_enabled', 'searchable_profile', 'cookies_enabled', 'popups_enabled', 'is_dark_mode')
+
+class FilterHistoryForm(forms.Form):
+    start_date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
+    start_time = forms.DateField(widget=forms.widgets.TimeInput(attrs={'type': 'time'}))
+    end_date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
+    end_time = forms.DateField(widget=forms.widgets.TimeInput(attrs={'type': 'time'}))
+
+
+    class Meta:
+        pass
+        #fields = ['start_date']
+        #widgets = {'start_date': forms.DateInput()}

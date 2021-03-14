@@ -18,6 +18,7 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from .models import *
 from .serializers import *
+import pytz
 # Create your views here.
 
 ################## Managing Website Pages ##################
@@ -243,7 +244,42 @@ def browsing_history_web(request):
     print(curr_account)
     accounts = curr_user.accounts.all()
     history = curr_account.history.all()
-    return render(request, "flexr_web/browsing_history.html", {"History": history, "Accounts": accounts})
+    form = FilterHistoryForm
+    
+    return render(request, "flexr_web/browsing_history.html", {"History": history, "Accounts": accounts, "form": form})
+
+@login_required
+def browsing_history_filter(request):
+    curr_user = request.user
+    curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+    accounts = curr_user.accounts.all()
+    form = FilterHistoryForm
+
+    # grab date and time information from POST form
+    start_date = request.POST['start_date']
+    start_time = request.POST['start_time']
+    end_date = request.POST['end_date']
+    end_time = request.POST['end_time']
+
+    # concat to datetime format
+    start_datetime = start_date + ' ' + start_time
+    end_datetime = end_date + ' ' + end_time
+
+    # construct datetime object with timezone
+    # TODO: Gerald check that timezone's work correctly
+    start = datetime.strptime(start_datetime, '%Y-%m-%d %H:%M').replace(tzinfo = pytz.UTC)
+    end = datetime.strptime(end_datetime, '%Y-%m-%d %H:%M').replace(tzinfo = pytz.UTC)
+    
+
+    # filter history based on given state and end datetimes
+    history = curr_account.history.filter(
+        visit_datetime__gte=start,
+        visit_datetime__lte=end
+    )
+
+    # this returns a new webpage, but probably shouldn't
+    # can we just edit the current webpage?
+    return render(request, "flexr_web/browsing_history.html", {"History": history, "Accounts": accounts, "form": form})
 
 @login_required
 def active_tabs_web(request):

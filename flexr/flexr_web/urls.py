@@ -24,6 +24,7 @@ urlpatterns = [
     path('edit_preferences/', views.edit_account_preferences_web, name = "edit account preferences"),
     path('api/history/<id>', HistoryView.as_view()),
     path('api/history/<id>/filter', HistoryView.as_view()),
+    path('filter_history/', views.browsing_history_filter, name = "filter history")
 
     #path('shared_folder/', ) TODO
     # TODO For note.html
