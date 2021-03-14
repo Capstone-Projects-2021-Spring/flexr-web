@@ -549,8 +549,20 @@ class TabView(LoginRequiredMixin, DetailView):
         curr_account = curr_user.accounts.get(account_id=self.request.session['account_id'])
         message = "sucess"
         site_url = request.POST.get("url")
+        print(request.POST)
         tab = Tab.open_tab(site_url = site_url, curr_account= curr_account)
         return HttpResponse(message)
+
+
+def add_tab(request):
+    curr_user = request.user
+    curr_account = curr_user.accounts.get(account_id= request.session['account_id'])
+    message = ""
+    site_url = request.POST.get("url")
+    print(request.POST)
+    tab = Tab.open_tab(site_url = site_url, curr_account=curr_account)
+    request.session['message'] = "Add Tab"
+    return redirect('/')
 
 
 ################## Managing shared folders ##################
