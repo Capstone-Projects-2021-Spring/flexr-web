@@ -25,21 +25,7 @@ import pytz
 
 class IndexView(LoginRequiredMixin, View):
     def get(self, *args, **kwargs):
-        # account = serializers.serialize("json", Account.objects.all() )
-        # print("Account: ", account)
-        # sites = serializers.serialize("json", account.sites.all())
-        # print("Sites: ", sites)
-        # tab = serializers.serialize("json", account.tabs.all())
-        # print("Tabs: ", tab)
-        # history = account.history.all()[0] #serializers.serialize("json", account.history.all()[0])
-        # print(history)
-        # print(history.site)
-        # print(history.site.site_ranking)
-        # return HttpResponse(account, sites, tab, history)
-        # response = JsonResponse({'account': account, "sites": sites,
-        #                          "tab": tab, "history": history})
         curr_user = self.request.user
-
         try:
             print("IndexView curr_user")
             curr_account = curr_user.accounts.get(account_id = self.request.session['account_id'])
@@ -49,7 +35,6 @@ class IndexView(LoginRequiredMixin, View):
             self.request.session['account_id'] = curr_account.account_id
             print("IndexView: Account initialized:" )
 
-
         accounts = curr_user.accounts.all()
         history = curr_account.history.all()
         sites = curr_account.sites.all()
@@ -58,50 +43,36 @@ class IndexView(LoginRequiredMixin, View):
         notes = curr_account.notes.all()
         # suggested_sites = curr_account.suggested_sites()
         print(curr_user)
-        if ('account_message' in self.request.session):
-            message = self.request.session['account_message']
-            print("message")
-            del self.request.session['account_message']
+        if ('message' in self.request.session):
+            message = self.request.session['message']
+            del self.request.session['message']
             messages.success(self.request, message)
+        elif('err_message' in self.request.session):
+            message = self.request.session['err_message']
+            del self.request.session['err_message']
+            messages.error(self.request, message)
         print("reached")
-
         form = AccountForm
         return render(self.request, "flexr_web/index.html",
                       {"curr_acc": curr_account, "Accounts": accounts, "Sites": sites, "Tabs": tabs, "Notes": notes,
                        "History": history, "Bookmarks": bookmarks,
                        "form": form})
-# @login_required()
-# def index(request):
-#     # account = serializers.serialize("json", Account.objects.all() )
-#     # print("Account: ", account)
-#     # sites = serializers.serialize("json", account.sites.all())
-#     # print("Sites: ", sites)
-#     # tab = serializers.serialize("json", account.tabs.all())
-#     # print("Tabs: ", tab)
-#     # history = account.history.all()[0] #serializers.serialize("json", account.history.all()[0])
-#     # print(history)
-#     # print(history.site)
-#     # print(history.site.site_ranking)
-#     # return HttpResponse(account, sites, tab, history)
-#     # response = JsonResponse({'account': account, "sites": sites,
-#     #                          "tab": tab, "history": history})
-#     curr_user = request.user
-#     curr_account = curr_user.accounts.all()[0]
-#     accounts = curr_user.accounts.all()
-#     history = curr_account.history.all()
-#     sites = curr_account.sites.all()
-#     tabs = curr_account.tabs.all()
-#     bookmarks = curr_account.bookmarks.all()
-#
-#     print(curr_user)
-#     return render(request, "flexr_web/index.html", {"Accounts": accounts, "Sites": sites, "Tabs": tabs,
-#
 
 @csrf_exempt
 def switch_account(request,*args, **kwargs):
-    request.session['account_id'] = kwargs["id"]
-    print("switching account....")
-    request.session['account_message'] = "Account Switched"
+
+    #TODO implement these request messages for every call to change something in database
+    #This will be usefull for testing
+    try:
+
+        request.user.accounts.get(account_id = kwargs["id"])
+        print("switching account....")
+        request.session['message'] = "Account Switched"
+        request.session['account_id'] = kwargs["id"]
+    except:
+        print("error switching account....")
+        request.session['err_message'] = "Error switching account"
+
     return HttpResponseRedirect('/')
 
 def login_web(request):
@@ -141,6 +112,7 @@ def add_account_web(request):
             new_account = Account.objects.create(user=request.user, email=email, username = username, phone_number = phone_number, type_of_account = type_of_account)
             new_account.save()
             request.session['account_id'] = new_account.account_id
+            request.session['message'] = "Account Created"
             return redirect('/')
 
 @login_required
@@ -150,7 +122,6 @@ def edit_account_web(request):
         print(form.errors)
 
         if form.is_valid():
-
             username = request.POST.get('username')
             email = request.POST.get('email')
             phone_number = request.POST.get('phone_number')
@@ -164,7 +135,7 @@ def edit_account_web(request):
             account.save()
             # messages.add_message(request, , 'A serious error occurred.')
             #TODO make sure that we error check everything
-
+            request.session['message'] = "Account Edited"
             return redirect('/profile')
 
 @login_required
@@ -199,8 +170,20 @@ def profile_web(request):
     account_form.fields['email'].initial = curr_account.email
     account_form.fields['phone_number'].initial = curr_account.phone_number
     account_form.fields['type_of_account'].initial = curr_account.type_of_account
+
+    if ('message' in request.session):
+        message = request.session['message']
+        del request.session['message']
+        messages.success(request, message)
+    elif ('err_message' in request.session):
+        message = request.session['err_message']
+        del request.session['err_message']
+        messages.error(request, message)
+
     return render(request, "flexr_web/profile.html", {"current_account":curr_account, "Accounts": accounts, "Preferences":acc_pref, "pref_form": pref_form, "account_form": account_form})
 
+CHECKBOX_MAPPING = {'on':True,
+                    None:False,}
 def edit_account_preferences_web(request):
     """
        Edits account preferences for the account
@@ -210,23 +193,27 @@ def edit_account_preferences_web(request):
                       JSONRequest with success message and edited Account Preferences instance or error message
     """
     if request.method == 'POST':
+        acc = request.user.accounts.get(account_id=request.session['account_id'])
+        # acc_pref = acc.account_preferences
+        # acc_pref.delete()
         form = PreferencesForm(request.POST)
         # TODO add in checking for dashes!
+        # This error below is gone bc I no longer check if form is valid
         print(form.errors) # TODO <ul class="errorlist"><li>home_page<ul class="errorlist"><li>Account_ preferences with this Home page already exists.</li></ul></li></ul>
-        if form.is_valid():
-            home_page = request.POST.get('home_page')
-            acc =  request.user.accounts.get(account_id = request.session['account_id'])
-            acc_pref = acc.account_preferences
-            home_page = request.POST.get('home_page')
-            home_page = acc.sites.get(id=home_page)
-            print(request.POST.get('sync_enabled'))
-            # acc_pref.sync_enabled = request.POST.get('sync_enabled')
-            # acc_pref.searchable_profile = request.POST.get('searchable_profile')
-            # acc_pref.cookies_enabled = request.POST.get('cookies_enabled')
-            # acc_pref.popups_enabled = request.POST.get('popups_enabled')
-            # acc_pref.is_dark_mode = request.POST.get('is_dark_mode')
-            acc_pref.save()
-            print("acc_pref", acc_pref)
+
+        home_page = request.POST.get('home_page')
+        acc_pref = acc.account_preferences
+        home_page = acc.sites.get(id=home_page)
+        acc_pref.home_page = home_page
+        acc_pref.sync_enabled = CHECKBOX_MAPPING[request.POST.get('sync_enabled')]
+        acc_pref.searchable_profile = CHECKBOX_MAPPING[request.POST.get('searchable_profile')]
+        acc_pref.cookies_enabled = CHECKBOX_MAPPING[request.POST.get('cookies_enabled')]
+        acc_pref.popups_enabled = CHECKBOX_MAPPING[request.POST.get('popups_enabled')]
+        acc_pref.is_dark_mode = CHECKBOX_MAPPING[request.POST.get('is_dark_mode')]
+        acc_pref.save()
+        print(acc_pref.sync_enabled)
+        print("acc_pref", acc_pref)
+        request.session['message'] = "Account Preferences Saved"
     return redirect('/profile')
 
 @login_required
@@ -251,6 +238,14 @@ def notes_hub_web(request):
     accounts = curr_user.accounts.all()
     notes = curr_account.notes.all()
     form = notef
+    if ('message' in request.session):
+        message = request.session['message']
+        del request.session['message']
+        messages.success(request, message)
+    elif ('err_message' in request.session):
+        message = request.session['err_message']
+        del request.session['err_message']
+        messages.error(request, message)
 
     return render(request, "flexr_web/notes.html", {"Notes": notes, "Accounts": accounts, 'form': form})
 
@@ -474,7 +469,7 @@ class AllTabsView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         curr_user = self.request.user
-        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+        curr_account = curr_user.accounts.get(account_id = self.request.session['account_id'])
         return Tab.objects.filter(account = curr_account)
 
     def get(self, *args, **kwargs):
@@ -495,7 +490,7 @@ class TabView(LoginRequiredMixin, DetailView):
 
     def get_queryset(self):
         curr_user = self.request.user
-        curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
+        curr_account = curr_user.accounts.get(account_id= self.request.session['account_id'])
         return Tab.objects.filter(account = curr_account)
 
     # This method is used to get a single tab
@@ -853,6 +848,7 @@ def create_note(request):
             curr_acc = request.user.accounts.get(account_id = request.session['account_id'])
 
             form.save()
+            request.session['message'] = "Note created"
     return redirect('/notes')
     """
        Creates note for the account

@@ -66,8 +66,12 @@
 </nav>
   {% if messages %}
     {% for message in messages%}
-        <script>toastr.success('{{message}}')</script>
 
+        {% if message.tags == "success"%}
+            <script>toastr.success('{{message}}')</script>
+        {% elif message.tags == "error"%}
+            <script>toastr.error('{{message}}')</script>
+        {%endif%}
     {%endfor%}
   {%endif %}
 </html>
