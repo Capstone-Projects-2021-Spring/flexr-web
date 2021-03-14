@@ -156,7 +156,12 @@ def profile_web(request):
         pref_form.fields['home_page'].initial = curr_account.account_preferences.home_page
         print(pref_form.fields['home_page'])
     else:
-        pref_form.fields['home_page'].initial = Site.objects.all()[0] #This isn't good for a first time user
+        try:
+            pref_form.fields['home_page'].initial = curr_account.sites.all()[0] #This isn't good for a first time user
+        except:
+            site = Site.objects.create(account = curr_account, url = "https://google.com")
+            site.save()
+            pref_form.fields['home_page'].initial = site
     pref_form.fields['home_page'].queryset = curr_account.sites.all() # have to be sure to only show that user's sites!
 
     pref_form.fields['sync_enabled'].initial = curr_account.account_preferences.sync_enabled

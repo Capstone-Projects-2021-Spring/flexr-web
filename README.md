@@ -42,6 +42,10 @@
 # Troubleshooting
 1. Django: OperationalError No Such Table
       * Fix: python manage.py migrate --run-syncdb
+2. Failed to build crpytography
+      * Fix: pip3 install hiredis
+      * In requirements.txt: change cryptography to 3.1.1
+      * In requirements.txt: change Twisted to 20.3.0
 
 # Project overview
 

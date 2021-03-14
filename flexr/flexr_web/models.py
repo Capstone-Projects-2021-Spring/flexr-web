@@ -84,9 +84,10 @@ class History(models.Model):
 
 
 class Site(models.Model):
+    name = models.CharField(max_length=50)
     account = models.ForeignKey("Account", on_delete=models.CASCADE, related_name="sites") #this collection of sites is the history
 
-    url = models.URLField()
+    url = models.URLField(max_length=2500)
 
     first_visit = models.DateTimeField(default=timezone.now) # need to put a method for this
     last_visit = models.DateTimeField(default=timezone.now) # need to put a method for this
@@ -112,8 +113,21 @@ class Site(models.Model):
     #     else:
     #         return 0 #Should never get to this point, but if there are more reecent visits than total visits, this must be the highest ranked site
 
+    def save(self, *args, **kwargs):
+        # call super method to create Tab entry
+        print("URL: ", )
+        url1 = str(self.url).split('?')[0]
+        url2 = url1.split('/')
+        print("URL: ", url1 )
+        try:
+            self.name = url2[2] + "/" + url2[3]
+        except:
+            self.name = url2[2]
+
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return str(self.url)
+        return str(self.name)
     #TODO  make it so that the site creates an instance of browsing history on first call. Need to set up chain reactions for site history
 
 # when a site is visited the url of the site will be used to search through all tabs
@@ -141,7 +155,6 @@ class Tab(models.Model):
             first_visit = timezone.now()
         if not last_visit:
             last_visit = timezone.now()
-
 
         try: # checks to see if the site already exists and opens tab
             site =  Site.objects.filter(account = curr_account).get(url = site_url)
