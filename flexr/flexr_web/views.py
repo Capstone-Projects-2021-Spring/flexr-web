@@ -538,9 +538,9 @@ class TabView(LoginRequiredMixin, DetailView):
         #print(self.request.session)
         curr_user = self.request.user
         curr_account = curr_user.accounts.get(account_id=self.request.session['account_id'])
-        message = ""
+        message = "sucess"
         site_url = request.POST.get("url")
-        message = Tab.open_tab(site_url = site_url, curr_account= curr_account)
+        tab = Tab.open_tab(site_url = site_url, curr_account= curr_account)
         return HttpResponse(message)
 
 
