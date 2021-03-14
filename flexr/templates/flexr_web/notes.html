@@ -3,6 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Flexr | Notes</title>
+    {% load static %}
+    <style>
+        #plus-icon:hover{
+            cursor: pointer;
+        }
+
+    </style>
 </head>
 <body>
     {% include "flexr_web/navbar.html" %}
@@ -20,7 +27,41 @@
         <a href="{% url 'delete_note' note.pk%}"><p>Delete Note</p> </a>
         <br>
     {%endfor%}
-    <a href="/create_note">create_note</a>
+    Create Note <img id="plus-icon" data-toggle="modal" data-target="#add_note" src="{% static 'icons/plus-square.svg' %}">
+
+    <div class="modal fade" id="add_note" tabindex="-1" role="dialog" aria-labelledby="add_noteLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="add_noteLabel">Add a note!</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+                <form method = "POST" action="{% url 'create_note' %}">
+                        {% csrf_token %}
+                        {% for field in form %}
+                        <p>
+                            {{ field.label_tag }}<br>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <small style="color: grey">{{ field.help_text }}</small>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <p style="color: red">{{ error }}</p>
+                            {% endfor %}
+                        </p>
+                        {% endfor %}
+                        <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Create note</button>
+                </div>
+                </form>
+          </div>
+        </div>
+      </div>
+    </div>
     <hr>
 
 </body>

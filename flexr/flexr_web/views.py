@@ -1,43 +1,31 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 
-
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
+from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest, HttpResponseRedirect
 from django.core import serializers
 from pydoc import *
 import json
 from django.views.generic import *
 from django.http import QueryDict
-from .forms import registrationform
+from .forms import *
 from .note_form import notef
 from django.contrib.auth import authenticate, login
 from django.views import View
 
 from django.views.decorators.csrf import csrf_exempt
 from .models import *
+from .serializers import *
+import pytz
 # Create your views here.
 
 ################## Managing Website Pages ##################
 
 class IndexView(LoginRequiredMixin, View):
     def get(self, *args, **kwargs):
-        # account = serializers.serialize("json", Account.objects.all() )
-        # print("Account: ", account)
-        # sites = serializers.serialize("json", account.sites.all())
-        # print("Sites: ", sites)
-        # tab = serializers.serialize("json", account.tabs.all())
-        # print("Tabs: ", tab)
-        # history = account.history.all()[0] #serializers.serialize("json", account.history.all()[0])
-        # print(history)
-        # print(history.site)
-        # print(history.site.site_ranking)
-        # return HttpResponse(account, sites, tab, history)
-        # response = JsonResponse({'account': account, "sites": sites,
-        #                          "tab": tab, "history": history})
         curr_user = self.request.user
-
         try:
             print("IndexView curr_user")
             curr_account = curr_user.accounts.get(account_id = self.request.session['account_id'])
@@ -47,54 +35,45 @@ class IndexView(LoginRequiredMixin, View):
             self.request.session['account_id'] = curr_account.account_id
             print("IndexView: Account initialized:" )
 
-
         accounts = curr_user.accounts.all()
         history = curr_account.history.all()
         sites = curr_account.sites.all()
         tabs = curr_account.tabs.all()
         bookmarks = curr_account.bookmarks.all()
-        devices = curr_account.devices.all()
+        notes = curr_account.notes.all()
         # suggested_sites = curr_account.suggested_sites()
         print(curr_user)
-
+        if ('message' in self.request.session):
+            message = self.request.session['message']
+            del self.request.session['message']
+            messages.success(self.request, message)
+        elif('err_message' in self.request.session):
+            message = self.request.session['err_message']
+            del self.request.session['err_message']
+            messages.error(self.request, message)
+        print("reached")
         form = AccountForm
-
         return render(self.request, "flexr_web/index.html",
-                      {"curr_acc": curr_account, "Accounts": accounts, "Sites": sites, "Tabs": tabs,
+                      {"curr_acc": curr_account, "Accounts": accounts, "Sites": sites, "Tabs": tabs, "Notes": notes,
                        "History": history, "Bookmarks": bookmarks,
-                       "Devices": devices, "form": form})
-# @login_required()
-# def index(request):
-#     # account = serializers.serialize("json", Account.objects.all() )
-#     # print("Account: ", account)
-#     # sites = serializers.serialize("json", account.sites.all())
-#     # print("Sites: ", sites)
-#     # tab = serializers.serialize("json", account.tabs.all())
-#     # print("Tabs: ", tab)
-#     # history = account.history.all()[0] #serializers.serialize("json", account.history.all()[0])
-#     # print(history)
-#     # print(history.site)
-#     # print(history.site.site_ranking)
-#     # return HttpResponse(account, sites, tab, history)
-#     # response = JsonResponse({'account': account, "sites": sites,
-#     #                          "tab": tab, "history": history})
-#     curr_user = request.user
-#     curr_account = curr_user.accounts.all()[0]
-#     accounts = curr_user.accounts.all()
-#     history = curr_account.history.all()
-#     sites = curr_account.sites.all()
-#     tabs = curr_account.tabs.all()
-#     bookmarks = curr_account.bookmarks.all()
-#     devices = curr_account.devices.all()
-#
-#     print(curr_user)
-#     return render(request, "flexr_web/index.html", {"Accounts": accounts, "Sites": sites, "Tabs": tabs,
-#
+                       "form": form})
 
 @csrf_exempt
 def switch_account(request,*args, **kwargs):
-    request.session['account_id'] = kwargs["id"]
-    return redirect('/')
+
+    #TODO implement these request messages for every call to change something in database
+    #This will be usefull for testing
+    try:
+
+        request.user.accounts.get(account_id = kwargs["id"])
+        print("switching account....")
+        request.session['message'] = "Account Switched"
+        request.session['account_id'] = kwargs["id"]
+    except:
+        print("error switching account....")
+        request.session['err_message'] = "Error switching account"
+
+    return HttpResponseRedirect('/')
 
 def login_web(request):
     return None
@@ -119,6 +98,7 @@ def register_web(request):
     context = {'form' : form}
     return render(request, 'registration/register.html', context)
 
+@login_required
 def add_account_web(request):
     if request.method == 'POST':
         form = AccountForm(request.POST)
@@ -132,11 +112,15 @@ def add_account_web(request):
             new_account = Account.objects.create(user=request.user, email=email, username = username, phone_number = phone_number, type_of_account = type_of_account)
             new_account.save()
             request.session['account_id'] = new_account.account_id
+            request.session['message'] = "Account Created"
             return redirect('/')
 
+@login_required
 def edit_account_web(request):
     if request.method == 'POST':
         form = AccountForm(request.POST)
+        print(form.errors)
+
         if form.is_valid():
             username = request.POST.get('username')
             email = request.POST.get('email')
@@ -149,7 +133,9 @@ def edit_account_web(request):
             account.phone_number = phone_number
             account.type_of_account = type_of_account
             account.save()
-
+            # messages.add_message(request, , 'A serious error occurred.')
+            #TODO make sure that we error check everything
+            request.session['message'] = "Account Edited"
             return redirect('/profile')
 
 @login_required
@@ -160,13 +146,75 @@ def profile_web(request):
     curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
     print(curr_account)
     accounts = curr_user.accounts.all()
-    devices = curr_account.devices.all()
     acc_pref = curr_account.account_preferences
     # site = curr_account.sites.all()[0]
     # acc_pref.home_page = site
-    acc_pref.save()
-    print(acc_pref)
-    return render(request, "flexr_web/profile.html", {"current_account":curr_account, "Accounts": accounts, "Devices": devices, "Preferences":acc_pref})
+
+    # print(acc_pref)
+    pref_form = PreferencesForm()
+    if(curr_account.account_preferences.home_page is not None):
+        pref_form.fields['home_page'].initial = curr_account.account_preferences.home_page
+        print(pref_form.fields['home_page'])
+    else:
+        pref_form.fields['home_page'].initial = Site.objects.all()[0] #This isn't good for a first time user
+    pref_form.fields['home_page'].queryset = curr_account.sites.all() # have to be sure to only show that user's sites!
+
+    pref_form.fields['sync_enabled'].initial = curr_account.account_preferences.sync_enabled
+    pref_form.fields['searchable_profile'].initial = curr_account.account_preferences.searchable_profile
+    pref_form.fields['cookies_enabled'].initial = curr_account.account_preferences.cookies_enabled
+    pref_form.fields['popups_enabled'].initial = curr_account.account_preferences.popups_enabled
+    pref_form.fields['is_dark_mode'].initial = curr_account.account_preferences.is_dark_mode
+
+    account_form = AccountForm()
+    account_form.fields['username'].initial = curr_account.username
+    account_form.fields['email'].initial = curr_account.email
+    account_form.fields['phone_number'].initial = curr_account.phone_number
+    account_form.fields['type_of_account'].initial = curr_account.type_of_account
+
+    if ('message' in request.session):
+        message = request.session['message']
+        del request.session['message']
+        messages.success(request, message)
+    elif ('err_message' in request.session):
+        message = request.session['err_message']
+        del request.session['err_message']
+        messages.error(request, message)
+
+    return render(request, "flexr_web/profile.html", {"current_account":curr_account, "Accounts": accounts, "Preferences":acc_pref, "pref_form": pref_form, "account_form": account_form})
+
+CHECKBOX_MAPPING = {'on':True,
+                    None:False,}
+def edit_account_preferences_web(request):
+    """
+       Edits account preferences for the account
+                  Parameters:
+                      request.PUT has a form for editing account preferences
+                  Returns:
+                      JSONRequest with success message and edited Account Preferences instance or error message
+    """
+    if request.method == 'POST':
+        acc = request.user.accounts.get(account_id=request.session['account_id'])
+        # acc_pref = acc.account_preferences
+        # acc_pref.delete()
+        form = PreferencesForm(request.POST)
+        # TODO add in checking for dashes!
+        # This error below is gone bc I no longer check if form is valid
+        print(form.errors) # TODO <ul class="errorlist"><li>home_page<ul class="errorlist"><li>Account_ preferences with this Home page already exists.</li></ul></li></ul>
+
+        home_page = request.POST.get('home_page')
+        acc_pref = acc.account_preferences
+        home_page = acc.sites.get(id=home_page)
+        acc_pref.home_page = home_page
+        acc_pref.sync_enabled = CHECKBOX_MAPPING[request.POST.get('sync_enabled')]
+        acc_pref.searchable_profile = CHECKBOX_MAPPING[request.POST.get('searchable_profile')]
+        acc_pref.cookies_enabled = CHECKBOX_MAPPING[request.POST.get('cookies_enabled')]
+        acc_pref.popups_enabled = CHECKBOX_MAPPING[request.POST.get('popups_enabled')]
+        acc_pref.is_dark_mode = CHECKBOX_MAPPING[request.POST.get('is_dark_mode')]
+        acc_pref.save()
+        print(acc_pref.sync_enabled)
+        print("acc_pref", acc_pref)
+        request.session['message'] = "Account Preferences Saved"
+    return redirect('/profile')
 
 @login_required
 def shared_folders_web(request):
@@ -189,13 +237,32 @@ def notes_hub_web(request):
     print(curr_account)
     accounts = curr_user.accounts.all()
     notes = curr_account.notes.all()
-    return render(request, "flexr_web/notes.html", {"Notes": notes, "Accounts": accounts})
+    form = notef
+    if ('message' in request.session):
+        message = request.session['message']
+        del request.session['message']
+        messages.success(request, message)
+    elif ('err_message' in request.session):
+        message = request.session['err_message']
+        del request.session['err_message']
+        messages.error(request, message)
+
+    return render(request, "flexr_web/notes.html", {"Notes": notes, "Accounts": accounts, 'form': form})
 
 # need args
 @login_required
 def note_individual_web(request, pk):
-    obj = Note.objects.get(pk=pk)
-    return render(request, "flexr_web/note.html", {"object": obj})
+    curr_user = request.user
+    print(curr_user)
+    curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
+    print(curr_account)
+    obj = curr_account.notes.get(pk=pk)
+    accounts = curr_user.accounts.all()
+    form = EditNoteForm()
+    form.fields['title'].initial = obj.title
+    form.fields['created_date'].initial = obj.created_date
+    form.fields['content'].initial = obj.content
+    return render(request, "flexr_web/note.html", {"object": obj, 'form': form, "accounts": accounts})
 
 @login_required
 def bookmarks_hub_web(request):
@@ -213,7 +280,42 @@ def browsing_history_web(request):
     print(curr_account)
     accounts = curr_user.accounts.all()
     history = curr_account.history.all()
-    return render(request, "flexr_web/browsing_history.html", {"History": history, "Accounts": accounts})
+    form = FilterHistoryForm
+    
+    return render(request, "flexr_web/browsing_history.html", {"History": history, "Accounts": accounts, "form": form})
+
+@login_required
+def browsing_history_filter(request):
+    curr_user = request.user
+    curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+    accounts = curr_user.accounts.all()
+    form = FilterHistoryForm
+
+    # grab date and time information from POST form
+    start_date = request.POST['start_date']
+    start_time = request.POST['start_time']
+    end_date = request.POST['end_date']
+    end_time = request.POST['end_time']
+
+    # concat to datetime format
+    start_datetime = start_date + ' ' + start_time
+    end_datetime = end_date + ' ' + end_time
+
+    # construct datetime object with timezone
+    # TODO: Gerald check that timezone's work correctly
+    start = datetime.strptime(start_datetime, '%Y-%m-%d %H:%M').replace(tzinfo = pytz.UTC)
+    end = datetime.strptime(end_datetime, '%Y-%m-%d %H:%M').replace(tzinfo = pytz.UTC)
+    
+
+    # filter history based on given start and end datetimes
+    history = curr_account.history.filter(
+        visit_datetime__gte=start,
+        visit_datetime__lte=end
+    )
+
+    # this returns a new webpage, but probably shouldn't
+    # can we just edit the current webpage?
+    return render(request, "flexr_web/browsing_history.html", {"History": history, "Accounts": accounts, "form": form})
 
 @login_required
 def active_tabs_web(request):
@@ -225,14 +327,6 @@ def active_tabs_web(request):
     tabs = curr_account.tabs.all()
     return render(request, "flexr_web/open_tabs.html", {"Tabs":tabs, "Accounts": accounts})
 
-@login_required
-def devices_web(request):
-    """
-    Creates the User in the database, allowing them to sign in
-            :param: request
-            :return: JsonResponse with success or error message
-    """
-    return None
 
 ################## REST API Endpoints ##################
 
@@ -295,19 +389,16 @@ class AccountView(LoginRequiredMixin, DetailView):
               :return:
                   JSONRequest with requested account or an error message
         """
+        
+        account = request.user.accounts.filter(pk = kwargs["id"])
 
-        acc = request.user.accounts.get(account_id = request.session['account_id'])
-    
-        # we ignore _state attr (pointer object)
-        # convert datetime to string, cannot directly JSONify it
-        data = {key:acc.__dict__[key] for key in acc.__dict__ if key != '_state'}
-        data['date_joined'] = str(data['date_joined'])
+        # if empty
+        if not account:
+            return HttpResponse(f'Account with id={kwargs["id"]} not found.', status=404)
 
-        if acc:
-            # send account attributes
-            return HttpResponse(json.dumps(data))
+        data = AccountSerializer(account[0])
+        return JsonResponse(data.data, safe=False)
 
-        return HttpResponse("User not found.")
         
     # TODO: Gerald
     # Session keys
@@ -320,11 +411,17 @@ class AccountView(LoginRequiredMixin, DetailView):
                   JSONRequest with success or error message
         """
 
-        #print(request.user.__dict__)
-        #print(request.session)
 
+        account = request.user.accounts.filter(pk = kwargs["id"])
 
-        return HttpResponse('TODO')
+        # if empty
+        if not account:
+            return HttpResponse(f'Account with id={kwargs["id"]} not found.', status=404)
+
+        request.session["account_id"] = kwargs["id"]
+        messages.success(self.request, 'Natalie has a fat ass <3333', extra_tags='alert')
+
+        return HttpResponse(f'Switched to Account {kwargs["id"]}')
 
 
     def post(self, request, *args, **kwargs):
@@ -337,11 +434,11 @@ class AccountView(LoginRequiredMixin, DetailView):
         """
         data = request.POST.dict()
         acc = Account.objects.create(user = request.user,  **data)
-        self.request.session['account_id'] = acc.account_id
+        
         if acc:
             return HttpResponse("Account created.")
         else:
-            return HttpResponse("Error occurred.")
+            return HttpResponse("Error occurred.", status=404)
 
     def put(self, request, *args, **kwargs):
         """
@@ -351,14 +448,13 @@ class AccountView(LoginRequiredMixin, DetailView):
                :return:
                   JSONRequest with success or error message
         """
-       
         data = json.loads(request.body)
         result = request.user.accounts.filter(pk = kwargs["id"]).update(**data)
         
         if result:
             return HttpResponse(f"Updated account with id: {kwargs['id']}")
         else:
-            return HttpResponse(f"Account with id: {kwargs['id']} not found")
+            return HttpResponse(f"Account with id: {kwargs['id']} not found", status=404)
 
     def delete(self, request, *args, **kwargs):
         """
@@ -374,7 +470,7 @@ class AccountView(LoginRequiredMixin, DetailView):
         if result:
             return HttpResponse(f"Deleted account with id: {kwargs['id']}")
         else:
-            return HttpResponse(f"Account with id: {kwargs['id']} not found")
+            return HttpResponse(f"Account with id: {kwargs['id']} not found", status=404)
 
 ##################  Managing tabs  ##################
 
@@ -382,7 +478,7 @@ class AllTabsView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         curr_user = self.request.user
-        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+        curr_account = curr_user.accounts.get(account_id = self.request.session['account_id'])
         return Tab.objects.filter(account = curr_account)
 
     def get(self, *args, **kwargs):
@@ -403,7 +499,7 @@ class TabView(LoginRequiredMixin, DetailView):
 
     def get_queryset(self):
         curr_user = self.request.user
-        curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
+        curr_account = curr_user.accounts.get(account_id= self.request.session['account_id'])
         return Tab.objects.filter(account = curr_account)
 
     # This method is used to get a single tab
@@ -419,10 +515,11 @@ class TabView(LoginRequiredMixin, DetailView):
         # print(self.tab)
         curr_account = Account.objects.filter(user = self.request.user)[0]
         message = Tab.visit_tab(kwargs["id"], curr_account)
-        return HttpResponse(tab)
+        data = TabSerializer(tab)
+        return JsonResponse(data.data, safe=False)
 
     # This method is used to close a tab
-    def delete(self, *args, **kwargs):
+    def delete(self, request, *args, **kwargs):
         """
         Closes a specifc tab, deletes from tab table
                   :param:
@@ -431,6 +528,10 @@ class TabView(LoginRequiredMixin, DetailView):
                       JSONRequest with success or error message
         """
         tab = self.get_queryset().filter(pk = kwargs["id"])[0]
+        
+        #curr_user = request.user
+        #curr_account = curr_user.accounts.get(account_id= request.session['account_id'])
+        #tab = Tab.objects.filter(account = curr_account).filter(pk = kwargs["id"])
         tab.delete()
         return HttpResponse("worked")
 
@@ -443,11 +544,12 @@ class TabView(LoginRequiredMixin, DetailView):
                  :return:
                      JSONRequest with success or error message
        """
+        #print(self.request.session)
         curr_user = self.request.user
-        curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
-        message = ""
+        curr_account = curr_user.accounts.get(account_id=self.request.session['account_id'])
+        message = "sucess"
         site_url = request.POST.get("url")
-        message = Tab.open_tab(site_url = site_url, curr_account= curr_account)
+        tab = Tab.open_tab(site_url = site_url, curr_account= curr_account)
         return HttpResponse(message)
 
 
@@ -593,45 +695,85 @@ def remove_bookmark_from_shared_folder(request):
 # filtering on andriod side
 # need filtering for webclient also
 
-def get_history(request):
-    """
-    Gets all site history from the current account
-              Parameters:
-                  request.GET has an id for a site history
-              Returns:
-                  JSONRequest with success message and the SiteHistory instance or error message
-    """
-    return None
+class HistoryView(LoginRequiredMixin, DetailView):
 
-def filter_history(request):
-    """
-    Returns filtered all site history from the current account
-              Parameters:
-                  request.GET has a JSON object that has the filter type and typed
-              Returns:
-                  JSONRequest with success message and the SiteHistory objects or error message
-    """
-    return None
+    def get(self, request, *args, **kwargs):
+        url = request.path.split('/')
 
-def delete_history_range(request):
-    """
-    Deletes all history from a user within a given range
-              Parameters:
-                  request.DELETE has a JSON object that has a date range
-              Returns:
-                  JSONRequest with success message and the SiteHistory objects or error message
-    """
-    return None
+        if url[-1] == 'filter':
+            return self.filter_history(request, *args, **kwargs)
+        else:
+            return self.get_history(request, *args, **kwargs)
 
-def delete_all_history(request):
-    """
-    Deletes all history from a user
-              Parameters:
-                  request.DELETE
-              Returns:
-                  JSONRequest with success message or error message
-    """
-    return None
+
+
+    def get_history(self, request, *args, **kwargs):
+        """
+        Gets all site history from the current account
+                Parameters:
+                    request.GET has an id for a site history
+                Returns:
+                    JSONRequest with success message and the SiteHistory instance or error message
+        """
+        #print('test')
+        history = History.objects.filter(account = kwargs["id"])
+        data = HistorySerializer(history, many=True)
+        return JsonResponse(data.data, safe=False)
+
+    def filter_history(self, request, *args, **kwargs):
+        """
+        Returns filtered all site history from the current account
+                Parameters:
+                    request.GET has a JSON object that has the filter type and typed
+                Returns:
+                    JSONRequest with success message and the SiteHistory objects or error message
+        """
+
+        payload = request.GET.dict()
+        history = History.objects.filter(
+            account = kwargs["id"],
+            visit_datetime__gte=payload['datetime_from'],
+            visit_datetime__lte=payload['datetime_to'])
+        data = HistorySerializer(history, many=True)
+        return JsonResponse(data.data, safe=False)
+
+    def delete(self, request, *args, **kwargs):
+        url = request.path.split('/')
+
+        if url[-1] == 'filter':
+            return self.delete_history_range(request, *args, **kwargs)
+        else:
+            return self.delete_all_history(request, *args, **kwargs)
+
+    def delete_history_range(self, request, *args, **kwargs):
+        """
+        Deletes all history from a user within a given range
+                Parameters:
+                    request.DELETE has a JSON object that has a date range
+                Returns:
+                    JSONRequest with success message and the SiteHistory objects or error message
+        """
+        payload = json.loads(request.body)
+        history = History.objects.filter(
+            account = kwargs["id"],
+            visit_datetime__gte=payload['datetime_from'],
+            visit_datetime__lte=payload['datetime_to']).delete()
+
+        return HttpResponse(f'{history} History objects removed')
+
+    def delete_all_history(self, request, *args, **kwargs):
+        """
+        Deletes all history from a user
+                Parameters:
+                    request.DELETE
+                Returns:
+                    JSONRequest with success message or error message
+        """
+
+        history = History.objects.all().delete()
+
+        return HttpResponse(f'{history} History objects removed')
+
 
 
 ##################  Managing Bookmarks ##################
@@ -717,7 +859,6 @@ def create_note(request):
 
     if request.method == 'POST':
         form = notef(request.POST)
-    
         # print("Note made")
         if form.is_valid():
             acc = request.user.accounts.get(account_id = request.session['account_id'])
@@ -756,7 +897,21 @@ def delete_note(request, pk):
     """
     return None
 
-def edit_note(request):
+def edit_note(request, pk):
+    if request.method == 'POST':
+        form = EditNoteForm(request.POST)
+        print("Note edited")
+        if form.is_valid():
+            title = request.POST.get('title')
+            created_date = request.POST.get('created_date')
+            content = request.POST.get('content')
+            curr_acc = Account.objects.get(account_id = request.session['account_id'])
+            obj = curr_acc.notes.get(pk=pk)
+            obj.title = title
+            obj.created_date = created_date
+            obj.content = content
+            obj.save()
+    return redirect('/notes/')
     """
        Edit note for the account
                   Parameters:

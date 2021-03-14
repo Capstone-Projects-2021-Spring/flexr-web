@@ -2,14 +2,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <title>Flexr | Profile</title>
+    <style>
+        #edit:hover{
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
     {% include "flexr_web/navbar.html" %}
     <h1>{{user.first_name}}&nbsp{{user.last_name}}&nbsp@{{user}}</h1>
     <h1>{{user.email}}</h1>
-    <h2 style="display:inline">{{current_account}}</h2><button style="display:inline;" data-toggle="modal" data-target="#view_account">Edit</button>
+    <h2 style="display:inline">{{current_account}}</h2><img id = "edit" src="{% static 'icons/pencil-square.svg'%}" data-toggle="modal" data-target="#view_account">
 
     <div class="modal fade" id="view_account" tabindex="-1" role="dialog" aria-labelledby="view_accountLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
@@ -23,39 +29,19 @@
           <div class="modal-body">
               <form method="post" action="/edit_account/">
                    {% csrf_token %}
-                    <p>
-                        <label for="id_username">Username:</label><br>
-                        <input value = "{{current_account.username}}"type="text" name="username" class="form-control" required="" id="id_username">
-                    </p>
-
-                    <p>
-                        <label for="id_email">Email:</label><br>
-                        <input type="email" value = "{{current_account.email}}" name="email" class="form-control" required="" id="id_email">
-                    </p>
-
-                    <p>
-                        <label for="id_phone_number">Phone number:</label><br>
-                        <input type="text" value="{{current_account.phone_number}}" name="phone_number" class="form-control" required="" id="id_phone_number">
-                    </p>
-
-                    <p>
-                        <label for="id_type_of_account">Type of account:</label><br>
-                        <select name="type_of_account" value = "{{current_account.type_of_account}}"class="form-control" id="id_type_of_account">
-
-                             <option value="--" disabled selected>--</option>
-
-                        <option value="Business">Business</option>
-
-                          <option value="Personal">Personal</option>
-
-                          <option value="Kids">Kids</option>
-
-                          <option value="Private">Private</option>
-
-                          <option value="Other">Other</option>
-
-                        </select>
-                    </p>
+                          {% for field in account_form %}
+                        <p>
+                            {{ field.label_tag }}<br>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <small style="color: grey">{{ field.help_text }}</small>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <p style="color: red">{{ error }}</p>
+                            {% endfor %}
+                        </p>
+                    {% endfor %}
+<!--
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -68,20 +54,24 @@
         </div>
       </div>
     </div>
-
     <hr>
-    <h3>Devices:</h3>
-    {%for dev in Devices%}
-        <p>dev</p>
-    {%endfor%}
-    <hr>
-    <h3>Preferences:</h3>
-    <p>Homepage: {{Preferences.home_page}}</p>
-    <p>Sync enabled: {{Preferences.sync_enabled}}</p>
-    <p>Searchable profile: {{Preferences.searchable_profile}}</p>
-    <p>Cookies enabled: {{Preferences.sync_enabled}}</p>
-    <p>Popups enabled: {{Preferences.popups_enabled}}</p>
-    <p>Darkmode enabled: {{Preferences.is_dark_mode}}</p>
 
+    <h3>Account Preferences:</h3>
+    <form method = "post" action="{% url 'edit account preferences' %}">
+        {% csrf_token %}
+        {% for field in pref_form %}
+            <p>
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.help_text %}
+                    <small style="color: grey">{{ field.help_text }}</small>
+                {% endif %}
+                {% for error in field.errors %}
+                    <p style="color: red">{{ error }}</p>
+                {% endfor %}
+            </p>
+        {% endfor %}
+         <button type="submit" class="btn btn-primary">Save changes</button>
+    </form>
 </body>
 </html>

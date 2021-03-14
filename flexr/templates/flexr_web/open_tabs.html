@@ -13,7 +13,7 @@
     <hr>
     <h3>Open Tabs:</h3>
     {%for tab in Tabs%}
-        <p>Tab: {{tab.site.url}}</p>
+        <p>Tab: <a href="{{tab.site.url}}">{{tab.site.url}}</a></p>
         <p>Created Date: {{tab.created_date}}</p>
         <p>Last Visited: {{tab.last_visited}}</p>
         <p>Status: {{tab.status}}</p>

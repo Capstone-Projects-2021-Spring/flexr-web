@@ -25,7 +25,7 @@ SECRET_KEY = 'w=n$izik0ret=s=e#is!-$e%^c8ru4b=6$=my^9@rl3_8iovae'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*', '18.221.147.115', 'http://ec2-18-221-147-115.us-east-2.compute.amazonaws.com/']
 
 
 # Application definition
@@ -114,6 +114,8 @@ LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
 
+# TODO Check this timezone out eventually
+
 USE_I18N = True
 
 USE_L10N = True
@@ -131,3 +133,5 @@ STATICFILES_DIRS = [
 LOGIN_REDIRECT_URL = '/'
 
 LOGOUT_REDIRECT_URL = '/'
+
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'

@@ -14,13 +14,19 @@ urlpatterns = [
     path('api/tab/<id>', TabView.as_view()),
     path('api/tab/', TabView.as_view()),
     path('create_note', create_note, name='create_note'),
+    path('edit_note/<int:pk>', edit_note, name='edit_note'),
     path('opennote/<int:pk>/', views.note_individual_web, name='note-detail'),
-    path('delete-note/<int:pk>/', delete_note, name='delete_note'),
+    path('delete-note/<int:pk>/', views.delete_note, name='delete_note'),
     path('api/account/<id>', AccountView.as_view()),
     path('api/account/', AccountView.as_view()),
     path('switch_account/<id>', views.switch_account, name = "switch account" ),
     path('add_account/', views.add_account_web, name = "add account"),
-    path('edit_account/', views.edit_account_web, name="add account")
+    path('edit_account/', views.edit_account_web, name="edit account"),
+    path('edit_preferences/', views.edit_account_preferences_web, name = "edit account preferences"),
+    path('api/history/<id>', HistoryView.as_view()),
+    path('api/history/<id>/filter', HistoryView.as_view()),
+    path('filter_history/', views.browsing_history_filter, name = "filter history")
+
     #path('shared_folder/', ) TODO
     # TODO For note.html
 ]
