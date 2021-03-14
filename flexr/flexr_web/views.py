@@ -298,7 +298,7 @@ def browsing_history_filter(request):
     end = datetime.strptime(end_datetime, '%Y-%m-%d %H:%M').replace(tzinfo = pytz.UTC)
     
 
-    # filter history based on given state and end datetimes
+    # filter history based on given start and end datetimes
     history = curr_account.history.filter(
         visit_datetime__gte=start,
         visit_datetime__lte=end
@@ -506,10 +506,11 @@ class TabView(LoginRequiredMixin, DetailView):
         # print(self.tab)
         curr_account = Account.objects.filter(user = self.request.user)[0]
         message = Tab.visit_tab(kwargs["id"], curr_account)
-        return HttpResponse(tab)
+        data = TabSerializer(tab)
+        return JsonResponse(data.data, safe=False)
 
     # This method is used to close a tab
-    def delete(self, *args, **kwargs):
+    def delete(self, request, *args, **kwargs):
         """
         Closes a specifc tab, deletes from tab table
                   :param:
@@ -518,6 +519,10 @@ class TabView(LoginRequiredMixin, DetailView):
                       JSONRequest with success or error message
         """
         tab = self.get_queryset().filter(pk = kwargs["id"])[0]
+        
+        #curr_user = request.user
+        #curr_account = curr_user.accounts.get(account_id= request.session['account_id'])
+        #tab = Tab.objects.filter(account = curr_account).filter(pk = kwargs["id"])
         tab.delete()
         return HttpResponse("worked")
 
@@ -530,8 +535,9 @@ class TabView(LoginRequiredMixin, DetailView):
                  :return:
                      JSONRequest with success or error message
        """
+        #print(self.request.session)
         curr_user = self.request.user
-        curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
+        curr_account = curr_user.accounts.get(account_id=self.request.session['account_id'])
         message = ""
         site_url = request.POST.get("url")
         message = Tab.open_tab(site_url = site_url, curr_account= curr_account)

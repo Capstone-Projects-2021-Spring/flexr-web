@@ -237,7 +237,7 @@ class Note(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="notes")
     # title = models.CharField(verbose_name="Note title", max_length=100, default="note_"+str(datetime.date()))
     title = models.CharField(verbose_name="Note title", max_length=100, default="note")
-    created_date = models.DateTimeField(default= timezone.now())
+    created_date = models.DateTimeField(default= timezone.now)
     content = models.TextField(verbose_name= "Note content") # https://pypi.org/project/django-richtextfield/#field-widget-settings
     lock = models.BooleanField(verbose_name="Is note password protected?" , default=False)
     password = models.CharField(max_length=40, blank=True)

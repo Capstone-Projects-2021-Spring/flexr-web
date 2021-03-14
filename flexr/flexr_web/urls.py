@@ -15,7 +15,7 @@ urlpatterns = [
     path('api/tab/', TabView.as_view()),
     path('create_note', create_note, name='create_note'),
     path('opennote/<int:pk>/', views.note_individual_web, name='note-detail'),
-    path('delete-note/<int:pk>/', delete_note, name='delete_note'),
+    path('delete-note/<int:pk>/', views.delete_note, name='delete_note'),
     path('api/account/<id>', AccountView.as_view()),
     path('api/account/', AccountView.as_view()),
     path('switch_account/<id>', views.switch_account, name = "switch account" ),
