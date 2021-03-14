@@ -258,7 +258,16 @@ def notes_hub_web(request):
 @login_required
 def note_individual_web(request, pk):
     obj = Note.objects.get(pk=pk)
-    return render(request, "flexr_web/note.html", {"object": obj})
+    curr_user = request.user
+    print(curr_user)
+    curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
+    print(curr_account)
+    accounts = curr_user.accounts.all()
+    form = EditNoteForm()
+    form.fields['title'].initial = obj.title
+    form.fields['created_date'].initial = obj.created_date
+    form.fields['content'].initial = obj.content
+    return render(request, "flexr_web/note.html", {"object": obj, 'form': form, "accounts": accounts})
 
 @login_required
 def bookmarks_hub_web(request):
@@ -877,7 +886,17 @@ def delete_note(request, pk):
     """
     return None
 
-def edit_note(request):
+def edit_note(request, pk):
+    obj = Note.objects.get(pk=pk)
+    if request.method == 'POST':
+        form = EditNoteForm(request.POST)
+        print("Note edited")
+        if form.is_valid():
+            curr_acc = request.user.accounts.get(account_id = request.session['account_id'])
+
+            form.save()
+    obj.save()
+    return redirect('/notes')
     """
        Edit note for the account
                   Parameters:

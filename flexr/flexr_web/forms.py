@@ -67,3 +67,9 @@ class FilterHistoryForm(forms.Form):
         pass
         #fields = ['start_date']
         #widgets = {'start_date': forms.DateInput()}
+
+class EditNoteForm(ModelForm):
+    class Meta:
+        model = Note
+        # Make homepage a url field? may need to apppend https://www.
+        fields = ('title', 'created_date', 'content')
