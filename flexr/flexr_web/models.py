@@ -258,7 +258,7 @@ class Note(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="notes")
     # title = models.CharField(verbose_name="Note title", max_length=100, default="note_"+str(datetime.date()))
     title = models.CharField(verbose_name="Note title", max_length=100, default="note")
-    created_date = models.DateTimeField()
+    created_date = models.DateTimeField(default= timezone.now)
     content = models.TextField(verbose_name= "Note content") # https://pypi.org/project/django-richtextfield/#field-widget-settings
     lock = models.BooleanField(verbose_name="Is note password protected?" , default=False)
     password = models.CharField(max_length=40, blank=True)
@@ -273,7 +273,7 @@ class sharedFolder(models.Model):
     #AttributeError: module 'django.db.models' has no attribute 'charField'
     title = models.TextField(verbose_name="Shared Folder Title", max_length=100, default="sharedFolder")
     description = models.TextField(verbose_name="Shared Folder description")
-    created_date = models.DateTimeField(default= timezone.auto_now)
+    created_date = models.DateTimeField(default= timezone.now)
     owner = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="owner")
     collaborators = []
     collaborators.append(owner)

@@ -714,15 +714,25 @@ def get_account_preferences(request):
 ##################  Managing Notes ##################
 
 def create_note(request):
+
     if request.method == 'POST':
         form = notef(request.POST)
+    
+        # print("Note made")
         if form.is_valid():
-            form.save()
-            return redirect('/')
-    else:
-        form = notef
-    context = {'form' : form}
-    return render(request, 'flexr_web/add_note.html', context)
+            acc = request.user.accounts.get(account_id = request.session['account_id'])
+            tit = request.POST.get('title')
+            cont = request.POST.get('content')
+            lo = request.POST.get('lock')
+            if lo == 'on':
+                lo = True
+            else:
+                lo = False
+            passw = request.POST.get('password')
+            newnote = Note.objects.create(account=acc, title=tit, content=cont, lock=lo, password=passw)
+            newnote.save()
+            return redirect('/notes')
+
     """
        Creates note for the account
                   Parameters:

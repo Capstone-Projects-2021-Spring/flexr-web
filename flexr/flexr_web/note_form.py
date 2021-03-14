@@ -12,7 +12,7 @@ class notef(ModelForm):
 
     class Meta:
         model = Note
-        fields = ('account','title', 'created_date', 'content', 'lock','password')
+        fields = ('title', 'content', 'lock','password')
 
     def clean_password(self):
         lock = self.cleaned_data.get('lock', False)
