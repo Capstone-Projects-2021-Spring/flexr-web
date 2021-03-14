@@ -11,7 +11,28 @@
     <h2>{{Accounts.0}}</h2>
 
     <hr>
-    
+    <div class="modal-body">
+        <form method="post" action="/filter_history/">
+             {% csrf_token %}
+             {% for field in form %}
+             <p>
+                 {{ field.label_tag }}<br>
+                 {{ field }} 
+            </p>
+
+            {% endfor %}
+
+          <div class="modal-footer">
+             <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
+
+<!--                    <button type="button" class="btn btn-danger" onclick="delete_account()">Delete</button>-->
+              <button type="submit" class="btn btn-primary">Filter</button>
+          </div>
+      </form>
+    </div>
+  </div>
+</div>
+</div>
     <hr>
     <h3>Browsing History:</h3>
     {%for entry in History%}
