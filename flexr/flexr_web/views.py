@@ -1,10 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 
-
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
+from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest, HttpResponseRedirect
 from django.core import serializers
 from pydoc import *
 import json
@@ -57,9 +57,14 @@ class IndexView(LoginRequiredMixin, View):
         notes = curr_account.notes.all()
         # suggested_sites = curr_account.suggested_sites()
         print(curr_user)
+        if ('account_message' in self.request.session):
+            message = self.request.session['account_message']
+            print("message")
+            del self.request.session['account_message']
+            messages.success(self.request, message)
+        print("reached")
 
         form = AccountForm
-
         return render(self.request, "flexr_web/index.html",
                       {"curr_acc": curr_account, "Accounts": accounts, "Sites": sites, "Tabs": tabs, "Notes": notes,
                        "History": history, "Bookmarks": bookmarks,
@@ -94,7 +99,9 @@ class IndexView(LoginRequiredMixin, View):
 @csrf_exempt
 def switch_account(request,*args, **kwargs):
     request.session['account_id'] = kwargs["id"]
-    return redirect('/')
+    print("switching account....")
+    request.session['account_message'] = "Account Switched"
+    return HttpResponseRedirect('/')
 
 def login_web(request):
     return None
@@ -340,6 +347,7 @@ class AccountView(LoginRequiredMixin, DetailView):
             return HttpResponse(f'Account with id={kwargs["id"]} not found.', status=404)
 
         request.session["account_id"] = kwargs["id"]
+        messages.success(self.request, 'Natalie has a fat ass <3333', extra_tags='alert')
 
         return HttpResponse(f'Switched to Account {kwargs["id"]}')
 
