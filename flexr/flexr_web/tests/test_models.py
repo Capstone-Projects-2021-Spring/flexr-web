@@ -97,43 +97,6 @@ class SiteTestCase(TestCase):
 
     # need to create a test for the datetimefields
 
-class DeviceTestCase(TestCase):
-
-    def setUp(self):
-        test_user = User.objects.create(first_name = "Al", last_name = "Annon", username="annon1234", email = "anon@gmail.com")
-        test_user.save()
-        test_acc = Account.objects.create(user=test_user, email=test_user.email, phone_number="5704600704",
-                                          type_of_account="Business")
-        test_acc.save()
-        test_device = Device.objects.create(account=test_acc, name="Test Device")
-        test_device.save()
-
-    def test_device_created(self):
-        test_acc = Account.objects.get(email="anon@gmail.com")
-        device_count = test_acc.devices.all().count()
-        self.assertEqual(device_count, 1, "Device count is 1")
-
-    def test_create_another_device(self):
-        test_acc = Account.objects.get(email="anon@gmail.com")
-        test_device2 = Device.objects.create(account=test_acc, name="Test Device 2")
-        test_device2.save()
-        device_count = test_acc.devices.all().count()
-        self.assertEqual(device_count, 2, "Device count is 2")
-
-    def test_device_edit(self):
-        test_device = Device.objects.get(name = "Test Device")
-        test_device.name = "Bob's Device"
-        test_device.save()
-        self.assertEqual(test_device.name, "Bob's Device")
-
-    def test_device_deleted(self):
-        test_device = Device.objects.get(name = "Test Device")
-        test_device.delete()
-        test_device.save()
-        test_acc = Account.objects.get(email="anon@gmail.com")
-        device_count = test_acc.devices.all().count()
-        self.assertEqual(device_count, 1, "Device count is 1")
-
 class BookmarkTestCase(TestCase):
 
     def setUp(self):
