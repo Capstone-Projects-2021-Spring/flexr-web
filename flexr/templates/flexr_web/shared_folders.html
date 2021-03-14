@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flexr | Shared Folders</title>
+    {% load static %}
+    <style>
+        #plus-icon:hover{
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+    {% include "flexr_web/navbar.html" %}
+<h1>Shared Folders: </h1>
+        {% for folder in Folders %}
+            <h2>{{folder.title}}</h2>
+        {% endfor %}
+
+</body>
+</html>
