@@ -376,7 +376,7 @@ def add_bookmark_web(request, id):
     tab = curr_account.tabs.get(pk = id)
     Bookmark.create_bookmark(tab, curr_account)
     request.session['message'] = "Bookmark Created"
-    return redirect('/bookmarks')
+    return redirect('/open_tabs')
 
 def delete_bookmark_web(request, id):
     curr_user = request.user
@@ -671,7 +671,7 @@ def close_tab(request, *args, **kwargs):
         request.session['message'] = "Tab closed"
     except:
         request.session['err_message'] = "Tab could not be closed"
-    return redirect('/')
+    return redirect('/') # TODO we should set up django sesions to know where to redirect a user based on previous page
 
 
 ################## Managing shared folders ##################
@@ -990,8 +990,9 @@ def create_note(request):
             if lo == 'on':
                 lo = True
             else:
-                print(passw)
-                if (passw is not None):
+
+                if (passw not in EMPTY_VALUES):
+                    print("reached",passw)
                     request.session['err_message'] = "Note not created. Please put a password on locked note"
                     return redirect('/notes')
                 lo = False

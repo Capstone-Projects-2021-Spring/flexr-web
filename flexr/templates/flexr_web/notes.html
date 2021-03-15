@@ -8,26 +8,30 @@
         #plus-icon:hover{
             cursor: pointer;
         }
-
     </style>
 </head>
 <body>
     {% include "flexr_web/navbar.html" %}
-    <h1>{{user.first_name}}&nbsp{{user.last_name}}</h1>
-    <h1>{{user.email}}</h1>
-    <h2>{{Accounts.0}}</h2>
+<!--    <h1>{{user.first_name}}&nbsp{{user.last_name}}</h1>-->
+<!--    <h1>{{user.email}}</h1>-->
+<!--    <h2>{{Accounts.0}}</h2>-->
 
     <hr>
     <h3>Notes:</h3>
-    {%for note in Notes%}
-        <p>title: <a href="{% url 'note-detail' note.pk%}"> 
-        {{note.title}}</a></p>
-        <p>Created Date: {{note.created_date}}</p>
-        <!-- <p>Content: {{note.content}}</p> -->
-        <a href="{% url 'delete_note' note.pk%}"><p>Delete Note</p> </a>
-        <br>
-    {%endfor%}
-    Create Note <img id="plus-icon" data-toggle="modal" data-target="#add_note" src="{% static 'icons/plus-square.svg' %}">
+    <p style="display: inline;">Create Note</p> <img style="display:inline;" id="plus-icon" data-toggle="modal" data-target="#add_note" src="{% static 'icons/plus-square.svg' %}">
+
+    <div class = "row">
+        {%for note in Notes%}
+            <div class = "card col-lg-3">
+                <p>title: <a href="{% url 'note-detail' note.pk%}">
+                {{note.title}}</a></p>
+                <p>Created Date: {{note.created_date}}</p>
+                <!-- <p>Content: {{note.content}}</p> -->
+                <a href="{% url 'delete_note' note.pk%}"><p>Delete Note</p> </a>
+                <br>
+            </div>
+        {%endfor%}
+    </div>
 
     <div class="modal fade" id="add_note" tabindex="-1" role="dialog" aria-labelledby="add_noteLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
