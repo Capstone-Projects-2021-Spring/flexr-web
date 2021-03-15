@@ -40,7 +40,7 @@ class Account(models.Model):
 
     # TODO Pushkin: Change teams to shared_folders
     # teams = models.ManyToManyField("Team", blank=True, null = True) #I don't think this should be a manytomany field this should be a list of teams got by a method?
-    shared_folders = models.ManyToManyField("sharedFolder", blank=True)
+    shared_folder = models.ManyToManyField("sharedFolder", blank=True)
 
     # friends = models.ManyToManyField("Account", blank=True, null = True) # this probably needs to be another table
     account_preferences = models.OneToOneField("Account_Preferences", on_delete=models.CASCADE, blank=True, null = True)
@@ -303,7 +303,7 @@ class sharedFolder(models.Model):
     title = models.TextField(verbose_name="Shared Folder Title", max_length=100, default="sharedFolder")
     description = models.TextField(verbose_name="Shared Folder description")
     created_date = models.DateTimeField(default= timezone.now)
-    owner = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="owner")
+    owner = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="shared_folders")
 
     # TODO need to have this be a many to many field
     collaborators = models.ManyToManyField(Account)

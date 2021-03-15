@@ -272,6 +272,14 @@ def note_individual_web(request, pk):
     form.fields['title'].initial = obj.title
     form.fields['created_date'].initial = obj.created_date
     form.fields['content'].initial = obj.content
+    if ('message' in request.session):
+        message = request.session['message']
+        del request.session['message']
+        messages.success(request, message)
+    elif ('err_message' in request.session):
+        message = request.session['err_message']
+        del request.session['err_message']
+        messages.error(request, message)
     return render(request, "flexr_web/note.html", {"object": obj, 'form': form, "accounts": accounts})
 
 @login_required
@@ -356,15 +364,14 @@ def add_bookmark_web(request, id):
     tab = curr_account.tabs.get(pk = id)
     Bookmark.create_bookmark(tab, curr_account)
     request.session['message'] = "Bookmark Created"
-    return render(request, "flexr_web/open_tabs.html", {"Tabs":tabs, "Accounts": accounts})
+    return redirect('/bookmarks')
 
 def delete_bookmark_web(request, id):
     curr_user = request.user
     curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
     Bookmark.delete_bookmark(id)
-    bookmarks = curr_account.bookmarks.all()
-    request.session['message'] = "Bookmark Delete"
-    return render(request, "flexr_web/bookmarks.html", {"Bookmarks": bookmarks})
+    request.session['message'] = "Bookmark Deleted"
+    return redirect('/bookmarks')
 
 
 @login_required
@@ -1018,7 +1025,9 @@ def edit_note(request, pk):
             obj.created_date = created_date
             obj.content = content
             obj.save()
-    return redirect('/notes/')
+            request.session['message'] = "Note edited"
+        request.session['err_message'] = "Note could not be edited"
+    return redirect('/opennote/'+str(obj.id))
     """
        Edit note for the account
                   Parameters:

@@ -28,7 +28,7 @@ class TabAdmin(admin.ModelAdmin):
 
 # Register your models here.
 admin.site.register(Account, AccountAdmin)
-admin.site.register(Team)
+admin.site.register(sharedFolder)
 admin.site.register(History)
 admin.site.register(Site)
 admin.site.register(Tab, TabAdmin)
