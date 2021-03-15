@@ -235,10 +235,10 @@ class Bookmark(models.Model):
 
     @classmethod
     def create_bookmark(cls, tab, curr_account, name='bookmark', last_visited=None):
-        Bookmark.objects.create(account = curr_account, 
-        bookmark_name = name, site=tab.site)
-
-        print('bookmark created')
+        try:
+            Bookmark.objects.create(account = curr_account, bookmark_name = name, site=tab.site)
+        except:
+            print('bookmark already exists')
     
     @classmethod
     def delete_bookmark(cls, id):

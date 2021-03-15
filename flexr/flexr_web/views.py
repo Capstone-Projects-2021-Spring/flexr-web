@@ -335,6 +335,14 @@ def active_tabs_web(request):
     print(curr_account)
     accounts = curr_user.accounts.all()
     tabs = curr_account.tabs.all()
+    if ('message' in request.session):
+        message = request.session['message']
+        del request.session['message']
+        messages.success(request, message)
+    elif ('err_message' in request.session):
+        message = request.session['err_message']
+        del request.session['err_message']
+        messages.error(request, message)
     return render(request, "flexr_web/open_tabs.html", {"Tabs":tabs, "Accounts": accounts})
 
 @login_required
@@ -346,7 +354,7 @@ def add_bookmark_web(request, id):
 
     tab = curr_account.tabs.get(pk = id)
     Bookmark.create_bookmark(tab, curr_account)
-
+    request.session['message'] = "Bookmark Created"
     return render(request, "flexr_web/open_tabs.html", {"Tabs":tabs, "Accounts": accounts})
 
 def delete_bookmark_web(request, id):
@@ -354,6 +362,7 @@ def delete_bookmark_web(request, id):
     curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
     Bookmark.delete_bookmark(id)
     bookmarks = curr_account.bookmarks.all()
+    request.session['message'] = "Bookmark Delete"
     return render(request, "flexr_web/bookmarks.html", {"Bookmarks": bookmarks})
 
 
@@ -362,6 +371,14 @@ def bookmarks_web(request):
     curr_user = request.user
     curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
     bookmarks = curr_account.bookmarks.all()
+    if ('message' in request.session):
+        message = request.session['message']
+        del request.session['message']
+        messages.success(request, message)
+    elif ('err_message' in request.session):
+        message = request.session['err_message']
+        del request.session['err_message']
+        messages.error(request, message)
     return render(request, "flexr_web/bookmarks.html", {"Bookmarks": bookmarks})
 
 
@@ -923,7 +940,12 @@ def create_note(request):
             passw = request.POST.get('password')
             newnote = Note.objects.create(account=acc, title=tit, content=cont, lock=lo, password=passw)
             newnote.save()
-            return redirect('/notes')
+            request.session['message'] = "Note created"
+        else:
+            request.session['err_message'] = "Note not created. Please put a password on locked note"
+            print(form.errors)
+
+        return redirect('/notes')
 
     """
        Creates note for the account

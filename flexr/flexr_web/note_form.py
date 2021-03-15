@@ -17,7 +17,8 @@ class notef(ModelForm):
     def clean_password(self):
         lock = self.cleaned_data.get('lock', False)
         password = self.cleaned_data.get('password', None)
-
+        print(password)
+        print(EMPTY_VALUES)
         if lock and password in EMPTY_VALUES:
             raise ValidationError("ENTER PASSWORD")
           
