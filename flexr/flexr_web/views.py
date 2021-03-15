@@ -223,7 +223,10 @@ def edit_account_preferences_web(request):
 
 @login_required
 def shared_folders_web(request):
-    return None
+    curr_user = request.user
+    curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+    folders = curr_account.shared_folders.all()
+    return render(request, "flexr_web/shared_folders.html", {"Folders": folders})
 
 @login_required
 def shared_folder_individual_web(request):
@@ -231,8 +234,10 @@ def shared_folder_individual_web(request):
     owner = shared_folder.owner
     #CHANGE THIS TO NOT USE THE SHARED FOLDERS COLLABORATORS, this was written this way for testing the view method
     collaborators = folder.collaborators
-    
-    return render(request, "flexr_web/shared_folder.html", {"SharedFolder": shared_folder, "Collaborators": collaborators})
+    tabs = folder.tabs
+    bookmarks = folder.bookmarks
+    notes = folder.notes
+    return render(request, "flexr_web/shared_folder.html", {"SharedFolder": shared_folder, "Collaborators": collaborators, "Tabs": tabs, "Bookmarks": bookmarks, "Notes": notes})
 
 @login_required
 def notes_hub_web(request):
