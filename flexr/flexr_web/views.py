@@ -270,7 +270,6 @@ def note_individual_web(request, pk):
     accounts = curr_user.accounts.all()
     form = EditNoteForm()
     form.fields['title'].initial = obj.title
-    form.fields['created_date'].initial = obj.created_date
     form.fields['content'].initial = obj.content
     if ('message' in request.session):
         message = request.session['message']
@@ -1017,12 +1016,10 @@ def edit_note(request, pk):
         print("Note edited")
         if form.is_valid():
             title = request.POST.get('title')
-            created_date = request.POST.get('created_date')
             content = request.POST.get('content')
             curr_acc = Account.objects.get(account_id = request.session['account_id'])
             obj = curr_acc.notes.get(pk=pk)
             obj.title = title
-            obj.created_date = created_date
             obj.content = content
             obj.save()
             request.session['message'] = "Note edited"

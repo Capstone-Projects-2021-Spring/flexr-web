@@ -72,4 +72,4 @@ class EditNoteForm(ModelForm):
     class Meta:
         model = Note
         # Make homepage a url field? may need to apppend https://www.
-        fields = ('title', 'created_date', 'content')
+        fields = ('title', 'content')
