@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.validators import EMPTY_VALUES
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest, HttpResponseRedirect
 from django.core import serializers
@@ -207,6 +208,10 @@ def edit_account_preferences_web(request):
         print(form.errors) # TODO <ul class="errorlist"><li>home_page<ul class="errorlist"><li>Account_ preferences with this Home page already exists.</li></ul></li></ul>
 
         home_page = request.POST.get('home_page')
+        if(home_page == ''):
+            print("This is the fix")
+            request.session['err_message'] = "Please select a homepage"
+
         acc_pref = acc.account_preferences
         home_page = acc.sites.get(id=home_page)
         acc_pref.home_page = home_page
@@ -279,7 +284,15 @@ def note_individual_web(request, pk):
         message = request.session['err_message']
         del request.session['err_message']
         messages.error(request, message)
-    return render(request, "flexr_web/note.html", {"object": obj, 'form': form, "accounts": accounts})
+
+    locked = obj.lock
+    if('note_unlocked' in request.session):
+        id = request.session['note_unlocked']
+        if( id == obj.id):
+            locked = False
+        del request.session['note_unlocked']
+
+    return render(request, "flexr_web/note.html", {"object": obj, 'form': form, "accounts": accounts, "locked": locked})
 
 @login_required
 def bookmarks_hub_web(request):
@@ -973,11 +986,16 @@ def create_note(request):
             tit = request.POST.get('title')
             cont = request.POST.get('content')
             lo = request.POST.get('lock')
+            passw = request.POST.get('password')
             if lo == 'on':
                 lo = True
             else:
+                print(passw)
+                if (passw is not None):
+                    request.session['err_message'] = "Note not created. Please put a password on locked note"
+                    return redirect('/notes')
                 lo = False
-            passw = request.POST.get('password')
+
             newnote = Note.objects.create(account=acc, title=tit, content=cont, lock=lo, password=passw)
             newnote.save()
             request.session['message'] = "Note created"
@@ -1025,6 +1043,8 @@ def edit_note(request, pk):
             request.session['message'] = "Note edited"
         request.session['err_message'] = "Note could not be edited"
     return redirect('/opennote/'+str(obj.id))
+
+
     """
        Edit note for the account
                   Parameters:
@@ -1032,7 +1052,21 @@ def edit_note(request, pk):
                   Returns:
                       JSONRequest with success message and the Note instance or error message
     """
-    return None
+    # return None
+
+def unlock_note(request, pk):
+    current_acc = request.user.accounts.get(account_id = request.session['account_id'])
+    form_password = request.POST.get('password')
+    note = current_acc.notes.get(pk = pk)
+
+    if(note.password == form_password):
+        request.session['note_unlocked'] = pk
+        request.session['message'] = "Note unlocked"
+    else:
+        request.session['err_message'] = "Wrong password"
+
+    return redirect('/opennote/' + str(pk))
+
 
 def get_note(request):
     """

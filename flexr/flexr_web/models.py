@@ -252,7 +252,7 @@ class Bookmark(models.Model):
 # TODO need to finalize the fields here
 class Account_Preferences(models.Model):
     name = models.CharField(default="Account Preferences", max_length=10)
-    home_page = models.OneToOneField(Site, on_delete=models.CASCADE, null= True, blank=True)
+    home_page = models.OneToOneField(Site, on_delete=models.CASCADE, null= True)
 
     # sync
     sync_enabled = models.BooleanField(default=True) # not sure if this is possible or useful

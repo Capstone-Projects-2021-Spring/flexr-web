@@ -17,6 +17,7 @@ urlpatterns = [
     path('edit_note/<int:pk>', edit_note, name='edit_note'),
     path('opennote/<int:pk>/', views.note_individual_web, name='note-detail'),
     path('delete-note/<int:pk>/', views.delete_note, name='delete_note'),
+    path('unlock_note/<int:pk>/', views.unlock_note, name='unlock note'),
     path('api/account/<id>', AccountView.as_view()),
     path('api/account/', AccountView.as_view()),
     path('switch_account/<id>', views.switch_account, name = "switch account" ),
@@ -33,6 +34,7 @@ urlpatterns = [
     path('delete_bookmark/<id>/', views.delete_bookmark_web, name = "delete bookmark"),
     path('bookmarks/', views.bookmarks_web, name = "bookmarks"),
     path('shared_folders/', views.shared_folders_web, name = "shared folders"),
-    path('shared_folder/', views.shared_folder_individual_web, name = "shared folder")
+    path('shared_folder/', views.shared_folder_individual_web, name = "shared folder"),
+
     # TODO For note.html
 ]
