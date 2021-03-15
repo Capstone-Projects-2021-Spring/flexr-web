@@ -17,7 +17,7 @@ class TabTestCase(TestCase):
         curr_user = authenticate(username='foo', password='bar')
         cls.now = datetime.datetime.now(tz=timezone.utc)
         acc = Account.objects.create(user = curr_user, email = "test@me.com", type_of_account = "Business")
-        site = Site.objects.create(account = acc, url = "www.google.com")
+        site = Site.objects.create(account = acc, url = "https://www.google.com/")
         tab = Tab.objects.create(account = acc, site = site, status = "Open", 
             created_date = cls.now, last_visited = cls.now)
 
@@ -53,7 +53,7 @@ class TabTestCase(TestCase):
         c = Client()
         c.login(username='foo', password='bar')
         c.get(path='/switch_account/1') # force account switch
-        c.post("/api/tab/-1", {"url": "www.facebook.com"})
+        c.post("/api/tab/-1", {"url": "https://www.facebook.com"})
         tab_count = Tab.objects.all().count()
         self.assertEqual(tab_count, 2)
 
@@ -184,9 +184,9 @@ class HistoryTestCase(TestCase):
          type_of_account = "Business", date_joined = cls.now)
 
         sites = [
-            Site.objects.create(account = cls.acc, url = 'www.google.com'),
-            Site.objects.create(account = cls.acc, url = 'www.chess.com'),
-            Site.objects.create(account = cls.acc, url = 'www.youtube.com'),
+            Site.objects.create(account = cls.acc, url = 'https://www.google.com'),
+            Site.objects.create(account = cls.acc, url = 'https://www.chess.com'),
+            Site.objects.create(account = cls.acc, url = 'https://www.youtube.com'),
         ]
 
         for i,site in enumerate(sites):
