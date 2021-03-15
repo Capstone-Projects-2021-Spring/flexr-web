@@ -26,7 +26,9 @@ urlpatterns = [
     path('api/history/<id>', HistoryView.as_view()),
     path('api/history/<id>/filter', HistoryView.as_view()),
     path('filter_history/', views.browsing_history_filter, name = "filter history"),
-    path('add_tab/', views.add_tab, name = "add tab")
+    path('add_tab/', views.add_tab, name = "add tab"),
+    path('open_tab/', views.open_tab, name = "open tab"),
+    path('close_tab/<id>', views.close_tab, name = "close tab")
 
     #path('shared_folder/', ) TODO
     # TODO For note.html

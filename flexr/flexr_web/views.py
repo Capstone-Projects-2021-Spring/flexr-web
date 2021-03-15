@@ -332,7 +332,6 @@ def active_tabs_web(request):
     tabs = curr_account.tabs.all()
     return render(request, "flexr_web/open_tabs.html", {"Tabs":tabs, "Accounts": accounts})
 
-
 ################## REST API Endpoints ##################
 
 
@@ -566,7 +565,39 @@ def add_tab(request):
     site_url = request.POST.get("url")
     print(request.POST)
     tab = Tab.open_tab(site_url = site_url, curr_account=curr_account)
-    request.session['message'] = "Add Tab"
+    request.session['message'] = "Tab added"
+    return redirect('/')
+
+# This opens the tab from a site
+@login_required
+def open_tab(request, *args, **kwargs):
+    print("Tab opening")
+    curr_user = request.user
+    curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
+    message = ""
+    try:
+        site_url = curr_account.sites.get(id = kwargs['id']).url
+        print(request.POST)
+        tab = Tab.open_tab(site_url=site_url, curr_account=curr_account)
+        request.session['message'] = "Tab added"
+    except:
+        request.session['err_message'] = "Tab could not be opened"
+    return redirect('/')
+
+@login_required
+def close_tab(request, *args, **kwargs):
+    curr_user = request.user
+    curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
+    message = ""
+    try:
+        tab = curr_account.tabs.get(id = kwargs['id'])
+        print(tab)
+
+        tab = Tab.close_tab( tabID = kwargs['id'], curr_account = curr_account)
+        print(tab)
+        request.session['message'] = "Tab closed"
+    except:
+        request.session['err_message'] = "Tab could not be closed"
     return redirect('/')
 
 
