@@ -202,7 +202,7 @@
         <div class = "row">
             {%for bm in Bookmarks%}
                 <div id = "bookmark" class = "tab card col-lg-4"  onclick="window.open('{{bm.site.url}}')">
-                    <p >{{bm}}</p>
+                    <p >{{bm.site}}</p>
                 </div>
             {%endfor%}
         </div>
