@@ -66,7 +66,7 @@ class SiteTestCase(TestCase):
         test_acc = Account.objects.create(user=test_user, email=test_user.email, phone_number="5704600704",
                                           type_of_account="Business")
         test_acc.save()
-        test_site = Site.objects.create(account = test_acc, url = "www.google.com")
+        test_site = Site.objects.create(account = test_acc, url = "https://www.google.com")
         test_site.save()
 
     def test_site_created(self):
@@ -76,19 +76,19 @@ class SiteTestCase(TestCase):
 
     def test_create_another_site(self):
         test_acc = Account.objects.get(email = "anon@gmail.com")
-        site2 = Site.objects.create(account = test_acc, url = "www.facebook.com")
+        site2 = Site.objects.create(account = test_acc, url = "https://www.facebook.com")
         site2.save()
         site_count = test_acc.sites.all().count()
         self.assertEqual(site_count, 2)
 
     def test_delete_site(self):
         test_acc = Account.objects.get(email="anon@gmail.com")
-        site2 = Site.objects.get(url = "www.google.com")
+        site2 = Site.objects.get(url = "https://www.google.com")
         site_count = test_acc.sites.all().count()
         self.assertEqual(site_count, 1)
 
     def test_update_recent_frequency(self):
-        site2 = Site.objects.get(url="www.google.com")
+        site2 = Site.objects.get(url="https://www.google.com")
         site2.number_of_visits += 1
         site2.save()
         self.assertEqual(site2.number_of_visits, 2)
@@ -105,7 +105,7 @@ class BookmarkTestCase(TestCase):
         test_acc = Account.objects.create(user=test_user, email=test_user.email, phone_number="5704600704",
                                           type_of_account="Business")
         test_acc.save()
-        test_site = Site.objects.create(account = test_acc, url = "www.google.com")
+        test_site = Site.objects.create(account = test_acc, url = "https://www.google.com")
         test_site.save()
         test_bookmark = Bookmark.objects.create(account = test_acc, bookmark_name = "Google", site = test_site)
         test_bookmark.save()
@@ -117,7 +117,7 @@ class BookmarkTestCase(TestCase):
 
     def test_create_another_bookmark(self):
         test_acc = Account.objects.get(email="anon@gmail.com")
-        test_site2 = Site.objects.create(account=test_acc, url="www.reddit.com")
+        test_site2 = Site.objects.create(account=test_acc, url="https://www.reddit.com")
         test_site2.save()
         test_bookmark2 = Bookmark.objects.create(account=test_acc, bookmark_name="Reddit", site=test_site2)
         test_bookmark2.save()
@@ -146,7 +146,7 @@ class TabTestCase(TestCase):
         test_acc = Account.objects.create(user=test_user, email=test_user.email, phone_number="5704600704",
                                           type_of_account="Business")
         test_acc.save()
-        test_site = Site.objects.create(account = test_acc, url = "www.google.com")
+        test_site = Site.objects.create(account = test_acc, url = "https://www.google.com")
         test_site.save()
         test_tab = Tab.objects.create(account = test_acc, site = test_site)
         test_tab.save()
@@ -158,7 +158,7 @@ class TabTestCase(TestCase):
 
     def test_create_another_tab(self):
         test_acc = Account.objects.get(email="anon@gmail.com")
-        test_site2 = Site.objects.create(account=test_acc, url="www.reddit.com")
+        test_site2 = Site.objects.create(account=test_acc, url="https://www.reddit.com")
         test_site2.save()
         test_tab2 = Tab.objects.create(account=test_acc, site=test_site2)
         test_tab2.save()
@@ -167,7 +167,7 @@ class TabTestCase(TestCase):
 
     def test_tab_deleted(self):
         test_acc = Account.objects.get(email="anon@gmail.com")
-        test_site = Site.objects.get(url="www.google.com")
+        test_site = Site.objects.get(url="https://www.google.com")
         test_tab = Tab.objects.get(site = test_site)
         test_tab.delete()
         test_tab.save()
@@ -182,7 +182,7 @@ class AccountPreferencesTestCase(TestCase):
         test_acc = Account.objects.create(user=test_user, email=test_user.email, phone_number="5704600704",
                                           type_of_account="Business")
         test_acc.save()
-        test_site = Site.objects.create(account = test_acc, url = "www.google.com")
+        test_site = Site.objects.create(account = test_acc, url = "https://www.google.com")
         test_site.save()
         test_account_preferences = Account_Preferences.objects.create(name = "Annon Pref1", home_page = test_site)
         test_account_preferences.save()
@@ -194,7 +194,7 @@ class AccountPreferencesTestCase(TestCase):
 
     def test_create_another_account_preferences(self):
         test_acc = Account.objects.get(email="anon@gmail.com")
-        test_site2 = Site.objects.create(account=test_acc, url="www.reddit.com")
+        test_site2 = Site.objects.create(account=test_acc, url="https://www.reddit.com")
         test_site2.save()
         test_account_preferences = Account_Preferences.objects.create(name = "Annon Pref2", home_page = test_site2)
         test_account_preferences.save()
