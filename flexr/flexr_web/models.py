@@ -179,7 +179,9 @@ class Tab(models.Model):
     @classmethod
     def close_tab(cls, tabID, curr_account):
         try:
-            tab = Tab.objects.filter(account = curr_account).get(pk = tabID)[0]
+            # print("Models", tabID)
+            tab = Tab.objects.filter(account = curr_account).get(id = tabID)
+
             tab.delete()
             return "successful"
         except:
@@ -212,11 +214,6 @@ class Tab(models.Model):
         super(Tab, self).save(*args, **kwargs)
 
         # create corresponding site object
-
-
-
-        
-
 
 class Bookmark(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="bookmarks")

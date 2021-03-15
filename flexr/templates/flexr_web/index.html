@@ -91,6 +91,11 @@
             overflow: hidden;
             word-wrap: break-word;
         }
+        .fa-window-close:hover{
+            cursor: pointer;
+            color: grey;
+        }
+
     </style>
 </head>
 
@@ -153,7 +158,7 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="add_tabLabel">Add an account!</h5>
+            <h5 class="modal-title" id="add_tabLabel">Add a tab!</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -178,8 +183,15 @@
         <h2 style="display:inline">Open tabs:</h2><img id="plus-icon" data-toggle="modal" data-target="#add_tab" src="{% static 'icons/plus-square.svg' %}">
         <div class = "row">
             {%for tab in Tabs%}
-                <div id = "tab" class = "tab card col-lg-4"  onclick="window.open('{{tab.site.url}}')">
-                    <p >{{tab.site}}</p>
+
+                <div id = "tab" class = "tab card col-lg-3"  >
+
+
+                     <div class="card-body"  style="display: inline;">
+                         <i class="far fa-window-close" onclick=" var conf = confirm('Do you want to close this tab?'); if(conf){ window.location.href = 'close_tab/{{tab.id}}'}" style="display: inline;"></i>
+                        <p onclick="window.open('{{tab.site.url}}')" style="display: inline;">{{tab.site}}</p>
+                      </div>
+
                 </div>
             {%endfor%}
         </div>
@@ -216,7 +228,7 @@
     <div class = "suggested sidenav">
         <h2>Suggested Sites:</h2>
         {%for site in Sites%}
-                <div id = "site" class = "site card col-lg-12"  onclick="window.open('{{site.url}}')">
+                <div id = "site" class = "site card col-lg-12" onclick="window.open('{{site.url}}'); ">
                         <p>{{site.name}}</p>
                 </div>
         {%endfor%}
