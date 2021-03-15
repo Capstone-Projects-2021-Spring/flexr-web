@@ -3,6 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Flexr | Open Tabs</title>
+    <style>
+        .fa-window-close:hover{
+            cursor: pointer;
+            color: grey;
+        }
+    </style>
+
 </head>
 <body>
     {% include "flexr_web/navbar.html" %}
@@ -15,8 +22,8 @@
 
     <div class = "row">
         {%for tab in Tabs%}
-
                 <div class = "card col-lg-3">
+                    <i class="far fa-window-close" onclick=" var conf = confirm('Do you want to close this tab?'); if(conf){ window.location.href = 'close_tab/{{tab.id}}'}" style="display: inline;"></i>
                     <p><a href="{{tab.site.url}}">{{tab.site.url}}</a></p>
                     <p>Created Date: {{tab.created_date}}</p>
                     <p>Last Visited: {{tab.last_visited}}</p>
