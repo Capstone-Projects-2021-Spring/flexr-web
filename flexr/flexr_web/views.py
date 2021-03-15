@@ -223,7 +223,10 @@ def edit_account_preferences_web(request):
 
 @login_required
 def shared_folders_web(request):
-    return None
+    curr_user = request.user
+    curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+    folders = curr_account.shared_folders.all()
+    return render(request, "flexr_web/shared_folders.html", {"Folders": folders})
 
 @login_required
 def shared_folder_individual_web(request):
@@ -231,8 +234,10 @@ def shared_folder_individual_web(request):
     owner = shared_folder.owner
     #CHANGE THIS TO NOT USE THE SHARED FOLDERS COLLABORATORS, this was written this way for testing the view method
     collaborators = folder.collaborators
-    
-    return render(request, "flexr_web/shared_folder.html", {"SharedFolder": shared_folder, "Collaborators": collaborators})
+    tabs = folder.tabs
+    bookmarks = folder.bookmarks
+    notes = folder.notes
+    return render(request, "flexr_web/shared_folder.html", {"SharedFolder": shared_folder, "Collaborators": collaborators, "Tabs": tabs, "Bookmarks": bookmarks, "Notes": notes})
 
 @login_required
 def notes_hub_web(request):
@@ -331,6 +336,38 @@ def active_tabs_web(request):
     accounts = curr_user.accounts.all()
     tabs = curr_account.tabs.all()
     return render(request, "flexr_web/open_tabs.html", {"Tabs":tabs, "Accounts": accounts})
+
+
+@login_required
+def add_bookmark_web(request, id):
+    curr_user = request.user
+    curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+    accounts = curr_user.accounts.all()
+    tabs = curr_account.tabs.all()
+
+    tab = curr_account.tabs.get(pk = id)
+    Bookmark.create_bookmark(tab, curr_account)
+
+    return render(request, "flexr_web/open_tabs.html", {"Tabs":tabs, "Accounts": accounts})
+
+def delete_bookmark_web(request, id):
+    curr_user = request.user
+    curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+    Bookmark.delete_bookmark(id)
+    bookmarks = curr_account.bookmarks.all()
+    return render(request, "flexr_web/bookmarks.html", {"Bookmarks": bookmarks})
+
+
+@login_required
+def bookmarks_web(request):
+    curr_user = request.user
+    curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+    bookmarks = curr_account.bookmarks.all()
+    return render(request, "flexr_web/bookmarks.html", {"Bookmarks": bookmarks})
+
+
+
+
 
 ################## REST API Endpoints ##################
 
@@ -904,15 +941,24 @@ def get_account_preferences(request):
 ##################  Managing Notes ##################
 
 def create_note(request):
+
     if request.method == 'POST':
         form = notef(request.POST)
-        print("Note made")
+        # print("Note made")
         if form.is_valid():
-            curr_acc = request.user.accounts.get(account_id = request.session['account_id'])
+            acc = request.user.accounts.get(account_id = request.session['account_id'])
+            tit = request.POST.get('title')
+            cont = request.POST.get('content')
+            lo = request.POST.get('lock')
+            if lo == 'on':
+                lo = True
+            else:
+                lo = False
+            passw = request.POST.get('password')
+            newnote = Note.objects.create(account=acc, title=tit, content=cont, lock=lo, password=passw)
+            newnote.save()
+            return redirect('/notes')
 
-            form.save()
-            request.session['message'] = "Note created"
-    return redirect('/notes')
     """
        Creates note for the account
                   Parameters:

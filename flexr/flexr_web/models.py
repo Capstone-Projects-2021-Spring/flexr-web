@@ -40,6 +40,7 @@ class Account(models.Model):
 
     # TODO Pushkin: Change teams to shared_folders
     # teams = models.ManyToManyField("Team", blank=True, null = True) #I don't think this should be a manytomany field this should be a list of teams got by a method?
+    shared_folders = models.ManyToManyField("sharedFolder", blank=True)
 
     # friends = models.ManyToManyField("Account", blank=True, null = True) # this probably needs to be another table
     account_preferences = models.OneToOneField("Account_Preferences", on_delete=models.CASCADE, blank=True, null = True)
@@ -229,7 +230,23 @@ class Bookmark(models.Model):
     def __str__(self):
         return str(self.bookmark_name)
 
+    @classmethod
+    def create_bookmark(cls, tab, curr_account, name='bookmark', last_visited=None):
+        Bookmark.objects.create(account = curr_account, 
+        bookmark_name = name, site=tab.site)
+
+        print('bookmark created')
+    
+    @classmethod
+    def delete_bookmark(cls, id):
+        bookmark = Bookmark.objects.filter(pk=id).delete()
+        print('bookmark deleted')
+
+
+    
+
 # TODO change bookmark status in the Site model on save
+# Gerald: What is bookmark status?
 
 # TODO need to make sure this deletes when account gets deleted (I think it does)
 # TODO need to finalize the fields here
@@ -289,7 +306,9 @@ class sharedFolder(models.Model):
     owner = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="owner")
 
     # TODO need to have this be a many to many field
-    collaborators = []
-    collaborators.append(owner)
+    collaborators = models.ManyToManyField(Account)
+    #bookmarks = models.ManyToManyField(Bookmark)
+    #tabs = models.ManyToManyField(Tab)
+    #notes = models.ManyToManyField(Note)
     def __str__(self):
         return str(self.title)
