@@ -1,33 +1,247 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <title>Flexr | Home</title>
+
+    <script>
+        async function switch_account(id){
+            let csrftoken = getCookie('csrftoken');
+            const resp = await fetch('http://127.0.0.1:8000/switch_account/'+id, {
+                method : "POST",
+                body: "hello",
+                headers : {"X-CSRFToken" : csrftoken},
+            });
+            window.location.reload();
+        }
+        // The following function are copying from
+        // https://docs.djangoproject.com/en/dev/ref/csrf/#ajax
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+    <style>
+                /* The sidebar menu */
+        .sidenav {
+          font-size: .7rem;
+          text-align:center;
+          height: 100%; /* Full-height: remove this if you want "auto" height */
+          width: 13%; /* Set the width of the sidebar */
+          padding: 1%;
+          position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+          z-index: 1; /* Stay on top */
+          top: 0; /* Stay at the top */
+          left: 0;
+          background-color: #d9d9d9; /* Black */
+          overflow-x: hidden; /* Disable horizontal scroll */
+          padding-top: 20px;
+        }
+
+    </style>
+    <style>
+        body {
+            padding-left: 15%;
+            padding-right: 15%;
+        }
+        #plus-icon:hover{
+            cursor: pointer;
+        }
+        #account, #tab, #note, #site, #history, #bookmark {
+            text-align:center;
+            margin: 1%;
+            max-height: 8rem;
+            overflow: hidden;
+            word-wrap: break-word;
+            text-overflow: ellipsis;
+
+        }
+        #account:hover, #tab:hover, #note:hover, #site:hover, #history:hover, #bookmark:hover{
+            text-align:center;
+            border: 1px solid black;
+            cursor: pointer;
+        }
+        #active_acc{
+            font-weight: bold;
+        }
+
+        .card{
+            font-size:
+            padding: 1%;
+            max-height: 10rem;
+            overflow: hidden;
+            word-wrap: break-word;
+            text-overflow: ellipsis;
+        }
+        .site{
+            max-height: 5rem;
+            padding: 2%;
+            overflow: hidden;
+            word-wrap: break-word;
+        }
+        .fa-window-close:hover{
+            cursor: pointer;
+            color: grey;
+        }
+
+    </style>
 </head>
+
 <body>
     {% include "flexr_web/navbar.html" %}
+    <div id = "accounts">
+        <h2 style="display:inline;" >Accounts:</h2> <img id="plus-icon" data-toggle="modal" data-target="#add_account" src="{% static 'icons/plus-square.svg' %}">
+        <div class = "row">
+            {%for acc in Accounts%}
 
-    <h1>Hello {{user}}, I am flexr</h1>
-     <h2>Accounts:</h2>
-    {%for acc in Accounts%}
-        <h3>{{acc}}</h3>
-    {%endfor%}
-    <h2>Devices:</h2>
-        {%for dev in Devices%}
-            <h3>{{dev}}</h3>
+                <div id = "account" class = "card col-lg-3" onclick="window.location.href = 'switch_account/{{acc.account_id}}'">
+                    {%if acc.account_id == curr_acc.account_id%}
+                        <h3 id = "active_acc" onclick="window.location.href = '/profile'">{{acc}}</h3>
+                    {%else%}
+                        <p>{{acc}}</p>
+                    {%endif%}
+                </div>
+            {%endfor%}
+        </div>
+    </div>
+
+    <div class="modal fade" id="add_account" tabindex="-1" role="dialog" aria-labelledby="add_accountLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="add_accountLabel">Add an account!</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <form method = "post" action="{% url 'add account' %}">
+                {% csrf_token %}
+                {% for field in form %}
+                    <p>
+                        {{ field.label_tag }}<br>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <small style="color: grey">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <p style="color: red">{{ error }}</p>
+                        {% endfor %}
+                    </p>
+                {% endfor %}
+
+                <!-- {{ form }} -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Create account</button>
+                </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="modal fade" id="add_tab" tabindex="-1" role="dialog" aria-labelledby="add_tabLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="add_tabLabel">Add a tab!</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <form method = "post" action="{% url 'add tab' %}">
+                {% csrf_token %}
+                <label for = "url">URL</label>
+                  <input type="url" id = "url" name = "url">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add tab</button>
+                </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class = "tabs">
+        <h2 style="display:inline">Open tabs:</h2><img id="plus-icon" data-toggle="modal" data-target="#add_tab" src="{% static 'icons/plus-square.svg' %}">
+        <div class = "row">
+            {%for tab in Tabs%}
+
+                <div id = "tab" class = "tab card col-lg-3"  >
+
+
+                     <div class="card-body"  style="display: inline;">
+                         <i class="far fa-window-close" onclick=" var conf = confirm('Do you want to close this tab?'); if(conf){ window.location.href = 'close_tab/{{tab.id}}'}" style="display: inline;"></i>
+                        <p onclick="window.open('{{tab.site.url}}')" style="display: inline;">{{tab.site}}</p>
+                      </div>
+
+                </div>
+            {%endfor%}
+        </div>
+    </div>
+
+    <div class = "bookmarks">
+        <h2>Bookmarks:</h2>
+        <div class = "row">
+            {%for bm in Bookmarks%}
+                <div id = "bookmark" class = "tab card col-lg-4"  onclick="window.open('{{bm.site.url}}')">
+                    <p >{{bm.site}}</p>
+                </div>
+            {%endfor%}
+        </div>
+    </div>
+    <div class = "notes">
+        <h2>Recent Notes:</h2>
+        <div class = "row">
+            {%for note in Notes%}
+                <div id = "note" class = "card col-lg-3"  onclick="window.location.href = '/opennote/{{note.id}}'">
+                        <p >{{note}}</p>
+                </div>
+            {%endfor%}
+        </div>
+    </div>
+<!--    <div class = "history">-->
+<!--        <h2>Recent Site history:</h2>-->
+<!--        {%for hist in History%}-->
+<!--                <div id = "history" class = "tab card col-lg-4"  onclick="window.open('{{hist.site.url}}')">-->
+<!--                        <h3 >{{hist.site.url}}</h3>-->
+<!--                </div>-->
+<!--        {%endfor%}-->
+<!--    </div>-->
+    <div class = "suggested sidenav">
+        <h2>Suggested Sites:</h2>
+        {%for site in Sites%}
+                <div id = "site" class = "site card col-lg-12" onclick="window.open('{{site.url}}'); ">
+                        <p>{{site.name}}</p>
+                </div>
         {%endfor%}
-    <h2>Sites:</h2>
-    {%for site in Sites%}
-        <h3>{{site}}</h3>
-    {%endfor%}
-    <h2>Open tabs:</h2>
-    {%for tab in Tabs%}
-        <h3>{{tab}}</h3>
-    {%endfor%}
-    <h2>Site history:</h2>
-    {%for hist in History%}
-        <h3>{{hist}}</h3>
-    {%endfor%}
-    <p><a href='accounts/logout'>Logout</a></p>
+    </div>
+
+     <div class = "shared_folders">
+        <h2>Shared folders:</h2>
+        {%for sf in Shared_folders%}
+                <div id = "sf" class = "card col-lg-12"  onclick="window.location.href = '/'">
+                        <p>{{sf}}</p>
+                </div>
+            {%endfor%}
+    </div>
+
 </body>
 </html>

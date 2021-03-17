@@ -1,12 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
-<nav>
-    <a href="/admin">Admin</a>
-    <a href="/profile">Profile</a>
-    <a href="/browsing_history">History</a>
-    <a href="/open_tabs">Tabs</a>
-    <a href="/notes">Notes</a>
-    <a href="/shared_folders">Shared Folders</a>
+<head>
+    {% load static %}
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <script src="https://kit.fontawesome.com/997a621b7c.js" crossorigin="anonymous"></script>
+    <style>
+        #toast-container {
+          top: auto !important;
+          left: auto !important;
+          top: 5%;
+          right:5%;
+        }
+        body{
+            padding-right: 15%;
+            padding-left: 15%;
+        }
+    </style>
+
+</head>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="/"><img src="{% static 'flexr_logo_2.png' %}" width="150px" height="55px"></a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav">
+
+      <li class="nav-item">
+        <a class="nav-link" href="/">Home</a>
+      </li>
+
+        <li class="nav-item">
+        <a class="nav-link" href="/browsing_history">History</a>
+      </li>
+        <li class="nav-item">
+        <a class="nav-link" href="/notes">Notes</a>
+      </li>
+        <li class="nav-item">
+        <a class="nav-link" href="/open_tabs">Tabs</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/bookmarks">Bookmarks</a>
+      </li>
+        <li class="nav-item ">
+        <a class="nav-link disabled" href="/shared_folders">Shared Folders</a>
+      </li>
+      {% if user.is_superuser %}
+      <li class="nav-item">
+            <a class="nav-link" href="/admin">Admin</a>
+      </li>
+      {% endif %}
+
+        <li class="nav-item">
+        <a class="nav-link" href="/profile">Profile</a>
+      </li>
+        <li class="nav-item">
+        <a class="nav-link" href='/accounts/logout'>Logout</a>
+      </li>
+    </ul>
+  </div>
 </nav>
+  {% if messages %}
+    {% for message in messages%}
+
+        {% if message.tags == "success"%}
+            <script>toastr.success('{{message}}')</script>
+        {% elif message.tags == "error"%}
+            <script>toastr.error('{{message}}')</script>
+        {%endif%}
+    {%endfor%}
+  {%endif %}
 </html>

@@ -13,8 +13,28 @@ urlpatterns = [
     path('api/tabs/', AllTabsView.as_view()),
     path('api/tab/<id>', TabView.as_view()),
     path('api/tab/', TabView.as_view()),
+    path('create_note', create_note, name='create_note'),
+    path('edit_note/<int:pk>', edit_note, name='edit_note'),
+    path('opennote/<int:pk>/', views.note_individual_web, name='note-detail'),
+    path('delete-note/<int:pk>/', views.delete_note, name='delete_note'),
+    path('unlock_note/<int:pk>/', views.unlock_note, name='unlock note'),
     path('api/account/<id>', AccountView.as_view()),
-    path('api/account/', AccountView.as_view())
-    #path('shared_folder/', ) TODO 
+    path('api/account/', AccountView.as_view()),
+    path('switch_account/<id>', views.switch_account, name = "switch account" ),
+    path('add_account/', views.add_account_web, name = "add account"),
+    path('edit_account/', views.edit_account_web, name="edit account"),
+    path('edit_preferences/', views.edit_account_preferences_web, name = "edit account preferences"),
+    path('api/history/<id>', HistoryView.as_view()),
+    path('api/history/<id>/filter', HistoryView.as_view()),
+    path('filter_history/', views.browsing_history_filter, name = "filter history"),
+    path('add_tab/', views.add_tab, name = "add tab"),
+    path('open_tab/', views.open_tab, name = "open tab"),
+    path('close_tab/<id>', views.close_tab, name = "close tab"),
+    path('add_bookmark/<id>/', views.add_bookmark_web, name = "add bookmark"),
+    path('delete_bookmark/<id>/', views.delete_bookmark_web, name = "delete bookmark"),
+    path('bookmarks/', views.bookmarks_web, name = "bookmarks"),
+    path('shared_folders/', views.shared_folders_web, name = "shared folders"),
+    path('shared_folder/', views.shared_folder_individual_web, name = "shared folder"),
+
     # TODO For note.html
 ]
