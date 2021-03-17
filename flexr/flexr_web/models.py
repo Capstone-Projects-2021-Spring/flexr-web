@@ -40,7 +40,7 @@ class Account(models.Model):
 
     # TODO Pushkin: Change teams to shared_folders
     # teams = models.ManyToManyField("Team", blank=True, null = True) #I don't think this should be a manytomany field this should be a list of teams got by a method?
-    shared_folder = models.ManyToManyField("sharedFolder", blank=True)
+    # shared_folder = models.ManyToManyField("sharedFolder", blank=True)
 
     # friends = models.ManyToManyField("Account", blank=True, null = True) # this probably needs to be another table
     account_preferences = models.OneToOneField("Account_Preferences", on_delete=models.CASCADE, blank=True, null = True)
@@ -300,15 +300,21 @@ class sharedFolder(models.Model):
     #ownerAccount 
     #Title was going to have a CharField in place of Textfield, but I got the following error:
     #AttributeError: module 'django.db.models' has no attribute 'charField'
-    title = models.TextField(verbose_name="Shared Folder Title", max_length=100, default="sharedFolder")
+    title = models.CharField(verbose_name="Shared Folder Title", max_length=100)
     description = models.TextField(verbose_name="Shared Folder description")
     created_date = models.DateTimeField(default= timezone.now)
     owner = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="shared_folders")
 
     # TODO need to have this be a many to many field
     collaborators = models.ManyToManyField(Account)
-    #bookmarks = models.ManyToManyField(Bookmark)
-    #tabs = models.ManyToManyField(Tab)
-    #notes = models.ManyToManyField(Note)
+    bookmarks = models.ManyToManyField(Bookmark, blank=True)
+    tabs = models.ManyToManyField(Tab , blank=True)
+    notes = models.ManyToManyField(Note , blank=True)
     def __str__(self):
         return str(self.title)
+
+    def save(self, *args, **kwargs):
+        # call super method to create Tab entry
+        #
+        super().save(*args, **kwargs)
+        print(self.collaborators.all())

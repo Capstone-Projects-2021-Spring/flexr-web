@@ -59,7 +59,7 @@
         #plus-icon:hover{
             cursor: pointer;
         }
-        #account, #tab, #note, #site, #history, #bookmark {
+        #account, #tab, #note, #site, #history, #bookmark, #sf {
             text-align:center;
             margin: 1%;
             max-height: 8rem;
@@ -68,7 +68,7 @@
             text-overflow: ellipsis;
 
         }
-        #account:hover, #tab:hover, #note:hover, #site:hover, #history:hover, #bookmark:hover{
+        #account:hover, #tab:hover, #note:hover, #site:hover, #history:hover, #bookmark:hover, #sf:hover{
             text-align:center;
             border: 1px solid black;
             cursor: pointer;
@@ -236,11 +236,13 @@
 
      <div class = "shared_folders">
         <h2>Shared folders:</h2>
-        {%for sf in Shared_folders%}
-                <div id = "sf" class = "card col-lg-12"  onclick="window.location.href = '/'">
+         <div class = "row">
+        {%for sf in Folders%}
+                <div id = "sf" class = "card col-lg-3"  onclick="window.location.href = '/shared_folder/{{sf.id}}'">
                         <p>{{sf}}</p>
                 </div>
             {%endfor%}
+             </div>
     </div>
 
 </body>

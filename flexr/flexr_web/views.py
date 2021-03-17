@@ -42,6 +42,7 @@ class IndexView(LoginRequiredMixin, View):
         tabs = curr_account.tabs.all()
         bookmarks = curr_account.bookmarks.all()
         notes = curr_account.notes.all()
+        folders = curr_account.shared_folders.all()
         # suggested_sites = curr_account.suggested_sites()
         print(curr_user)
         if ('message' in self.request.session):
@@ -56,7 +57,7 @@ class IndexView(LoginRequiredMixin, View):
         form = AccountForm
         return render(self.request, "flexr_web/index.html",
                       {"curr_acc": curr_account, "Accounts": accounts, "Sites": sites, "Tabs": tabs, "Notes": notes,
-                       "History": history, "Bookmarks": bookmarks,
+                       "History": history, "Bookmarks": bookmarks, "Folders":folders,
                        "form": form})
 
 @csrf_exempt
@@ -163,8 +164,8 @@ def profile_web(request):
             site = Site.objects.create(account = curr_account, url = "https://google.com")
             site.save()
             pref_form.fields['home_page'].initial = site
-    pref_form.fields['home_page'].queryset = curr_account.sites.all() # have to be sure to only show that user's sites!
 
+    pref_form.fields['home_page'].queryset = curr_account.sites.all() # have to be sure to only show that user's sites!
     pref_form.fields['sync_enabled'].initial = curr_account.account_preferences.sync_enabled
     pref_form.fields['searchable_profile'].initial = curr_account.account_preferences.searchable_profile
     pref_form.fields['cookies_enabled'].initial = curr_account.account_preferences.cookies_enabled
@@ -231,18 +232,70 @@ def shared_folders_web(request):
     curr_user = request.user
     curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
     folders = curr_account.shared_folders.all()
-    return render(request, "flexr_web/shared_folders.html", {"Folders": folders})
+
+    folder_form = SharedFolder()
+    folder_form.fields['bookmarks'].queryset = curr_account.bookmarks.all()
+    folder_form.fields['tabs'].queryset = curr_account.tabs.all()
+    folder_form.fields['notes'].queryset = curr_account.notes.all()
+    folder_form.fields['collaborators'].initial = curr_account
+
+    if ('message' in request.session):
+        message = request.session['message']
+        del request.session['message']
+        messages.success(request, message)
+    elif ('err_message' in request.session):
+        message = request.session['err_message']
+        del request.session['err_message']
+        messages.error(request, message)
+
+    return render(request, "flexr_web/shared_folders.html", {"Folders": folders, "folder_form": folder_form})
 
 @login_required
-def shared_folder_individual_web(request):
-    shared_folder = request.shared_folder
+def shared_folder_individual_web(request, pk):
+    current_acc = request.user.accounts.get(account_id = request.session['account_id'])
+    shared_folder = current_acc.shared_folders.get(id = pk)
     owner = shared_folder.owner
     #CHANGE THIS TO NOT USE THE SHARED FOLDERS COLLABORATORS, this was written this way for testing the view method
-    collaborators = folder.collaborators
-    tabs = folder.tabs
-    bookmarks = folder.bookmarks
-    notes = folder.notes
-    return render(request, "flexr_web/shared_folder.html", {"SharedFolder": shared_folder, "Collaborators": collaborators, "Tabs": tabs, "Bookmarks": bookmarks, "Notes": notes})
+    collaborators = shared_folder.collaborators.all()
+    print(collaborators)
+    tabs = shared_folder.tabs.all()
+    print(tabs)
+    bookmarks = shared_folder.bookmarks.all()
+    notes = shared_folder.notes.all()
+
+    # if a tab, bookmark, note is in the shared folder. Then the way we have the api's set up the user that doesn't own the object will now not be able to view, edit, or delete the object
+    # we may want to add a field to each object that says "shared"
+
+    # return render(request, "flexr_web/shared_folder.html", {"SharedFolder": shared_folder, "Collaborators": collaborators, "Tabs": tabs, "Bookmarks": bookmarks, "Notes": notes})
+    return render(request, "flexr_web/shared_folder.html", {"shared_folder": shared_folder, "Collaborators": collaborators, "Tabs":tabs, "Bookmarks": bookmarks, "Notes": notes})
+
+@login_required
+def create_shared_folder_web(request):
+    # Change required fields on the form.
+    if request.method == 'POST':
+        form = SharedFolder(request.POST)
+        if form.is_valid():
+            # form.save()
+            print(request.POST)
+            title = form.cleaned_data['title']
+            desc = form.cleaned_data['description']
+            owner = request.user.accounts.get(account_id = request.session['account_id'])
+            collaborators =  form.cleaned_data['collaborators']
+            tabs = form.cleaned_data['tabs']
+            notes = form.cleaned_data['notes']
+            bookmarks = form.cleaned_data['bookmarks']
+            folder = sharedFolder.objects.create(title = title, description = desc, owner = owner)
+            folder.collaborators.set(collaborators)
+            folder.tabs.set(tabs)
+            folder.notes.set(notes)
+            folder.bookmarks.set(bookmarks)
+
+            folder.save()
+            request.session['message'] = "Shared Folder created"
+        else:
+            request.session['err_message'] = "Shared Folder not created."
+            print(form.errors)
+        return redirect('/shared_folders')
 
 @login_required
 def notes_hub_web(request):
@@ -276,6 +329,7 @@ def note_individual_web(request, pk):
     form = EditNoteForm()
     form.fields['title'].initial = obj.title
     form.fields['content'].initial = obj.content
+
     if ('message' in request.session):
         message = request.session['message']
         del request.session['message']

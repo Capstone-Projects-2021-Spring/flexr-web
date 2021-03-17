@@ -7,10 +7,22 @@
 <body>
     {% include "flexr_web/navbar.html" %}
     <h1>Folder title: {{shared_folder.title}}</h1>
-    <h1>Folder owner: {{shared_folder.owner</h1>
+    <h1>Folder owner: {{shared_folder.owner}}</h1>
     <h1>Collaborators: </h1>
-    {% for collaborator in collaborators %}
+    {% for collaborator in Collaborators %}
         <p>{{collaborator}}</p>
+    {% endfor %}
+    <h1>Notes: </h1>
+    {% for note in Notes %}
+        <p>{{note}}</p>
+    {% endfor %}
+    <h1>Bookmarks: </h1>
+    {% for bookmark in Bookmarks %}
+        <p>{{bookmark}}</p>
+    {% endfor %}
+    <h1>Tabs: </h1>
+    {% for tab in Tabs %}
+        <p>{{tab}}</p>
     {% endfor %}
 </body>
 </html>

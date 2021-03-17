@@ -18,9 +18,12 @@ class BookmarkInLine(admin.TabularInline):
 class NoteInLine(admin.TabularInline):
     model = Note
 
+class SharedFolderInLine(admin.TabularInline):
+    model = sharedFolder
+
 class AccountAdmin(admin.ModelAdmin):
     inlines = [
-        TabInLine, HistoryInLine, SiteInLine, BookmarkInLine, NoteInLine,
+        TabInLine, HistoryInLine, SiteInLine, BookmarkInLine, NoteInLine, SharedFolderInLine
     ]
 
 class TabAdmin(admin.ModelAdmin):

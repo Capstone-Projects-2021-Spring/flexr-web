@@ -34,7 +34,7 @@ urlpatterns = [
     path('delete_bookmark/<id>/', views.delete_bookmark_web, name = "delete bookmark"),
     path('bookmarks/', views.bookmarks_web, name = "bookmarks"),
     path('shared_folders/', views.shared_folders_web, name = "shared folders"),
-    path('shared_folder/', views.shared_folder_individual_web, name = "shared folder"),
-
+    path('shared_folder/<int:pk>/', views.shared_folder_individual_web, name = "shared folder"),
+    path('add_shared_folder/', views.create_shared_folder_web, name = "add shared folder")
     # TODO For note.html
 ]
