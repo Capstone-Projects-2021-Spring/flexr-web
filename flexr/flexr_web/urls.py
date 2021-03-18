@@ -37,7 +37,7 @@ urlpatterns = [
 
     path('open_tabs/', TabsView.as_view(), name='tabs'), #broken
     path('add_tab/', TabsView().add_tab, name = "add tab"),
-    path('open_tab/', TabsView().open_tab, name = "open tab"),
+    #path('open_tab/', TabsView().open_tab, name = "open tab"),
     path('close_tab/<id>', TabsView().close_tab, name = "close tab"),
 
     path('bookmarks/', BookmarksView.as_view(), name = "bookmarks"), #broken

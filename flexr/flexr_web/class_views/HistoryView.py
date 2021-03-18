@@ -12,10 +12,10 @@ from ..forms import *
 # TODO: Gerald add delete history button
 
 class HistoryView(LoginRequiredMixin, View):
-    
     """
     View class for the history page
     """
+
     def get(self, *args, **kwargs):
         """
         Display the history page
@@ -81,4 +81,7 @@ class HistoryView(LoginRequiredMixin, View):
 
     # TODO: Gerald
     def delete(self, *args, **kwargs):
+        """
+        Delete a history object
+        """
         pass

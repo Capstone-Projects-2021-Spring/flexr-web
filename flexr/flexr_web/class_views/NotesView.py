@@ -54,19 +54,28 @@ class NotesView(LoginRequiredMixin, View):
         Create a new note
         """
 
-        self.request = request
+        #self.request = request
 
-        form = notef(self.request.POST)
+        # get form object 
+        form = notef(request.POST)
+
+        # check that form is valid
         if form.is_valid():
-            acc = self.request.user.accounts.get(account_id = self.request.session['account_id'])
-            tit = self.request.POST.get('title')
-            cont = self.request.POST.get('content')
-            lo = self.request.POST.get('lock')
-            passw = self.request.POST.get('password')
+
+            # get current account
+            acc = request.user.accounts.get(account_id = request.session['account_id'])
+
+            # grab note information from the form 
+            tit = request.POST.get('title')
+            cont = request.POST.get('content')
+            lo = request.POST.get('lock')
+            passw = request.POST.get('password')
+
+            # check whether note is password locked
             if lo == 'on':
                 lo = True
-            else:
 
+            else:
                 if (passw not in EMPTY_VALUES):
                     print("reached",passw)
                     request.session['err_message'] = "Note not created. Please put a password on locked note"
@@ -76,9 +85,10 @@ class NotesView(LoginRequiredMixin, View):
             newnote = Note.objects.create(account=acc, title=tit, content=cont, lock=lo, password=passw)
             newnote.save()
             request.session['message'] = "Note created"
+
         else:
             request.session['err_message'] = "Note not created. Please put a password on locked note"
-            print(form.errors)
+            #print(form.errors)
 
         return redirect('/notes')
 

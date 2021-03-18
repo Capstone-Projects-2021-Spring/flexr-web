@@ -70,7 +70,6 @@ class ProfileView(LoginRequiredMixin, View):
          "pref_form": pref_form, 
          "account_form": account_form})
 
-    # Gerald: should be put instead of post ?
     def edit_account(self, request, *args, **kwargs):
         
         acc = request.user.accounts.get(account_id=request.session['account_id'])
