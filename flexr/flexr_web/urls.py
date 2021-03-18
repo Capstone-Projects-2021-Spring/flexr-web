@@ -3,13 +3,69 @@ from django.urls import path
 from . import views
 from .views import *
 
+# Gerald: probably a better way to do this, but I'm dumb
+from .class_views.AccountView import AccountView
+from .class_views.BookmarksView import BookmarksView
+from .class_views.HistoryView import HistoryView
+from .class_views.IndexView import IndexView
+from .class_views.NoteView import NoteView
+from .class_views.NotesView import NotesView
+from .class_views.ProfileView import ProfileView
+from .class_views.SharedFolderView import SharedFolderView
+from .class_views.SharedFoldersView import SharedFoldersView
+from .class_views.TabsView import TabsView
+
+urlpatterns = [
+    path('register', views.register_web, name='register'),
+
+    path('', IndexView.as_view(), name='index'), #broken
+
+    path('add_account/', AccountView().add_account, name = "add account"),
+    path('switch_account/<id>', AccountView().switch_account, name = "switch account"),
+
+    path('browsing_history/', HistoryView.as_view(), name='history'),
+    path('filter_history/', HistoryView().filter, name = "filter history"),
+
+    path('notes/', NotesView.as_view(), name='notes'), #broken
+    path('create_note', NotesView().create_note, name='create_note'),
+    path('note/<int:pk>/', NoteView.as_view(), name='note-detail'),
+    path('delete-note/<int:pk>/', NotesView().delete_note, name='delete_note'),
+
+    path('opennote/<int:pk>', NoteView.as_view(), name='note-detail'), #broken
+    path('edit_note/<int:pk>', NoteView().edit_note, name='edit_note'),
+    path('unlock_note/<int:pk>/', NoteView().unlock_note, name='unlock note'),
+
+    path('open_tabs/', TabsView.as_view(), name='tabs'), #broken
+    path('add_tab/', TabsView().add_tab, name = "add tab"),
+    path('open_tab/', TabsView().open_tab, name = "open tab"),
+    path('close_tab/<id>', TabsView().close_tab, name = "close tab"),
+
+    path('bookmarks/', BookmarksView.as_view(), name = "bookmarks"), #broken
+    path('add_bookmark/<id>/', BookmarksView().add_bookmark, name = "add bookmark"),
+    path('delete_bookmark/<id>/', BookmarksView().delete_bookmark, name = "delete bookmark"),
+
+    path('shared_folders/', SharedFoldersView.as_view(), name = "shared folders"),
+    path('add_shared_folder/', SharedFoldersView().create_shared_folder, name = "add shared folder"),
+
+    path('shared_folder/<int:pk>/', SharedFolderView.as_view(), name = "shared folder"),
+
+    path('profile/', ProfileView.as_view(), name='profile'), #broken
+    path('edit_account/', ProfileView().edit_account, name="edit account"),
+    path('edit_preferences/', ProfileView().edit_account_preferences, name = "edit account preferences"),
+
+
+    
+]
+
+# old patterns
+''' 
 urlpatterns = [
     path('', IndexView.as_view(), name='index'),
     path('register', views.register_web, name='register'),
-    path('profile/', views.profile_web, name='profile'),
-    path('open_tabs/', views.active_tabs_web, name='tabs'),
-    path('notes/', views.notes_hub_web, name='notes'),
-    path('browsing_history/', views.browsing_history_web, name='history'),
+    path('profile/', ProfileView.as_view(), name='profile'),
+    path('open_tabs/', TabsView.as_view(), name='tabs'),
+    path('notes/', NotesView.as_view(), name='notes'),
+    path('browsing_history/', HistoryView.as_view(), name='history'),
     path('api/tabs/', AllTabsView.as_view()),
     path('api/tab/<id>', TabView.as_view()),
     path('api/tab/', TabView.as_view()),
@@ -32,9 +88,10 @@ urlpatterns = [
     path('close_tab/<id>', views.close_tab, name = "close tab"),
     path('add_bookmark/<id>/', views.add_bookmark_web, name = "add bookmark"),
     path('delete_bookmark/<id>/', views.delete_bookmark_web, name = "delete bookmark"),
-    path('bookmarks/', views.bookmarks_web, name = "bookmarks"),
+    path('bookmarks/', BookmarksView.as_view(), name = "bookmarks"),
     path('shared_folders/', views.shared_folders_web, name = "shared folders"),
     path('shared_folder/<int:pk>/', views.shared_folder_individual_web, name = "shared folder"),
     path('add_shared_folder/', views.create_shared_folder_web, name = "add shared folder")
     # TODO For note.html
 ]
+'''

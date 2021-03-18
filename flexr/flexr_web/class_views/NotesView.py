@@ -1,0 +1,92 @@
+from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.validators import EMPTY_VALUES
+from django.shortcuts import redirect, render
+from django.views import View
+
+import pytz
+
+from ..models import *
+from ..forms import *
+
+# Gerald: why is notef in its own file?
+from ..note_form import notef 
+
+# TODO: Gerald more comments
+class NotesView(LoginRequiredMixin, View):
+    """
+    View class for the notes page
+    """
+
+    def get(self, *args, **kwargs):
+        """
+        Display the notes page
+        """
+        # get current user and current account
+        curr_user = self.request.user
+        curr_account = curr_user.accounts.get(account_id = self.request.session['account_id'])
+
+        # get all user's accounts and notes
+        accounts = curr_user.accounts.all()
+        notes = curr_account.notes.all()
+
+        # get note form object on the page
+        form = notef
+
+        # request messages for debugging
+        if ('message' in self.request.session):
+            message = self.request.session['message']
+            del self.request.session['message']
+            messages.success(self.request, message)
+        elif ('err_message' in self.request.session):
+            message = self.request.session['err_message']
+            del self.request.session['err_message']
+            messages.error(self.request, message)
+
+        # display the page
+        return render(self.request, "flexr_web/notes.html", 
+        {"Notes": notes, 
+        "Accounts": accounts, 
+        'form': form})
+
+    def create_note(self, request, *args, **kwargs):
+        """
+        Create a new note
+        """
+
+        self.request = request
+
+        form = notef(self.request.POST)
+        if form.is_valid():
+            acc = self.request.user.accounts.get(account_id = self.request.session['account_id'])
+            tit = self.request.POST.get('title')
+            cont = self.request.POST.get('content')
+            lo = self.request.POST.get('lock')
+            passw = self.request.POST.get('password')
+            if lo == 'on':
+                lo = True
+            else:
+
+                if (passw not in EMPTY_VALUES):
+                    print("reached",passw)
+                    request.session['err_message'] = "Note not created. Please put a password on locked note"
+                    return redirect('/notes')
+                lo = False
+
+            newnote = Note.objects.create(account=acc, title=tit, content=cont, lock=lo, password=passw)
+            newnote.save()
+            request.session['message'] = "Note created"
+        else:
+            request.session['err_message'] = "Note not created. Please put a password on locked note"
+            print(form.errors)
+
+        return redirect('/notes')
+
+
+    def delete_note(self, *args, **kwargs):
+        """
+        Delete a note
+        """
+        obj = Note.objects.get(pk=kwargs['pk'])
+        obj.delete()
+        return redirect('/notes')
