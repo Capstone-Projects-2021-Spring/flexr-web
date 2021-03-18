@@ -330,7 +330,7 @@ class Friendship(models.Model):
                                             ("Pending", "Pending"),
                                             ("Declined", "Declined")),
                                    default="Pending")
-    sent_date = models.DateTimeField(default= timezone.now())
+    sent_date = models.DateTimeField(default= timezone.now)
     accepted_date = models.DateTimeField(blank = True, null=True)
     def __str__(self):
         return str(self.sent) + " -> " + str(self.received) + " | " + str(self.status)
