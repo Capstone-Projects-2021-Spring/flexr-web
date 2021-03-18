@@ -62,10 +62,10 @@ urlpatterns = [
 urlpatterns = [
     path('', IndexView.as_view(), name='index'),
     path('register', views.register_web, name='register'),
-    path('profile/', ProfileView.as_view(), name='profile'),
-    path('open_tabs/', TabsView.as_view(), name='tabs'),
-    path('notes/', NotesView.as_view(), name='notes'),
-    path('browsing_history/', HistoryView.as_view(), name='history'),
+    path('profile/', views.profile_web, name='profile'),
+    path('open_tabs/', views.active_tabs_web, name='tabs'),
+    path('notes/', views.notes_hub_web, name='notes'),
+    path('browsing_history/', views.browsing_history_web, name='history'),
     path('api/tabs/', AllTabsView.as_view()),
     path('api/tab/<id>', TabView.as_view()),
     path('api/tab/', TabView.as_view()),
@@ -88,7 +88,7 @@ urlpatterns = [
     path('close_tab/<id>', views.close_tab, name = "close tab"),
     path('add_bookmark/<id>/', views.add_bookmark_web, name = "add bookmark"),
     path('delete_bookmark/<id>/', views.delete_bookmark_web, name = "delete bookmark"),
-    path('bookmarks/', BookmarksView.as_view(), name = "bookmarks"),
+    path('bookmarks/', views.bookmarks_web, name = "bookmarks"),
     path('shared_folders/', views.shared_folders_web, name = "shared folders"),
     path('shared_folder/<int:pk>/', views.shared_folder_individual_web, name = "shared folder"),
     path('add_shared_folder/', views.create_shared_folder_web, name = "add shared folder")
