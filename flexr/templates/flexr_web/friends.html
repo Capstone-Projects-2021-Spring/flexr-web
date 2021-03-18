@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Friends | Flexr</title>
+</head>
+<body>
+    {% include "flexr_web/navbar.html" %}
+    <h1 style="display: inline;">Friends: </h1>
+        <div class = "row">
+        {% for friend in Friends %}
+            <div class = "folder card col-md-3" >
+                <h2>{{friend}}</h2>
+            </div>
+        {% endfor %}
+        </div>
+
+</body>
+</html>
