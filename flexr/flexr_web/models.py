@@ -40,9 +40,12 @@ class Account(models.Model):
 
     # TODO Pushkin: Change teams to shared_folders
     # teams = models.ManyToManyField("Team", blank=True, null = True) #I don't think this should be a manytomany field this should be a list of teams got by a method?
-    # shared_folder = models.ManyToManyField("sharedFolder", blank=True)
+    # shared_folder = models.ManyToManyField("sharedFolder", blank=True, related_name = "shared_folders")
 
-    # friends = models.ManyToManyField("Account", blank=True, null = True) # this probably needs to be another table
+    friends = models.ManyToManyField("Account", related_name= "all_friends") # this probably needs to be another table
+    notifs = models.ManyToManyField("Friendship")
+    pending_friends = models.ManyToManyField("Account", related_name="all_pending_friends")
+
     account_preferences = models.OneToOneField("Account_Preferences", on_delete=models.CASCADE, blank=True, null = True)
     account_id = models.AutoField(primary_key=True)
 
@@ -54,7 +57,7 @@ class Account(models.Model):
         super().save(*args, **kwargs)  # Call the "real" save() method.
 
     def __str__(self):
-        return str(self.username) + " " + str(self.type_of_account)
+        return str(self.username)+str(self.account_id) + " " + str(self.type_of_account)
 
 # TODO get rid of this class once it is turned into shared_folder
 class Team(models.Model):
@@ -304,7 +307,6 @@ class sharedFolder(models.Model):
     description = models.TextField(verbose_name="Shared Folder description")
     created_date = models.DateTimeField(default= timezone.now)
     owner = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="shared_folders")
-
     # TODO need to have this be a many to many field
     collaborators = models.ManyToManyField(Account)
     bookmarks = models.ManyToManyField(Bookmark, blank=True)
@@ -315,6 +317,55 @@ class sharedFolder(models.Model):
 
     def save(self, *args, **kwargs):
         # call super method to create Tab entry
-        #
+        
         super().save(*args, **kwargs)
         print(self.collaborators.all())
+
+
+class Friendship(models.Model):
+    sent = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="from_friend")
+    received = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="to_friend")
+    status = models.CharField(verbose_name="Status", max_length=50,
+                                   choices=(("Accepted", "Accepted"),
+                                            ("Pending", "Pending"),
+                                            ("Declined", "Declined")),
+                                   default="Pending")
+    sent_date = models.DateTimeField(default= timezone.now())
+    accepted_date = models.DateTimeField(blank = True, null=True)
+    def __str__(self):
+        return str(self.sent) + " -> " + str(self.received) + " | " + str(self.status)
+
+    class Meta:
+        ordering = ['sent_date']
+
+    def save(self, *args, **kwargs):
+        if(self.status == "Accepted" ):
+            self.accepted_date = timezone.now()
+            super().save(*args, **kwargs)
+
+            self.sent.friends.add(self.received)
+            self.received.friends.add(self.sent)
+
+            self.received.notifs.remove(self)
+
+            self.sent.pending_friends.remove(self.received)
+            self.received.pending_friends.remove(self.sent)
+
+            self.sent.save()
+            self.received.save()
+
+        elif (self.status == "Pending"):
+            super().save(*args, **kwargs)
+            self.received.notifs.add(self)
+            self.sent.pending_friends.add(self.received)
+            self.received.pending_friends.add(self.sent)
+
+            self.sent.save()
+            self.received.save()
+        else:
+            super().save(*args, **kwargs)
+            self.received.notifs.remove(self)
+            self.sent.pending_friends.remove(self.received)
+            self.received.pending_friends.remove(self.sent)
+            self.sent.save()
+            self.received.save()

@@ -35,6 +35,13 @@ urlpatterns = [
     path('bookmarks/', views.bookmarks_web, name = "bookmarks"),
     path('shared_folders/', views.shared_folders_web, name = "shared folders"),
     path('shared_folder/<int:pk>/', views.shared_folder_individual_web, name = "shared folder"),
-    path('add_shared_folder/', views.create_shared_folder_web, name = "add shared folder")
+    path('add_shared_folder/', views.create_shared_folder_web, name = "add shared folder"),
+
+    path('friends/', views.friends, name = "friends"),
+    path('add_friend/', views.add_friend, name = "add friend"),
+    path('deny_friend/<int:pk>', views.deny_friend, name = "deny friend"),
+    path('accept_friend/<int:pk>', views.accept_friend, name="accept friend"),
+    path('remove_friend/<int:pk>', views.remove_friend, name="remove friend"),
+
     # TODO For note.html
 ]
