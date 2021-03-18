@@ -53,6 +53,13 @@ urlpatterns = [
     path('edit_account/', ProfileView().edit_account, name="edit account"),
     path('edit_preferences/', ProfileView().edit_account_preferences, name = "edit account preferences"),
 
+    
+    path('friends/', views.friends, name = "friends"),
+    path('add_friend/', views.add_friend, name = "add friend"),
+    path('deny_friend/<int:pk>', views.deny_friend, name = "deny friend"),
+    path('accept_friend/<int:pk>', views.accept_friend, name="accept friend"),
+    path('remove_friend/<int:pk>', views.remove_friend, name="remove friend"),
+
 
     
 ]
