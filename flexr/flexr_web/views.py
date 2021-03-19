@@ -610,7 +610,7 @@ class AccountView(LoginRequiredMixin, DetailView):
             return HttpResponse(f'Account with id={kwargs["id"]} not found.', status=404)
 
         request.session["account_id"] = kwargs["id"]
-        messages.success(self.request, 'Natalie has a fat ass <3333', extra_tags='alert')
+        messages.success(self.request, 'Account patched', extra_tags='alert')
 
         return HttpResponse(f'Switched to Account {kwargs["id"]}')
 
@@ -685,7 +685,6 @@ class AllTabsView(LoginRequiredMixin, ListView):
         # print(tab_list)
         return HttpResponse(tabs)
 
-
 class TabView(LoginRequiredMixin, DetailView):
 
     def get_queryset(self):
@@ -743,7 +742,6 @@ class TabView(LoginRequiredMixin, DetailView):
         print(request.POST)
         tab = Tab.open_tab(site_url = site_url, curr_account= curr_account)
         return HttpResponse(message)
-
 
 def add_tab(request):
     curr_user = request.user

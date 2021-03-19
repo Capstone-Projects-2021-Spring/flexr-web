@@ -60,8 +60,20 @@ urlpatterns = [
     path('accept_friend/<int:pk>', views.accept_friend, name="accept friend"),
     path('remove_friend/<int:pk>', views.remove_friend, name="remove friend"),
 
+    #API Endpoints
 
-    
+    # path('api/login/', ),
+    # path('api/register/', ),
+
+    path('api/tabs/', AllTabsView.as_view()),
+    path('api/tab/<id>', TabView.as_view()),
+    path('api/tab/', TabView.as_view()),
+
+    path('api/account/<id>', AccountView.as_view()),
+    path('api/account/', AccountView.as_view()),
+
+    path('api/history/<id>', HistoryView.as_view()),
+    path('api/history/<id>/filter', HistoryView.as_view()),
 ]
 
 # old patterns
