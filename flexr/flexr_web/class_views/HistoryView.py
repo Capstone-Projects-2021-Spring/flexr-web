@@ -75,7 +75,6 @@ class HistoryView(LoginRequiredMixin, View):
             visit_datetime__lte=end
         )
 
-        # TODO: Gerald make sure this actually works
         return redirect('/browsing_history/')
 
 
