@@ -9,6 +9,9 @@
         #edit:hover{
             cursor: pointer;
         }
+        .fa-user-plus:hover{
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -16,7 +19,74 @@
     <h1>{{user.first_name}}&nbsp{{user.last_name}}&nbsp@{{user}}</h1>
     <h1>{{user.email}}</h1>
     <h2 style="display:inline">{{current_account}}</h2><img id = "edit" src="{% static 'icons/pencil-square.svg'%}" data-toggle="modal" data-target="#view_account">
+    <br>
+    <h1 style="display:inline;" >Friends: </h1><i style="display:inline;" class="fas fa-user-plus" data-toggle="modal" data-target="#friend_search" ></i>
+    <div class = "row">
+        {% for friend in Friends %}
+            <div class = "folder card col-md-3" >
+                <p>{{friend}}</p>
+                <button type="button" style="width: 35%; display: inline;" class="btn btn-danger" onclick="window.location.href = '/remove_friend/{{friend.account_id}}'">Delete</button>
+            </div>
+        {% endfor %}
+    </div>
+    <h1 style="display:inline;" >Friend Requests: </h1>
+    <div class = "row">
+    {% for request in friend_requests %}
+        <div class = "folder card col-md-3" >
+            <p style="display: inline;">{{request.sent.user.first_name}} {{request.sent.user.last_name}}</p>
+<!--            <h2>{{request.sent_date}}</h2>-->
+            <button type="button" style="width: 35%; display: inline;" class="btn btn-danger" onclick="window.location.href = '/deny_friend/{{request.id}}'">Deny</button>
+            <button type="button" style="width: 35%; display: inline;" class="btn btn-success" onclick="window.location.href = '/accept_friend/{{request.id}}'">Accept</button>
+        </div>
+    {% endfor %}
+    </div>
+<!--    friend search -->
+    <div class="modal fade" id="friend_search" tabindex="-1" role="dialog" aria-labelledby="friend_searchLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="friend_searchLabel">Add a friend</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <form method="post" action="/add_friend/">
+                   {% csrf_token %}
+<!--                    <input type="text" id="tags" name = "account_friend">-->
+                    <select name = "account_friend">
+                        {% for account in AllAccounts %}
+                            <option value = {{account.account_id}}>{{account.username}} - {{account.user.first_name}} {{account.user.last_name}} {{account.account_id}}</option>
+                        {% endfor %}
+                    </select>
+                  <script>
+                  $( function() {
+                        var availableTags = [
+                            {% for account in AllAccounts %}
+                                "{{account.username}} - {{account.user.first_name}} {{account.user.last_name}} {{account.account_id}}",
+                            {% endfor %}
+                        ];
+                        $( "#tags" ).autocomplete({
+                          source: availableTags
+                        });
+                      } );
+                  </script>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+<!--                    {% if user.accounts.all|length > 1%}-->
 
+<!--                        <button type="button" class="btn btn-danger" onclick="delete_account()">Delete</button>-->
+<!--                    {%endif%}-->
+                    <button type="submit" class="btn btn-primary">Send friend request!</button>
+                </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+<!-- edit account -->
     <div class="modal fade" id="view_account" tabindex="-1" role="dialog" aria-labelledby="view_accountLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">

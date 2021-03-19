@@ -20,6 +20,8 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import *
 from .serializers import *
 import pytz
+from django.db.models import Q
+from itertools import chain
 # Create your views here.
 
 ################## Managing Website Pages ##################
@@ -42,7 +44,8 @@ class IndexView(LoginRequiredMixin, View):
         tabs = curr_account.tabs.all()
         bookmarks = curr_account.bookmarks.all()
         notes = curr_account.notes.all()
-        folders = curr_account.shared_folders.all()
+        folders = sharedFolder.objects.filter(collaborators = curr_account.account_id)
+        print(folders)
         # suggested_sites = curr_account.suggested_sites()
         print(curr_user)
         if ('message' in self.request.session):
@@ -178,6 +181,7 @@ def profile_web(request):
     account_form.fields['phone_number'].initial = curr_account.phone_number
     account_form.fields['type_of_account'].initial = curr_account.type_of_account
 
+
     if ('message' in request.session):
         message = request.session['message']
         del request.session['message']
@@ -187,7 +191,16 @@ def profile_web(request):
         del request.session['err_message']
         messages.error(request, message)
 
-    return render(request, "flexr_web/profile.html", {"current_account":curr_account, "Accounts": accounts, "Preferences":acc_pref, "pref_form": pref_form, "account_form": account_form})
+    friends = curr_account.all_friends.all()
+    friend_requests = curr_account.to_friend.all().filter(status = "Pending")
+    print("friend requests", friend_requests)
+    pending_friends = curr_account.all_pending_friends.all()
+    print(pending_friends)
+    all_accounts =  Account.objects.filter(~Q(account_id__in=[o.account_id for o in accounts])) #this needs to be filter on account preferences searchable
+    return render(request, "flexr_web/profile.html", {"curr_acc":curr_account, "Accounts": accounts,
+                                                      "Preferences":acc_pref, "pref_form": pref_form,
+                                                      "account_form": account_form, "Friends":friends, "AllAccounts": all_accounts,
+                                                      "friend_requests": friend_requests})
 
 CHECKBOX_MAPPING = {'on':True,
                     None:False,}
@@ -233,10 +246,12 @@ def shared_folders_web(request):
     curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
     folders = curr_account.shared_folders.all()
 
+    # make these autocorrect on typing?
     folder_form = SharedFolder()
     folder_form.fields['bookmarks'].queryset = curr_account.bookmarks.all()
     folder_form.fields['tabs'].queryset = curr_account.tabs.all()
     folder_form.fields['notes'].queryset = curr_account.notes.all()
+    folder_form.fields['collaborators'].queryset = curr_account.friends.all()
     folder_form.fields['collaborators'].initial = curr_account
 
     if ('message' in request.session):
@@ -248,7 +263,7 @@ def shared_folders_web(request):
         del request.session['err_message']
         messages.error(request, message)
 
-    return render(request, "flexr_web/shared_folders.html", {"Folders": folders, "folder_form": folder_form})
+    return render(request, "flexr_web/shared_folders.html", {"Folders": folders, "folder_form": folder_form, "curr_acc": curr_account })
 
 @login_required
 def shared_folder_individual_web(request, pk):
@@ -267,7 +282,7 @@ def shared_folder_individual_web(request, pk):
     # we may want to add a field to each object that says "shared"
 
     # return render(request, "flexr_web/shared_folder.html", {"SharedFolder": shared_folder, "Collaborators": collaborators, "Tabs": tabs, "Bookmarks": bookmarks, "Notes": notes})
-    return render(request, "flexr_web/shared_folder.html", {"shared_folder": shared_folder, "Collaborators": collaborators, "Tabs":tabs, "Bookmarks": bookmarks, "Notes": notes})
+    return render(request, "flexr_web/shared_folder.html", {"shared_folder": shared_folder, "Collaborators": collaborators, "Tabs":tabs, "Bookmarks": bookmarks, "Notes": notes, "curr_acc":current_acc})
 
 @login_required
 def create_shared_folder_web(request):
@@ -315,7 +330,7 @@ def notes_hub_web(request):
         del request.session['err_message']
         messages.error(request, message)
 
-    return render(request, "flexr_web/notes.html", {"Notes": notes, "Accounts": accounts, 'form': form})
+    return render(request, "flexr_web/notes.html", {"Notes": notes, "Accounts": accounts, 'form': form, "curr_acc": curr_account})
 
 # need args
 @login_required
@@ -346,7 +361,7 @@ def note_individual_web(request, pk):
             locked = False
         del request.session['note_unlocked']
 
-    return render(request, "flexr_web/note.html", {"object": obj, 'form': form, "accounts": accounts, "locked": locked})
+    return render(request, "flexr_web/note.html", {"object": obj, 'form': form, "accounts": accounts, "locked": locked, "curr_acc":curr_account})
 
 @login_required
 def bookmarks_hub_web(request):
@@ -366,7 +381,7 @@ def browsing_history_web(request):
     history = curr_account.history.all()
     form = FilterHistoryForm
     
-    return render(request, "flexr_web/browsing_history.html", {"History": history, "Accounts": accounts, "form": form})
+    return render(request, "flexr_web/browsing_history.html", {"History": history, "Accounts": accounts, "form": form, "curr_acc":curr_account})
 
 @login_required
 def browsing_history_filter(request):
@@ -399,7 +414,7 @@ def browsing_history_filter(request):
 
     # this returns a new webpage, but probably shouldn't
     # can we just edit the current webpage?
-    return render(request, "flexr_web/browsing_history.html", {"History": history, "Accounts": accounts, "form": form})
+    return render(request, "flexr_web/browsing_history.html", {"History": history, "Accounts": accounts, "form": form, "curr_acc":curr_account})
 
 @login_required
 def active_tabs_web(request):
@@ -417,7 +432,7 @@ def active_tabs_web(request):
         message = request.session['err_message']
         del request.session['err_message']
         messages.error(request, message)
-    return render(request, "flexr_web/open_tabs.html", {"Tabs":tabs, "Accounts": accounts})
+    return render(request, "flexr_web/open_tabs.html", {"Tabs":tabs, "Accounts": accounts, "curr_acc":curr_account})
 
 
 @login_required
@@ -453,11 +468,56 @@ def bookmarks_web(request):
         message = request.session['err_message']
         del request.session['err_message']
         messages.error(request, message)
-    return render(request, "flexr_web/bookmarks.html", {"Bookmarks": bookmarks})
+    return render(request, "flexr_web/bookmarks.html", {"Bookmarks": bookmarks, "curr_acc":curr_account})
 
 
+def friends(request):
+    curr_account = request.user.accounts.get(account_id = request.session['account_id'])
+    friends = curr_account.friends.all()
+    print(friends)
+    return render(request, "flexr_web/friends.html", {"Friends": friends})
 
+def add_friend(request):
+    friend_acc_id = request.POST.get('account_friend')
+    friend_account = Account.objects.get(account_id = friend_acc_id)
+    user_account = request.user.accounts.get(account_id = request.session['account_id'])
+    friend_request = Friendship.objects.get_or_create(sent = user_account, received = friend_account)
+    return redirect('/friends')
 
+# class FriendViews(DetailView):
+
+def deny_friend(request, pk):
+    friend_request = Friendship.objects.get(id = pk)
+    friend_request.status = "Declined"
+    friend_request.save()
+    request.session['message'] = "Friend request DENIED"
+    return redirect('/profile')
+
+def accept_friend(request, pk):
+    friend_request = Friendship.objects.get(id = pk)
+    friend_request.status = "Accepted"
+    friend_request.save()
+    request.session['message'] = "Friend request ACCEPTED"
+    return redirect('/profile')
+
+def remove_friend(request, pk):
+    current_account = request.user.accounts.get(account_id = request.session['account_id'])
+    friend_account = Account.objects.get(account_id=pk)
+
+    current_account.all_friends.remove(friend_account)
+    friend_account.all_friends.remove(current_account)
+    try:
+        friendship = Friendship.objects.filter(sent = current_account, received = friend_account)[0]
+    except:
+        friendship = Friendship.objects.filter(sent = friend_account, received = current_account)[0]
+
+    friend_request = Friendship.objects.get(id = pk)
+    friend_request.status = "Declined"
+    friend_request.save()
+    current_account.save()
+    friend_account.save()
+    request.session['message'] = "Friend deleted"
+    return redirect('/profile')
 
 ################## REST API Endpoints ##################
 
@@ -550,7 +610,7 @@ class AccountView(LoginRequiredMixin, DetailView):
             return HttpResponse(f'Account with id={kwargs["id"]} not found.', status=404)
 
         request.session["account_id"] = kwargs["id"]
-        messages.success(self.request, 'Natalie has a fat ass <3333', extra_tags='alert')
+        messages.success(self.request, 'Account patched', extra_tags='alert')
 
         return HttpResponse(f'Switched to Account {kwargs["id"]}')
 
@@ -625,7 +685,6 @@ class AllTabsView(LoginRequiredMixin, ListView):
         # print(tab_list)
         return HttpResponse(tabs)
 
-
 class TabView(LoginRequiredMixin, DetailView):
 
     def get_queryset(self):
@@ -683,7 +742,6 @@ class TabView(LoginRequiredMixin, DetailView):
         print(request.POST)
         tab = Tab.open_tab(site_url = site_url, curr_account= curr_account)
         return HttpResponse(message)
-
 
 def add_tab(request):
     curr_user = request.user

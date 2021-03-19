@@ -21,9 +21,17 @@ class NoteInLine(admin.TabularInline):
 class SharedFolderInLine(admin.TabularInline):
     model = sharedFolder
 
+class FriendshipInline1(admin.TabularInline):
+    model = Friendship
+    fk_name = "sent"
+
+class FriendshipInline2(admin.TabularInline):
+    model = Friendship
+    fk_name = "received"
+
 class AccountAdmin(admin.ModelAdmin):
     inlines = [
-        TabInLine, HistoryInLine, SiteInLine, BookmarkInLine, NoteInLine, SharedFolderInLine
+        TabInLine, HistoryInLine, SiteInLine, BookmarkInLine, NoteInLine, SharedFolderInLine, FriendshipInline1, FriendshipInline2
     ]
 
 class TabAdmin(admin.ModelAdmin):
@@ -32,6 +40,7 @@ class TabAdmin(admin.ModelAdmin):
 # Register your models here.
 admin.site.register(Account, AccountAdmin)
 admin.site.register(sharedFolder)
+admin.site.register(Friendship)
 admin.site.register(History)
 admin.site.register(Site)
 admin.site.register(Tab, TabAdmin)
