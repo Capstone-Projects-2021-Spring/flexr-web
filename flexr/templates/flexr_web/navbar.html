@@ -84,12 +84,17 @@
                     <a class="dropdown-item" href="/admin">Admin</a>
             {% endif %}
             {% for notif in curr_acc.notifs.all%}
-                <p style="display: inline;">{{notif.sent.user.first_name}} {{notif.sent.user.last_name}}</p>
-    <!--            <h2>{{request.sent_date}}</h2>-->
-                <button type="button" style="width: 35%; display: inline;" class="btn btn-danger" onclick="window.location.href = '/deny_friend/{{notif.id}}'">Deny</button>
-                <button type="button" style="width: 35%; display: inline;" class="btn btn-success" onclick="window.location.href = '/accept_friend/{{notif.id}}'">Accept</button>
-                <br>
-                <hr>
+                <p>{{notif.received.user.first_name}} </p>
+                {% if notif.status == "Pending" %}
+                    <p style="display: inline;">{{notif.sent.user.first_name}} {{notif.sent.user.last_name}}</p>
+                    <button type="button" style="width: 35%; display: inline;" class="btn btn-danger" onclick="window.location.href = '/deny_friend/{{notif.id}}'">Deny</button>
+                    <button type="button" style="width: 35%; display: inline;" class="btn btn-success" onclick="window.location.href = '/accept_friend/{{notif.id}}'">Accept</button>
+                    <br>
+                    <hr>
+                {%elif notif.status == "Accepted"%}
+                    <p style="display: inline;">{{notif.received}} accepted your friend request</p>
+                    <button type="button" style="width: 35%; display: inline;" class="btn btn-primary" onclick="window.location.href = '/remove_notif/{{notif.id}}'">Okay</button>
+                {% endif %}
             {% endfor %}
           <a class="dropdown-item" href='/accounts/logout'>Log out</a>
         </div>

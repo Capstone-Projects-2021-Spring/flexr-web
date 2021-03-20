@@ -502,6 +502,13 @@ def accept_friend(request, pk):
     request.session['message'] = "Friend request ACCEPTED"
     return redirect('/profile')
 
+def remove_notif(request, pk):
+    curr_account = request.user.accounts.get(account_id = request.session['account_id'])
+    notif = curr_account.notifs.get(id = pk)
+    curr_account.notifs.remove(notif)
+    curr_account.save()
+    return redirect('/')
+
 def remove_friend(request, pk):
     current_account = request.user.accounts.get(account_id = request.session['account_id'])
     friend_account = Account.objects.get(account_id=pk)
@@ -514,8 +521,7 @@ def remove_friend(request, pk):
         if(friendship.count() == 0):
             request.session['errmessage'] = "Trouble finding friendship"
             return redirect('/profile')
-
-    friendship = Friendship.objects.get(id = pk)
+    friendship = friendship[0]
     friendship.status = "Declined"
     friendship.save()
     current_account.save()
