@@ -180,7 +180,7 @@ def profile_web(request):
     account_form.fields['email'].initial = curr_account.email
     account_form.fields['phone_number'].initial = curr_account.phone_number
     account_form.fields['type_of_account'].initial = curr_account.type_of_account
-
+    print("hello")
 
     if ('message' in request.session):
         message = request.session['message']
@@ -196,7 +196,9 @@ def profile_web(request):
     print("friend requests", friend_requests)
     pending_friends = curr_account.all_pending_friends.all()
     print(pending_friends)
-    all_accounts =  Account.objects.filter(~Q(account_id__in=[o.account_id for o in accounts])) #this needs to be filter on account preferences searchable
+    # all_accounts =  Account.objects.filter(~Q(account_id__in=[o.account_id for o in accounts])) #this needs to be filter on account preferences searchable
+    all_accounts = accounts
+    print(all_accounts)
     return render(request, "flexr_web/profile.html", {"curr_acc":curr_account, "Accounts": accounts,
                                                       "Preferences":acc_pref, "pref_form": pref_form,
                                                       "account_form": account_form, "Friends":friends, "AllAccounts": all_accounts,
@@ -500,20 +502,28 @@ def accept_friend(request, pk):
     request.session['message'] = "Friend request ACCEPTED"
     return redirect('/profile')
 
+def remove_notif(request, pk):
+    curr_account = request.user.accounts.get(account_id = request.session['account_id'])
+    notif = curr_account.notifs.get(id = pk)
+    curr_account.notifs.remove(notif)
+    curr_account.save()
+    return redirect('/')
+
 def remove_friend(request, pk):
     current_account = request.user.accounts.get(account_id = request.session['account_id'])
     friend_account = Account.objects.get(account_id=pk)
 
     current_account.all_friends.remove(friend_account)
     friend_account.all_friends.remove(current_account)
-    try:
-        friendship = Friendship.objects.filter(sent = current_account, received = friend_account)[0]
-    except:
-        friendship = Friendship.objects.filter(sent = friend_account, received = current_account)[0]
-
-    friend_request = Friendship.objects.get(id = pk)
-    friend_request.status = "Declined"
-    friend_request.save()
+    friendship = Friendship.objects.filter(sent = current_account, received = friend_account)
+    if(friendship.count() == 0):
+        friendship = Friendship.objects.filter(sent = friend_account, received = current_account)
+        if(friendship.count() == 0):
+            request.session['errmessage'] = "Trouble finding friendship"
+            return redirect('/profile')
+    friendship = friendship[0]
+    friendship.status = "Declined"
+    friendship.save()
     current_account.save()
     friend_account.save()
     request.session['message'] = "Friend deleted"

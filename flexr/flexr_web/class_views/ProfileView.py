@@ -2,6 +2,8 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect, render
 from django.views import View
+from django.db.models import Q
+from itertools import chain
 
 import pytz
 
@@ -25,10 +27,13 @@ class ProfileView(LoginRequiredMixin, View):
 
         # get current user and current account
         curr_user = self.request.user
-        curr_account = curr_user.accounts.get(account_id = self.request.session['account_id'])
-
+        
         # get all accounts for the user and
         # account preferrences for the users
+        print(curr_user)
+        curr_account = curr_user.accounts.get(account_id=self.request.session['account_id'])
+        print(curr_account)
+
         accounts = curr_user.accounts.all()
         acc_pref = curr_account.account_preferences
 
@@ -51,7 +56,7 @@ class ProfileView(LoginRequiredMixin, View):
 
             # worst case scenario no sites found and set to google
             except:
-                site = Site.objects.create(account = curr_account, url = "https://google.com")
+                site = Site.objects.create(account=curr_account, url="https://google.com")
                 site.save()
                 pref_form.fields['home_page'].initial = site
 
@@ -59,6 +64,7 @@ class ProfileView(LoginRequiredMixin, View):
         pref_form.fields['home_page'].queryset = curr_account.sites.all() 
 
         # populate initial form data from current account's preferences
+
         pref_form.fields['sync_enabled'].initial = curr_account.account_preferences.sync_enabled
         pref_form.fields['searchable_profile'].initial = curr_account.account_preferences.searchable_profile
         pref_form.fields['cookies_enabled'].initial = curr_account.account_preferences.cookies_enabled
@@ -72,6 +78,7 @@ class ProfileView(LoginRequiredMixin, View):
         account_form.fields['email'].initial = curr_account.email
         account_form.fields['phone_number'].initial = curr_account.phone_number
         account_form.fields['type_of_account'].initial = curr_account.type_of_account
+        print("hello")
 
         # request messages for debugging
         if ('message' in self.request.session):
@@ -126,6 +133,21 @@ class ProfileView(LoginRequiredMixin, View):
 
             # return to profile page
             return redirect('/profile')
+          
+        friends = curr_account.all_friends.all()
+        friend_requests = curr_account.to_friend.all().filter(status="Pending")
+        print("friend requests", friend_requests)
+        pending_friends = curr_account.all_pending_friends.all()
+        print(pending_friends)
+        all_accounts =  Account.objects.filter(~Q(account_id__in=[o.account_id for o in accounts])) #this needs to be filter on account preferences searchable
+        # all_accounts = accounts
+        print(all_accounts)
+        return render(self.request, "flexr_web/profile.html", {"curr_acc": curr_account, "Accounts": accounts,
+                                                          "Preferences": acc_pref, "pref_form": pref_form,
+                                                          "account_form": account_form, "Friends": friends,
+                                                          "AllAccounts": all_accounts,
+                                                          "friend_requests": friend_requests})
+
 
 
     def edit_account_preferences(self, request, *args, **kwargs):

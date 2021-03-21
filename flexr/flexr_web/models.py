@@ -347,6 +347,7 @@ class Friendship(models.Model):
             self.received.friends.add(self.sent)
 
             self.received.notifs.remove(self)
+            self.sent.notifs.add(self)
 
             self.sent.pending_friends.remove(self.received)
             self.received.pending_friends.remove(self.sent)
@@ -369,3 +370,4 @@ class Friendship(models.Model):
             self.received.pending_friends.remove(self.sent)
             self.sent.save()
             self.received.save()
+            self.delete()
