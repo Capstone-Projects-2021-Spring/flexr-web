@@ -1,14 +1,18 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.views import View
+from django.views.generic import DetailView
 
+import json
 import pytz
 
 from ..models import *
 from ..forms import *
+from ..serializers import HistorySerializer
 
-# TODO: Gerald add request messages
+
 # TODO: Gerald add delete history button
 
 class HistoryView(LoginRequiredMixin, View):
@@ -31,6 +35,19 @@ class HistoryView(LoginRequiredMixin, View):
 
         # get history form object on the page
         form = FilterHistoryForm
+
+        # request messages for debugging
+        if ('message' in self.request.session):
+            message = self.request.session['message']
+            del self.request.session['message']
+            messages.success(self.request, message)
+
+        elif ('err_message' in self.request.session):
+            message = self.request.session['err_message']
+            del self.request.session['err_message']
+            messages.error(self.request, message)
+
+
         # display the page
         return render(self.request, "flexr_web/browsing_history.html",
          {"History": history, 
@@ -75,6 +92,9 @@ class HistoryView(LoginRequiredMixin, View):
             visit_datetime__lte=end
         )
 
+        # request message for debugging
+        request.session['message'] = "History Filtered"
+
         return redirect('/browsing_history/')
 
 
@@ -84,3 +104,81 @@ class HistoryView(LoginRequiredMixin, View):
         Delete a history object
         """
         pass
+
+class HistoryViewAPI(LoginRequiredMixin, DetailView):
+    def get(self, request, *args, **kwargs):
+        url = request.path.split('/')
+
+        if url[-1] == 'filter':
+            return self.filter_history(request, *args, **kwargs)
+        else:
+            return self.get_history(request, *args, **kwargs)
+
+
+
+    def get_history(self, request, *args, **kwargs):
+        """
+        Gets all site history from the current account
+                Parameters:
+                    request.GET has an id for a site history
+                Returns:
+                    JSONRequest with success message and the SiteHistory instance or error message
+        """
+        #print('test')
+        history = History.objects.filter(account = kwargs["id"])
+        data = HistorySerializer(history, many=True)
+        return JsonResponse(data.data, safe=False)
+
+    def filter_history(self, request, *args, **kwargs):
+        """
+        Returns filtered all site history from the current account
+                Parameters:
+                    request.GET has a JSON object that has the filter type and typed
+                Returns:
+                    JSONRequest with success message and the SiteHistory objects or error message
+        """
+
+        payload = request.GET.dict()
+        history = History.objects.filter(
+            account = kwargs["id"],
+            visit_datetime__gte=payload['datetime_from'],
+            visit_datetime__lte=payload['datetime_to'])
+        data = HistorySerializer(history, many=True)
+        return JsonResponse(data.data, safe=False)
+
+    def delete(self, request, *args, **kwargs):
+        url = request.path.split('/')
+
+        if url[-1] == 'filter':
+            return self.delete_history_range(request, *args, **kwargs)
+        else:
+            return self.delete_all_history(request, *args, **kwargs)
+
+    def delete_history_range(self, request, *args, **kwargs):
+        """
+        Deletes all history from a user within a given range
+                Parameters:
+                    request.DELETE has a JSON object that has a date range
+                Returns:
+                    JSONRequest with success message and the SiteHistory objects or error message
+        """
+        payload = json.loads(request.body)
+        history = History.objects.filter(
+            account = kwargs["id"],
+            visit_datetime__gte=payload['datetime_from'],
+            visit_datetime__lte=payload['datetime_to']).delete()
+
+        return HttpResponse(f'{history} History objects removed')
+
+    def delete_all_history(self, request, *args, **kwargs):
+        """
+        Deletes all history from a user
+                Parameters:
+                    request.DELETE
+                Returns:
+                    JSONRequest with success message or error message
+        """
+
+        history = History.objects.filter(account = kwargs["id"]).delete()
+
+        return HttpResponse(f'{history} History objects removed')
