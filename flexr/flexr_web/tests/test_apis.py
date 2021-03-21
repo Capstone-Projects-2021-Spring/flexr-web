@@ -199,3 +199,62 @@ class BookmarkAPITestCase(TestCase):
         data_expected = 0
 
         self.assertEquals(data, data_expected)
+
+
+class UserAPITestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.curr_user = User.objects.create_user('foo', 'myemail@test.com', 'bar')
+        cls.curr_user.save()
+        
+
+    def test_sign_up(self):
+        c = Client()
+
+        payload = {
+        "username": "username",
+        "email": "email@domain.com",
+        "password": "password"
+        }
+
+        result = c.post(path='/api/register/', data=payload)
+
+        data = User.objects.all().count()
+        data_expected = 2
+
+        self.assertEquals(data, data_expected)
+
+        
+
+    def test_login(self):
+        c = Client()
+
+        payload = {
+        "username": "foo",
+        "password": "bar"
+        }
+
+        result = c.post(path='/api/login/', data=payload)
+
+        self.assertEquals(result.status_code, 200)
+
+    def test_logout(self):
+        c = Client()
+        c.login(username='foo', password='bar')
+
+        result = c.get(path='/api/logout/')
+
+        self.assertEquals(result.status_code, 200)
+
+
+    def test_check_status(self):
+        c = Client()
+
+        result = c.get(path='/api/status/')
+        data = json.loads(result.content)
+        self.assertEquals(data, False)
+
+        c.login(username='foo', password='bar')
+        result = c.get(path='/api/status/')
+        data = json.loads(result.content)
+        self.assertEquals(data, True)
