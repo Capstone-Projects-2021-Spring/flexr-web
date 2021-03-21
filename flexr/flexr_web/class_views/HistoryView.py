@@ -3,6 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.views import View
+from django.views.generic import DetailView
 
 import json
 import pytz
@@ -90,7 +91,7 @@ class HistoryView(LoginRequiredMixin, View):
         """
         pass
 
-class HistoryViewAPI():
+class HistoryViewAPI(LoginRequiredMixin, DetailView):
     def get(self, request, *args, **kwargs):
         url = request.path.split('/')
 
