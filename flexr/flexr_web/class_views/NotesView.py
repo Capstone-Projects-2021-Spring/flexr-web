@@ -54,8 +54,6 @@ class NotesView(LoginRequiredMixin, View):
         Create a new note
         """
 
-        #self.request = request
-
         # get form object 
         form = notef(request.POST)
 
@@ -97,6 +95,12 @@ class NotesView(LoginRequiredMixin, View):
         """
         Delete a note
         """
+
+        # grab requested note object
         obj = Note.objects.get(pk=kwargs['pk'])
+
+        # delete note object
         obj.delete()
+
+        # return to notes page
         return redirect('/notes')
