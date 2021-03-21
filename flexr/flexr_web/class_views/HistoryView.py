@@ -13,7 +13,6 @@ from ..forms import *
 from ..serializers import HistorySerializer
 
 
-# TODO: Gerald add request messages
 # TODO: Gerald add delete history button
 
 class HistoryView(LoginRequiredMixin, View):
@@ -36,6 +35,19 @@ class HistoryView(LoginRequiredMixin, View):
 
         # get history form object on the page
         form = FilterHistoryForm
+
+        # request messages for debugging
+        if ('message' in self.request.session):
+            message = self.request.session['message']
+            del self.request.session['message']
+            messages.success(self.request, message)
+
+        elif ('err_message' in self.request.session):
+            message = self.request.session['err_message']
+            del self.request.session['err_message']
+            messages.error(self.request, message)
+
+
         # display the page
         return render(self.request, "flexr_web/browsing_history.html",
          {"History": history, 
@@ -80,7 +92,9 @@ class HistoryView(LoginRequiredMixin, View):
             visit_datetime__lte=end
         )
 
-        # TODO: Gerald make sure this actually works
+        # request message for debugging
+        request.session['message'] = "History Filtered"
+
         return redirect('/browsing_history/')
 
 
@@ -165,6 +179,6 @@ class HistoryViewAPI(LoginRequiredMixin, DetailView):
                     JSONRequest with success message or error message
         """
 
-        history = History.objects.all().delete()
+        history = History.objects.filter(account = kwargs["id"]).delete()
 
         return HttpResponse(f'{history} History objects removed')
