@@ -16,7 +16,9 @@ from .class_views.ProfileView import ProfileView
 from .class_views.SharedFolderView import SharedFolderView
 from .class_views.SharedFoldersView import SharedFoldersView
 from .class_views.TabsView import TabsView
+from .class_views.UserView import UserAPIView
 from .class_views.FriendView import FriendView
+
 
 urlpatterns = [
     path('register', views.register_web, name='register'),
@@ -63,10 +65,13 @@ urlpatterns = [
     path('accept_friend/<int:pk>', FriendView().accept_friend, name="accept friend"),
     path('remove_friend/<int:pk>', FriendView().remove_friend, name="remove friend"),
     path('remove_notif/<int:pk>', FriendView().remove_notif, name="remove notif"),
+
     #API Endpoints
 
-    # path('api/login/', ),
-    # path('api/register/', ),
+    path('api/login/', UserAPIView().login),
+    path('api/register/', UserAPIView().sign_up),
+    path('api/logout/', UserAPIView().logout),
+    path('api/status/', UserAPIView().check_status),
 
     path('api/tabs/', AllTabsView.as_view()),
     path('api/tab/<id>', TabView.as_view()),
