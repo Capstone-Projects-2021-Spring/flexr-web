@@ -6,9 +6,8 @@ from django.views import View
 from ..models import *
 from ..forms import *
 
-# TODO: Gerald add the other functionality
+
 # TODO: Gerald refractor out common code like request messages
-# TODO: Gerald connect class based views to their html page
 # TODO: Gerald fix broken view tests 
 class IndexView(LoginRequiredMixin, View):
     """
@@ -46,7 +45,7 @@ class IndexView(LoginRequiredMixin, View):
         folders = curr_account.shared_folders.all()
         # suggested_sites = curr_account.suggested_sites()
 
-        print(curr_user)
+        #print(curr_user)
 
         # request messages for debugging
         if ('message' in self.request.session):
@@ -58,7 +57,7 @@ class IndexView(LoginRequiredMixin, View):
             del self.request.session['err_message']
             messages.error(self.request, message)
 
-        print("reached")
+        #print("reached")
 
         # get account form object
         form = AccountForm

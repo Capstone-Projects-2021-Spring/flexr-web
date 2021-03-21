@@ -4,6 +4,8 @@ from . import views
 from .views import *
 
 # Gerald: probably a better way to do this, but I'm dumb
+from .class_views.AccountView import AccountViewWeb
+from .class_views.AccountView import AccountViewAPI
 from .class_views.AccountView import AccountView
 from .class_views.BookmarksView import BookmarksView, BookmarksViewAPI
 from .class_views.HistoryView import HistoryView, HistoryViewAPI
@@ -15,14 +17,16 @@ from .class_views.SharedFolderView import SharedFolderView
 from .class_views.SharedFoldersView import SharedFoldersView
 from .class_views.TabsView import TabsView
 from .class_views.UserView import UserAPIView
+from .class_views.FriendView import FriendView
+
 
 urlpatterns = [
     path('register', views.register_web, name='register'),
 
     path('', IndexView.as_view(), name='index'), #broken
 
-    path('add_account/', AccountView().add_account, name = "add account"),
-    path('switch_account/<id>', AccountView().switch_account, name = "switch account"),
+    path('add_account/', AccountViewWeb().add_account, name = "add account"),
+    path('switch_account/<id>', AccountViewWeb().switch_account, name = "switch account"),
 
     path('browsing_history/', HistoryView.as_view(), name='history'),
     path('filter_history/', HistoryView().filter, name = "filter history"),
@@ -55,13 +59,12 @@ urlpatterns = [
     path('edit_preferences/', ProfileView().edit_account_preferences, name = "edit account preferences"),
 
     
-    path('friends/', views.friends, name = "friends"),
-    path('add_friend/', views.add_friend, name = "add friend"),
-    path('deny_friend/<int:pk>', views.deny_friend, name = "deny friend"),
-    path('accept_friend/<int:pk>', views.accept_friend, name="accept friend"),
-    path('remove_friend/<int:pk>', views.remove_friend, name="remove friend"),
-    path('remove_notif/<int:pk>', views.remove_notif, name="remove notif"),
-
+    path('friends/', FriendView.as_view(), name = "friends"),
+    path('add_friend/', FriendView().add_friend, name = "add friend"),
+    path('deny_friend/<int:pk>', FriendView().deny_friend, name = "deny friend"),
+    path('accept_friend/<int:pk>', FriendView().accept_friend, name="accept friend"),
+    path('remove_friend/<int:pk>', FriendView().remove_friend, name="remove friend"),
+    path('remove_notif/<int:pk>', FriendView().remove_notif, name="remove notif"),
 
     #API Endpoints
 
@@ -75,8 +78,9 @@ urlpatterns = [
     path('api/tab/open', TabView.as_view()),
     path('api/tab/open', TabView.as_view()),
 
-    path('api/account/<id>', AccountView.as_view()),
-    path('api/accounts/', AccountView.as_view()),
+    path('api/account/<id>', AccountViewAPI.as_view()),
+    path('api/accounts/', AccountViewAPI.as_view()),
+    path('api/account/<int:pk>/switch/', AccountViewAPI().switch_account, name = "switch account"),
 
     path('api/history/<id>', HistoryViewAPI.as_view()),
     path('api/history/<id>/filter', HistoryViewAPI.as_view()),

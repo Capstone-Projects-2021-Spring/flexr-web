@@ -42,9 +42,9 @@ class Account(models.Model):
     # teams = models.ManyToManyField("Team", blank=True, null = True) #I don't think this should be a manytomany field this should be a list of teams got by a method?
     # shared_folder = models.ManyToManyField("sharedFolder", blank=True, related_name = "shared_folders")
 
-    friends = models.ManyToManyField("Account", related_name= "all_friends") # this probably needs to be another table
-    notifs = models.ManyToManyField("Friendship")
-    pending_friends = models.ManyToManyField("Account", related_name="all_pending_friends")
+    friends = models.ManyToManyField("Account", related_name= "all_friends", blank=True) # this probably needs to be another table
+    notifs = models.ManyToManyField("Friendship",  blank=True)
+    pending_friends = models.ManyToManyField("Account", related_name="all_pending_friends",  blank=True)
 
     account_preferences = models.OneToOneField("Account_Preferences", on_delete=models.CASCADE, blank=True, null = True)
     account_id = models.AutoField(primary_key=True)
