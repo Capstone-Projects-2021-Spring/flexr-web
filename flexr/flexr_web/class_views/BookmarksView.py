@@ -1,12 +1,16 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.views import View
+from django.views.generic import DetailView
 
+import json
 import pytz
 
 from ..models import *
 from ..forms import *
+from ..serializers import BookmarkSerializer
 
 
 class BookmarksView(LoginRequiredMixin, View):
@@ -84,3 +88,99 @@ class BookmarksView(LoginRequiredMixin, View):
         
         # return to bookmarks page
         return redirect('/bookmarks')
+
+
+class BookmarksViewAPI(LoginRequiredMixin, DetailView):
+
+    def post(self, request, *args, **kwargs):
+        """
+            Adds a bookmark to a bookmark table for the specific account
+                    Parameters:
+                        request.PUT has a form for data for a bookmark
+                    Returns:
+                        JSONRequest with success or error message
+        """
+
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+
+        data = request.POST.dict()
+        bookmark = Bookmark.objects.create(account=curr_account, **data)
+
+        return HttpResponse(f'{bookmark} bookmark object created')
+
+
+    def put(self, request, *args, **kwargs):
+        """
+            Edits a bookmark from a bookmark table for the specific account
+                    Parameters:
+                        request.PUT has a form for data for the edited bookmark
+                    Returns:
+                        JSONRequest with success or error message
+        """
+        
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+
+        data = json.loads(request.body)
+        result = Bookmark.objects.filter(pk = kwargs["id"]).update(**data)
+
+        return HttpResponse(f'Bookmark object edited')
+
+    def get(self, request, *args, **kwargs):
+        """
+        Gets a specific bookmark from a bookmark table for the specific account
+                    Parameters:
+                        request.GET has an id for a bookmark
+                    Returns:
+                        JSONRequest with success message and a bookmark or error message
+        """
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+
+        bookmark = Bookmark.objects.filter(account = curr_account,
+        pk = kwargs["id"])[0]
+    
+        data = BookmarkSerializer(bookmark)
+        
+        return JsonResponse(data.data, safe=False)
+
+    def delete(self, request, *args, **kwargs):
+        url = request.path.split('/')
+
+        if url[-1] == 'all':
+            return self.delete_all_bookmarks(request, *args, **kwargs)
+        else:
+            return self.delete_bookmark(request, *args, **kwargs)
+
+    def delete_bookmark(self, request, *args, **kwargs):
+        """
+            Removes a bookmark from a bookmark table for the specific account
+                    Parameters:
+                        request.DELETE has an id for a bookmark
+                    Returns:
+                        JSONRequest with success or error message
+        """
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+
+        bookmark = Bookmark.objects.filter(account = curr_account, pk = kwargs["id"]).delete()
+
+        return HttpResponse(f'{bookmark} Bookmark object removed')
+
+        
+
+    def delete_all_bookmarks(self, request, *args, **kwargs):
+        """
+        Removes all bookmark from a bookmark table for the specific account
+                    Parameters:
+                        request.DELETE has an id for a bookmark
+                    Returns:
+                        JSONRequest with success or error message
+        """
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+
+        bookmarks = Bookmark.objects.filter(account = curr_account).delete()
+
+        return HttpResponse(f'{bookmarks} Bookmark object removed')

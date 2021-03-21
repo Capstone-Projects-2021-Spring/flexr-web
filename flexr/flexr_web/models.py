@@ -119,10 +119,10 @@ class Site(models.Model):
 
     def save(self, *args, **kwargs):
         # call super method to create Tab entry
-        print("URL: ", )
+        #print("URL: ", )
         url1 = str(self.url).split('?')[0]
         url2 = url1.split('/')
-        print("URL: ", url1 )
+        #print("URL: ", url1 )
         try:
             self.name = url2[2] + "/" + url2[3]
         except:
