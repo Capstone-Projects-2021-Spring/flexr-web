@@ -4,6 +4,7 @@ from django.shortcuts import redirect, render
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView
+from django.http import HttpResponse
 
 import pytz
 
@@ -17,7 +18,7 @@ from ..forms import *
     #This will be usefull for testing
 
 # Gerald: Do we need DetailView ?
-class AccountView(LoginRequiredMixin, DetailView):
+class AccountViewWeb(LoginRequiredMixin, DetailView):
     """
     View class for the account management
     """
@@ -80,3 +81,31 @@ class AccountView(LoginRequiredMixin, DetailView):
 
         # return to index page
         return redirect('/')
+
+
+class AccountViewAPI(LoginRequiredMixin, DetailView):
+    """This is for a detail view of a single account"""
+
+    def get(self, request):
+        """This returns the user's current account"""
+        curr_user = request.user
+        current_account = curr_user.accounts.get(account_id = request.session['account_id'])
+        print("AccountViewAPI current account: ", current_account)
+
+    def switch_account(self, request, pk):
+        curr_user = request.user
+        if(curr_user.accounts.filter(account_id = pk).count() == 1):
+            request.session['account_id'] = pk
+            print("Account View API: account switched")
+            return HttpResponse(status=200)
+            # need to return some json
+        else:
+            print("Account View API: account does not exist for that user with that id")
+            return HttpResponse(status = 404)
+            # need to return some json here 404 or 403
+
+    # This needs to be POST
+    # def edit_account(self, request):
+    #     curr_user = request.user
+    #     curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+
