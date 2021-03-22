@@ -14,27 +14,27 @@ class IndexView(LoginRequiredMixin, View):
     """
     View class for the index/home page
     """
-    def get(self, *args, **kwargs):
+    def get(self,request, *args, **kwargs):
         """
         Display the index/home page
         """
 
         # get current user
-        curr_user = self.request.user
+        curr_user = request.user
 
         # try to get current account
         try:
             print("IndexView curr_user")
-            curr_account = curr_user.accounts.get(account_id = self.request.session['account_id'])
-            # print("IndexView: Account Successfully Switched: "+ str(curr_account))
+            curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+            print("IndexView: Account Successfully Switched: "+ str(curr_account))
             curr_account.rank_sites()
         # if no current account found, set current account to
         # first account for the current user
         except:
             curr_account = curr_user.accounts.all()[0]
-            self.request.session['account_id'] = curr_account.account_id
+            request.session['account_id'] = curr_account.account_id
             curr_account.rank_sites()
-            # print("IndexView: Account initialized:" )
+            print("IndexView: Account initialized:" )
 
         # grab all models for the current user
         # and the current account
@@ -51,21 +51,21 @@ class IndexView(LoginRequiredMixin, View):
         print(curr_user)
 
         # request messages for debugging
-        if ('message' in self.request.session):
-            message = self.request.session['message']
-            del self.request.session['message']
-            messages.success(self.request, message)
-        elif('err_message' in self.request.session):
-            message = self.request.session['err_message']
-            del self.request.session['err_message']
-            messages.error(self.request, message)
+        if ('message' in request.session):
+            message = request.session['message']
+            del request.session['message']
+            messages.success(request, message)
+        elif('err_message' in request.session):
+            message = request.session['err_message']
+            del request.session['err_message']
+            messages.error(request, message)
 
 
         # get account form object
         form = AccountForm
 
         # display the page
-        return render(self.request, "flexr_web/index.html",
+        return render(request, "flexr_web/index.html",
                       {"curr_acc": curr_account, 
                        "Accounts": accounts, 
                        "Sites": sites,

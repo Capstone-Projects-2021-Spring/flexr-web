@@ -77,7 +77,6 @@ def switch_account(request,*args, **kwargs):
     except:
         print("error switching account....")
         request.session['err_message'] = "Error switching account"
-
     return HttpResponseRedirect('/')
 
 def login_web(request):
