@@ -74,22 +74,24 @@ class Account(models.Model):
                 max_freq = site.recent_frequency
             if site.number_of_visits > max_visits:
                 max_visits = site.number_of_visits
-        print("Account.rank_sites: min_mindelta ",min_mindelta)
-        print("Account.rank_sites: max_freq ",max_freq)
-        print("Account.rank_sites: max_visits ",max_visits)
+        # print("Account.rank_sites: min_mindelta ",min_mindelta)
+        # print("Account.rank_sites: max_freq ",max_freq)
+        # print("Account.rank_sites: max_visits ",max_visits)
         for site in self.sites.all().iterator():
             mindelta = (timezone.now() - site.last_visit).days * 1440 # 1440 minutes in a day
             site.site_ranking = round(((min_mindelta+.1)/(mindelta+.1))*(20)+(site.recent_frequency/max_freq)*(65)+(site.number_of_visits/ max_visits)*(15),3)
             site.save()
-            print("Account.rank_sites: site.site_ranking: ",site, site.site_ranking)
+            # print("Account.rank_sites: site.site_ranking: ",site, site.site_ranking)
 
 
         # print(self.suggested_sites.all())
         for x in self.suggested_sites.all().iterator():
             self.suggested_sites.remove(x)
-        # print("Ordered sites", self.sites.order_by('site_ranking'))
-        for x in self.sites.order_by('-site_ranking')[5:].iterator():
+        #
+        for x in self.sites.order_by('-site_ranking')[:5].iterator():
             self.suggested_sites.add(x)
+        # print(self.suggested_sites.all())
+
         if(self.suggested_sites.all().count() < 5):
             # print("not enuf")
             for x in self.sites.all().iterator():
@@ -160,7 +162,7 @@ class Site(models.Model):
         last_week =  timezone.now() - timedelta(days = 7)
         history = History.objects.filter(site = self,
                                          visit_datetime__gt = last_week)
-        print("Site.calculate_frequency ",history.count())
+        # print("Site.calculate_frequency ",history.count())
         freq = history.count()
         return freq
 

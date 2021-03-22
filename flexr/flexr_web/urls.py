@@ -6,7 +6,6 @@ from .views import *
 # Gerald: probably a better way to do this, but I'm dumb
 from .class_views.AccountView import AccountViewWeb
 from .class_views.AccountView import AccountViewAPI
-from .class_views.AccountView import AccountView
 from .class_views.BookmarksView import BookmarksView, BookmarksViewAPI
 from .class_views.HistoryView import HistoryView, HistoryViewAPI
 from .class_views.IndexView import IndexView

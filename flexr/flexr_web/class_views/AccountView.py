@@ -22,7 +22,7 @@ class AccountViewWeb(LoginRequiredMixin, DetailView):
     """
     View class for the account management
     """
-    
+
     # Gerald: no Account page so we don't 
     # need to display anything
     def get(self, *args, **kwargs):

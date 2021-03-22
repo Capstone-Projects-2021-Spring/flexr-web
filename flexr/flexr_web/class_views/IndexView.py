@@ -26,7 +26,7 @@ class IndexView(LoginRequiredMixin, View):
         try:
             print("IndexView curr_user")
             curr_account = curr_user.accounts.get(account_id = self.request.session['account_id'])
-            print("IndexView: Account Successfully Switched: "+ str(curr_account))
+            # print("IndexView: Account Successfully Switched: "+ str(curr_account))
             curr_account.rank_sites()
         # if no current account found, set current account to
         # first account for the current user
@@ -34,7 +34,7 @@ class IndexView(LoginRequiredMixin, View):
             curr_account = curr_user.accounts.all()[0]
             self.request.session['account_id'] = curr_account.account_id
             curr_account.rank_sites()
-            print("IndexView: Account initialized:" )
+            # print("IndexView: Account initialized:" )
 
         # grab all models for the current user
         # and the current account
