@@ -11,6 +11,11 @@ class HistoryInLine(admin.TabularInline):
 
 class SiteInLine(admin.TabularInline):
     model = Site
+    fk_name = "account"
+
+class SiteInLine2(admin.TabularInline):
+    model = Site
+    fk_name = "suggested_sites"
 
 class BookmarkInLine(admin.TabularInline):
     model = Bookmark
@@ -31,7 +36,7 @@ class FriendshipInline2(admin.TabularInline):
 
 class AccountAdmin(admin.ModelAdmin):
     inlines = [
-        TabInLine, HistoryInLine, SiteInLine, BookmarkInLine, NoteInLine, SharedFolderInLine, FriendshipInline1, FriendshipInline2
+        TabInLine, HistoryInLine, SiteInLine, SiteInLine2 , BookmarkInLine, NoteInLine, SharedFolderInLine, FriendshipInline1, FriendshipInline2
     ]
 
 class TabAdmin(admin.ModelAdmin):
