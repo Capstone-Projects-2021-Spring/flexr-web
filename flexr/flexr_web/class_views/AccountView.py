@@ -4,12 +4,13 @@ from django.shortcuts import redirect, render
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 
 import pytz
 
 from ..models import *
 from ..forms import *
+from ..serializers import *
 
 # TODO: Gerald add request messages
 # TODO: Gerald add comments
@@ -86,11 +87,37 @@ class AccountViewWeb(LoginRequiredMixin, DetailView):
 class AccountViewAPI(LoginRequiredMixin, DetailView):
     """This is for a detail view of a single account"""
 
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
         """This returns the user's current account"""
+
+        url = request.path.split('/')
+
+        if url[-1] == 'accounts':
+            return self.get_all(request, *args, **kwargs)
+        else:
+            return self.get_account(request, *args, **kwargs)
+
+    def get_account(self, request, *args, **kwargs):
         curr_user = request.user
         current_account = curr_user.accounts.get(account_id = request.session['account_id'])
-        print("AccountViewAPI current account: ", current_account)
+
+
+        account = Account.objects.filter(pk = kwargs['id'])
+
+        data = AccountSerializer(account)
+        return JsonResponse(data.data, safe=False)
+
+    def get_all(self, request, *args, **kwargs):
+        curr_user = request.user
+        current_account = curr_user.accounts.get(account_id = request.session['account_id'])
+
+        accounts = curr_user.accounts.all()
+
+        data = AccountSerializer(accounts)
+        return JsonResponse(data.data, safe=False)
+
+
+
 
     def switch_account(self, request, pk):
         curr_user = request.user
