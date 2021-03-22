@@ -6,8 +6,9 @@ from .views import *
 # Gerald: probably a better way to do this, but I'm dumb
 from .class_views.AccountView import AccountViewWeb
 from .class_views.AccountView import AccountViewAPI
-from .class_views.BookmarksView import BookmarksView
-from .class_views.HistoryView import HistoryView
+from .class_views.AccountView import AccountView
+from .class_views.BookmarksView import BookmarksView, BookmarksViewAPI
+from .class_views.HistoryView import HistoryView, HistoryViewAPI
 from .class_views.IndexView import IndexView
 from .class_views.NoteView import NoteView
 from .class_views.NotesView import NotesView
@@ -76,8 +77,13 @@ urlpatterns = [
     path('api/accounts/', AccountViewAPI.as_view()),
     path('api/account/<int:pk>/switch/', AccountViewAPI().switch_account, name = "switch account"),
 
-    path('api/history/<id>', HistoryView.as_view()),
-    path('api/history/<id>/filter', HistoryView.as_view()),
+    path('api/history/<id>', HistoryViewAPI.as_view()),
+    path('api/history/<id>/filter', HistoryViewAPI.as_view()),
+
+    path('api/bookmarks/', BookmarksViewAPI.as_view()),
+    path('api/bookmarks/<id>', BookmarksViewAPI.as_view()),
+    path('api/bookmarks/all', BookmarksViewAPI.as_view()),
+
 ]
 
 # old patterns
