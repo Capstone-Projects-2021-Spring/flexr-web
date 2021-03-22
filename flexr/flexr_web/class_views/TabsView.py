@@ -88,7 +88,7 @@ class TabsView(LoginRequiredMixin, View):
             request.session['err_message'] = "Tab could not be closed"
 
         # TODO we should set up django sesions to know where to redirect a user based on previous page
-        return redirect('/') 
+        return redirect('/open_tabs')
 
 
 
