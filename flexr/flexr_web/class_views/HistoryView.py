@@ -185,6 +185,20 @@ class HistoryViewAPI(LoginRequiredMixin, DetailView):
         data = HistorySerializer(history, many=True)
         return JsonResponse(data.data, safe=False)
 
+    # delete history objects based on list of ids
+    def post(self, request, *args, **kwargs):
+        # get current user and current account
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+    
+        # get history objects to delete
+        delete = request.POST.getlist('DELETE', [])
+
+        # delete requested history objects
+        curr_account.history.filter(pk__in=delete).delete()
+
+        return HttpResponse(f'History objects removed')
+
     def delete(self, request, *args, **kwargs):
         url = request.path.split('/')
 

@@ -61,6 +61,20 @@ class HistoryAPITestCase(TestCase):
 
         self.assertEqual(data, data_expected)
 
+    def test_post_history_delete(self):
+        c = Client()
+        c.login(username='foo', password='bar')
+        c.get(path='/switch_account/1')
+
+        payload = {'DELETE': [1,3]}
+
+        c.post(path ="/api/history/", data=payload)
+
+        data = History.objects.all().count()
+        data_expected = 1
+
+        self.assertEqual(data, data_expected)
+
     def test_delete_history_range(self):
         c = Client()
         c.login(username='foo', password='bar')
