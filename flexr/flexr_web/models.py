@@ -3,8 +3,8 @@ from django.core.validators import RegexValidator  # used for phone number and e
 from django.db import models
 from datetime import datetime
 from django.utils import timezone
-from datetime import datetime
-
+from datetime import datetime, timedelta
+from django.db.models import Sum
 # Create your models here.
 
 class Account(models.Model):
@@ -49,7 +49,6 @@ class Account(models.Model):
     account_preferences = models.OneToOneField("Account_Preferences", on_delete=models.CASCADE, blank=True, null = True)
     account_id = models.AutoField(primary_key=True)
 
-
     def save(self,  *args, **kwargs):
 
         if self.pk is None: #new users
@@ -58,6 +57,47 @@ class Account(models.Model):
 
     def __str__(self):
         return str(self.username)+str(self.account_id) + " " + str(self.type_of_account)
+
+    def rank_sites(self):
+        # print("Ranking sites", self.sites.all())
+        min_mindelta = 0
+        max_freq = 0
+        max_visits = 0
+        for site in self.sites.all().iterator():
+            mindelta = (timezone.now() - site.last_visit).days * 1440 # 1440 minutes in a day
+            # this may be unnessesary
+            site.recent_frequency = site.calculate_frequency()
+            site.save()
+            if mindelta < min_mindelta:
+                min_mindelta = mindelta
+            if site.recent_frequency > max_freq:
+                max_freq = site.recent_frequency
+            if site.number_of_visits > max_visits:
+                max_visits = site.number_of_visits
+        print("Account.rank_sites: min_mindelta ",min_mindelta)
+        print("Account.rank_sites: max_freq ",max_freq)
+        print("Account.rank_sites: max_visits ",max_visits)
+        for site in self.sites.all().iterator():
+            mindelta = (timezone.now() - site.last_visit).days * 1440 # 1440 minutes in a day
+            site.site_ranking = round(((min_mindelta+.1)/(mindelta+.1))*(20)+(site.recent_frequency/max_freq)*(65)+(site.number_of_visits/ max_visits)*(15),3)
+            site.save()
+            print("Account.rank_sites: site.site_ranking: ",site, site.site_ranking)
+
+
+        # print(self.suggested_sites.all())
+        for x in self.suggested_sites.all().iterator():
+            self.suggested_sites.remove(x)
+        # print("Ordered sites", self.sites.order_by('site_ranking'))
+        for x in self.sites.order_by('-site_ranking')[5:].iterator():
+            self.suggested_sites.add(x)
+        if(self.suggested_sites.all().count() < 5):
+            # print("not enuf")
+            for x in self.sites.all().iterator():
+                self.suggested_sites.add(x)
+        # print(self.suggested_sites.all())
+        self.save()
+        # for
+        print("Account.rank_sites: suggested sites: ", self.suggested_sites.all())
 
 # TODO get rid of this class once it is turned into shared_folder
 class Team(models.Model):
@@ -86,10 +126,14 @@ class History(models.Model):
     def __str__(self):
         return "User " + str(self.account.account_id)+ ": " + str(self.visit_datetime) + " " + str(self.site.url)
 
+    def save(self, *args, **kwargs):
+        self.site.visited()
+        super().save(*args, **kwargs)
 
 class Site(models.Model):
     name = models.CharField(max_length=50)
     account = models.ForeignKey("Account", on_delete=models.CASCADE, related_name="sites") #this collection of sites is the history
+    suggested_sites = models.ForeignKey("Account", on_delete=models.CASCADE, related_name="suggested_sites", blank=True, null = True)
 
     url = models.URLField(max_length=2500)
 
@@ -106,8 +150,24 @@ class Site(models.Model):
 
     # TODO Add functionality once a site is visited (check the Tab class)
     def visited(self):
-        self.last_visit = datetime.now()
+        self.last_visit = timezone.now()
+        self.recent_frequency = self.calculate_frequency()
+        self.save()
+        # self.rank_site()
         # site_ranking = # update site ranking here
+
+    def calculate_frequency(self):
+        last_week =  timezone.now() - timedelta(days = 7)
+        history = History.objects.filter(site = self,
+                                         visit_datetime__gt = last_week)
+        print("Site.calculate_frequency ",history.count())
+        freq = history.count()
+        return freq
+
+    # def rank_site(self):
+    #     mindelta = (timezone.now() - self.last_visit).days * 1440 # 1440 minutes in a day
+    #     print("Site rank_site: mindelta: ",mindelta)
+
 
     #TODO This needs to be implemented
     #Pseudocode for rankSite, a method that returns a number between 0 and 100, where the lower return value is the greater site ranking
@@ -119,15 +179,14 @@ class Site(models.Model):
 
     def save(self, *args, **kwargs):
         # call super method to create Tab entry
-        print("URL: ", )
+        # print("URL: ", )
         url1 = str(self.url).split('?')[0]
         url2 = url1.split('/')
-        print("URL: ", url1 )
+        # print("URL: ", url1 )
         try:
             self.name = url2[2] + "/" + url2[3]
         except:
             self.name = url2[2]
-
         super().save(*args, **kwargs)
 
     def __str__(self):
