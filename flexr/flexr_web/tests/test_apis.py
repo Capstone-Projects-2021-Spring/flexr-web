@@ -235,6 +235,8 @@ class UserAPITestCase(TestCase):
         }
 
         result = c.post(path='/api/login/', data=payload)
+        data = json.loads(result.content)
+        print(data)
 
         self.assertEquals(result.status_code, 200)
 

@@ -11,6 +11,7 @@ import pytz
 
 from ..models import *
 from ..forms import *
+from ..serializers import *
 
 
 class UserAPIView(View):
@@ -57,7 +58,8 @@ class UserAPIView(View):
 
             if user:
                 login(request, user)
-                return HttpResponse(f'Loggined into user {username}', status=200)
+                data = UserSerializer(user)
+                return JsonResponse(data.data, safe=False)
 
         return HttpResponse('Error logging in', status=404)
 
@@ -96,4 +98,4 @@ class UserAPIView(View):
 
             return JsonResponse(status, safe=False)
 
-        return HttpResponse('Erro checking status', status=404)
+        return HttpResponse('Error checking status', status=404)
