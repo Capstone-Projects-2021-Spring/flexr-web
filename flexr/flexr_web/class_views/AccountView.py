@@ -70,9 +70,11 @@ class AccountViewWeb(LoginRequiredMixin, DetailView):
 
             # get account to switch to
             request.user.accounts.get(account_id = kwargs["id"])
-
+            print("Requested accounts",request.user.accounts.get(account_id = kwargs["id"]))
             # switch account id and message of the session
             request.session['message'] = "Account Switched"
+            if ("account_id" in request.session):
+                del request.session['account_id']
             request.session['account_id'] = kwargs["id"]
 
         except:
