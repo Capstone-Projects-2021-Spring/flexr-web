@@ -123,11 +123,26 @@ class HistoryView(LoginRequiredMixin, View):
 
 
     # TODO: Gerald
-    def delete(self, *args, **kwargs):
+    def delete(self, request, *args, **kwargs):
         """
-        Delete a history object
+        Delete requested history objects
         """
-        pass
+
+        # get current user and current account
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+    
+        # get history objects to delete
+        delete = request.POST.getlist('DELETE', [])
+
+        # delete requested history objects
+        curr_account.history.filter(pk__in=delete).delete()
+
+        # request message for debugging
+        request.session['message'] = "History Deleted"
+
+        # return to history page
+        return redirect('/browsing_history/')
 
 class HistoryViewAPI(LoginRequiredMixin, DetailView):
     def get(self, request, *args, **kwargs):
@@ -148,7 +163,7 @@ class HistoryViewAPI(LoginRequiredMixin, DetailView):
                 Returns:
                     JSONRequest with success message and the SiteHistory instance or error message
         """
-        
+
         history = History.objects.filter(account = kwargs["id"])
         data = HistorySerializer(history, many=True)
         return JsonResponse(data.data, safe=False)
