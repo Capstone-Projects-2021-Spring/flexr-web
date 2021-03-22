@@ -92,7 +92,7 @@ class AccountViewAPI(LoginRequiredMixin, DetailView):
 
         url = request.path.split('/')
 
-        if url[-1] == 'accounts':
+        if url[-2] == 'accounts':
             return self.get_all(request, *args, **kwargs)
         else:
             return self.get_account(request, *args, **kwargs)
