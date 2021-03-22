@@ -28,7 +28,7 @@ urlpatterns = [
     path('switch_account/<id>', AccountViewWeb().switch_account, name = "switch account"),
 
     path('browsing_history/', HistoryView.as_view(), name='history'),
-    path('filter_history/', HistoryView().filter, name = "filter history"),
+    #path('filter_history/', HistoryView().filter, name = "filter history"),
 
     path('notes/', NotesView.as_view(), name='notes'), #broken
     path('create_note', NotesView().create_note, name='create_note'),

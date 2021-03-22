@@ -12,7 +12,7 @@
 
     <hr>
     <div class="modal-body">
-        <form method="post" action="/filter_history/">
+        <form method="post">
              {% csrf_token %}
              {% for field in form %}
              <p>

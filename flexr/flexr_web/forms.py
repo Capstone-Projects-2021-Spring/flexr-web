@@ -57,15 +57,14 @@ class PreferencesForm(ModelForm):
         fields = ('home_page', 'sync_enabled', 'searchable_profile', 'cookies_enabled', 'popups_enabled', 'is_dark_mode')
 
 class FilterHistoryForm(forms.Form):
-    start_date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
-    start_time = forms.DateField(widget=forms.widgets.TimeInput(attrs={'type': 'time'}))
-    end_date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
-    end_time = forms.DateField(widget=forms.widgets.TimeInput(attrs={'type': 'time'}))
+    site = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}), required=False)
+    start_date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), required=False)
+    start_time = forms.DateField(widget=forms.widgets.TimeInput(attrs={'type': 'time'}), required=False)
+    end_date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), required=False)
+    end_time = forms.DateField(widget=forms.widgets.TimeInput(attrs={'type': 'time'}), required=False)
 
     class Meta:
         pass
-        #fields = ['start_date']
-        #widgets = {'start_date': forms.DateInput()}
 
 class EditNoteForm(ModelForm):
     class Meta:

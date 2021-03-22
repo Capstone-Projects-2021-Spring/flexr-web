@@ -55,7 +55,7 @@ class HistoryView(LoginRequiredMixin, View):
           "form": form})
 
 
-    def filter(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         """
         Filter the account's history by datetime range
         """
@@ -71,31 +71,55 @@ class HistoryView(LoginRequiredMixin, View):
         form = FilterHistoryForm
 
         # grab date and time information from POST form
+        site = request.POST['site']
         start_date = request.POST['start_date']
         start_time = request.POST['start_time']
         end_date = request.POST['end_date']
         end_time = request.POST['end_time']
 
+        # set default time if None
+        if not start_time:
+            start_time = '00:00'
+
+        # set default time if None
+        if not end_time:
+            end_time = '00:00'
+
         # concat to datetime format
         start_datetime = start_date + ' ' + start_time
         end_datetime = end_date + ' ' + end_time
 
-        # construct datetime object with timezone
         # TODO: Gerald check that timezone's work correctly
-        start = datetime.strptime(start_datetime, '%Y-%m-%d %H:%M').replace(tzinfo = pytz.UTC)
-        end = datetime.strptime(end_datetime, '%Y-%m-%d %H:%M').replace(tzinfo = pytz.UTC)
         
+        # grab all history objects
+        history = curr_account.history.all()
 
-        # filter history based on given start and end datetimes
-        history = curr_account.history.filter(
-            visit_datetime__gte=start,
+        # filter based on site if given
+        if site:
+            history = history.filter(site__url__icontains=site)
+
+        # filter based on start if given
+        if start_date:
+            start = datetime.strptime(start_datetime, '%Y-%m-%d %H:%M').replace(tzinfo = pytz.UTC)
+            history = history.filter(
+            visit_datetime__gte=start)
+
+        # filter based on end if given
+        if end_date:
+            end = datetime.strptime(end_datetime, '%Y-%m-%d %H:%M').replace(tzinfo = pytz.UTC)
+            history = history.filter(
             visit_datetime__lte=end
         )
+
 
         # request message for debugging
         request.session['message'] = "History Filtered"
 
-        return redirect('/browsing_history/')
+        # Gerald: using redirect doesn't work here?
+        return render(request, "flexr_web/browsing_history.html",
+         {"History": history, 
+          "Accounts": accounts,
+          "form": form})
 
 
     # TODO: Gerald
@@ -124,7 +148,7 @@ class HistoryViewAPI(LoginRequiredMixin, DetailView):
                 Returns:
                     JSONRequest with success message and the SiteHistory instance or error message
         """
-        #print('test')
+        
         history = History.objects.filter(account = kwargs["id"])
         data = HistorySerializer(history, many=True)
         return JsonResponse(data.data, safe=False)
