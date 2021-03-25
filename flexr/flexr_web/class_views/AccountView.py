@@ -115,7 +115,7 @@ class AccountViewAPI(LoginRequiredMixin, DetailView):
 
         accounts = curr_user.accounts.all()
 
-        data = AccountSerializer(accounts)
+        data = AccountSerializer(accounts, many = True)
         return JsonResponse(data.data, safe=False)
 
 
