@@ -30,7 +30,7 @@ class SharedFoldersView(LoginRequiredMixin, View):
         folders = curr_account.shared_folders.all()
 
         # created a shared folder and populate its attributes
-        folder_form = SharedFolder()
+        folder_form = EditSharedFolder()
         folder_form.fields['bookmarks'].queryset = curr_account.bookmarks.all()
         folder_form.fields['tabs'].queryset = curr_account.tabs.all()
         folder_form.fields['notes'].queryset = curr_account.notes.all()
@@ -59,7 +59,7 @@ class SharedFoldersView(LoginRequiredMixin, View):
         # Change required fields on the form.
     
         # get the form object
-        form = SharedFolder(request.POST)
+        form = EditSharedFolder(request.POST)
 
         # check that the form is valid
         if form.is_valid():
@@ -97,4 +97,11 @@ class SharedFoldersView(LoginRequiredMixin, View):
         print(sharedFolder.objects.get(pk=kwargs['pk']))
         my = sharedFolder.objects.get(pk=kwargs['pk'])
         my.delete()
+        return redirect('/shared_folders')
+
+    def edit_shared_folder(self, request, *args, **kwargs):
+        form = EditSharedFolder(request.POST)
+        if form.is_valid():
+            print("\n\n\n\nit'svalid")
+
         return redirect('/shared_folders')
