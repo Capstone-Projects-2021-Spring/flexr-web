@@ -92,4 +92,9 @@ class SharedFoldersView(LoginRequiredMixin, View):
 
         # return to shared folders page
         return redirect('/shared_folders')
-    
+
+    def delete_shared_folder(self, *args, **kwargs):
+        print(sharedFolder.objects.get(pk=kwargs['pk']))
+        my = sharedFolder.objects.get(pk=kwargs['pk'])
+        my.delete()
+        return redirect('/shared_folders')
