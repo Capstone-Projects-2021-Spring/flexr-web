@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Flexr | Shared Folder</title>
+    {% load static %}
 </head>
 <body>
     {% include "flexr_web/navbar.html" %}
@@ -25,7 +26,7 @@
         <p>{{tab}}</p>
     {% endfor %}
     <a href="{% url 'delete_shared_folder' shared_folder.pk%}"><p>Delete Folder</p> </a>
-    Edit Folder <img id="plus-icon" data-toggle="modal" data-target="#edit_folder" src="static/icons/plus-square.svg">
+    Edit Folder <img id="plus-icon" data-toggle="modal" data-target="#edit_folder" src="{% static 'icons/plus-square.svg' %}">
 
         <div class="modal fade" id="edit_folder" tabindex="-1" role="dialog" aria-labelledby="edit_folderLabel" aria-hidden="true">
           <div class="modal-dialog" role="document">
