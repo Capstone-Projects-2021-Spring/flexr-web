@@ -17,7 +17,7 @@ from .class_views.SharedFoldersView import SharedFoldersView
 from .class_views.TabsView import TabsView
 from .class_views.UserView import UserAPIView
 from .class_views.FriendView import FriendView
-
+from .class_views.SiteView import SiteAPIView
 
 urlpatterns = [
     path('register', views.register_web, name='register'),
@@ -71,6 +71,8 @@ urlpatterns = [
     path('api/register/', UserAPIView().sign_up),
     path('api/logout/', UserAPIView().logout),
     path('api/status/', UserAPIView().check_status),
+
+    path('api/site/', SiteAPIView.as_view()),
 
     path('api/tabs/', AllTabsView.as_view()),
     path('api/tab/<id>', TabView.as_view()),

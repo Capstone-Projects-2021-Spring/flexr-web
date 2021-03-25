@@ -8,10 +8,17 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['username', 'email']
 
 class AccountSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Account
-        fields = ['user', 'email', 'phone_number', 'date_joined', 'type_of_account', 
+        fields = ['user', 'username', 'email', 'phone_number', 'date_joined', 'type_of_account',
         'account_preferences', 'account_id']
+
+class SiteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Site
+        fields = ['name', 'acocunt', 'suggested_sites', 'url', 'first_visit', 'last_visit', 'recent_frequency',
+                  'number_of_visits', 'site_ranking', 'open_tab', 'bookmarked']
 
 class TabSerializer(serializers.ModelSerializer):
     class Meta:
