@@ -17,7 +17,7 @@ class AccountSerializer(serializers.ModelSerializer):
 class SiteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Site
-        fields = ['name', 'acocunt', 'suggested_sites', 'url', 'first_visit', 'last_visit', 'recent_frequency',
+        fields = ['name', 'account', 'suggested_sites', 'url', 'first_visit', 'last_visit', 'recent_frequency',
                   'number_of_visits', 'site_ranking', 'open_tab', 'bookmarked']
 
 class TabSerializer(serializers.ModelSerializer):
