@@ -72,7 +72,7 @@ class EditNoteForm(ModelForm):
         # Make homepage a url field? may need to apppend https://www.
         fields = ('title', 'content')
 
-class SharedFolder(ModelForm):
+class EditSharedFolder(ModelForm):
     class Meta:
         model = sharedFolder
         fields = ('title', 'description', 'collaborators', 'bookmarks', 'tabs', 'notes')

@@ -29,6 +29,7 @@
             <div class = "folder card col-md-3" onclick="window.location.href = '/shared_folder/{{folder.id}}'">
                 <h2>{{folder.title}}</h2>
                 <p>{{folder.description}}</p>
+                <a href="{% url 'delete_shared_folder' folder.pk%}"><p>Delete Folder</p> </a>
                 {% for collaborator in folder.collaborators.all %}
                     <p>{{collaborator}}</p>
                 {% endfor %}
