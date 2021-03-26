@@ -99,6 +99,47 @@ class AccountViewAPI(LoginRequiredMixin, DetailView):
         else:
             return self.get_account(request, *args, **kwargs)
 
+    def post(self, request):
+        """This creates a new account for a user"""
+
+        curr_user = request.user
+        data = request.POST.dict()
+        new_account = Account.objects.create(user = curr_user, **data)
+        new_account.save()
+        return HttpResponse(f'{new_account} account object created')
+
+    def put(self, request):
+        curr_user = request.user
+        data = request.PUT.dict()
+        account_id = request.PUT.get('account_id')
+        edit_account = curr_user.accounts.get(account_id = account_id)
+        edit_account.usernameusername = request.PUT.get('username')
+        edit_account.email = request.PUT.get('email')
+        edit_account.phone_number = request.PUT.get('phone_number')
+        edit_account.type_of_account = request.PUT.get('type_of_account')
+        edit_account.save()
+
+        data = AccountSerializer(edit_account)
+        return JsonResponse(data.data, safe=False)
+
+    def delete(self, request,  *args, **kwargs ):
+        curr_user = request.user
+        count_of_accs_prev = curr_user.accounts.all().count()
+        acc_id = request.DELETE.get('account_id')
+        if(request.session['account_id'] == acc_id):
+            curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+            curr_account.delete()
+            request.session['account_id'] = curr_user.accounts.all()[0].account_id
+        else:
+            acc_to_delete = curr_user.accounts.get(account_id = acc_id)
+            acc_to_delete.delete()
+
+        count_of_accs_aft = curr_user.accounts.all().count()
+        if(count_of_accs_prev > count_of_accs_aft):
+            return HttpResponse(f"Account {acc_id} successfully deleted")
+        else:
+            return HttpResponse(f"Account {acc_id} was not deleted")
+
     def get_account(self, request, *args, **kwargs):
         curr_user = request.user
         current_account = curr_user.accounts.get(account_id = request.session['account_id'])
