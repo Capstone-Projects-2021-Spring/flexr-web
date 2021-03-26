@@ -12,7 +12,7 @@
 
     <hr>
     <div class="modal-body">
-        <form method="post" action="/filter_history/">
+        <form method="post">
              {% csrf_token %}
              {% for field in form %}
              <p>
@@ -35,11 +35,19 @@
 </div>
     <hr>
     <h3>Browsing History:</h3>
+    <form method = "POST" action="{% url 'delete history'%}">
+    {% csrf_token %}
     {%for entry in History%}
-        <p>Title: <a href="{{entry.site.url}}"> {{entry.site.url}}</a></p>
-        <p>Visit Date: {{entry.visit_datetime}}</p>
+    <input type="checkbox" id="{{entry.id}}" name="DELETE" value="{{entry.id}}">
+        <p>Site: <a href="{{entry.site.url}}"> {{entry.site.url}}</a>
+            
+        </p>
+        <p>Visit Date: {{entry.visit_datetime}} </p>
+        
         <br>
     {%endfor%}
+    <button type="submit" class="btn btn-primary">Delete</button>
+    </form>
     <hr>
 
 </body>

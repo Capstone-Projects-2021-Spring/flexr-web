@@ -28,7 +28,8 @@ urlpatterns = [
     path('switch_account/<id>', AccountViewWeb().switch_account, name = "switch account"),
 
     path('browsing_history/', HistoryView.as_view(), name='history'),
-    path('filter_history/', HistoryView().filter, name = "filter history"),
+    path('browsing_history/delete', HistoryView().delete, name='delete history'),
+    #path('filter_history/', HistoryView().filter, name = "filter history"),
 
     path('notes/', NotesView.as_view(), name='notes'), #broken
     path('create_note', NotesView().create_note, name='create_note'),
@@ -81,6 +82,8 @@ urlpatterns = [
     path('api/accounts/', AccountViewAPI.as_view()),
     path('api/account/<int:pk>/switch/', AccountViewAPI().switch_account, name = "switch account"),
 
+    path('api/history/', HistoryViewAPI.as_view()),
+    path('api/history/filter', HistoryViewAPI.as_view()),
     path('api/history/<id>', HistoryViewAPI.as_view()),
     path('api/history/<id>/filter', HistoryViewAPI.as_view()),
 
