@@ -9,6 +9,30 @@
 <!--    <h1>{{user.first_name}}&nbsp{{user.last_name}}</h1>-->
 <!--    <h1>{{user.email}}</h1>-->
 <!--    <h2>{{Accounts.0}}</h2>-->
+
+    <hr>
+    <div class="modal-body">
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+            <p>
+                {{ field.label_tag }}<br>
+                {{ field }} 
+            </p>
+
+            {% endfor %}
+
+         <div class="modal-footer">
+         <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
+
+<!--                    <button type="button" class="btn btn-danger" onclick="delete_account()">Delete</button>-->
+          <button type="submit" class="btn btn-primary">Filter</button>
+         </div>
+        </form>
+    </div>
+   </div>
+</div>
+</div>
     <hr>
     <h3>Bookmarks:</h3>
     {%for bookmark in Bookmarks%}
