@@ -87,9 +87,9 @@ urlpatterns = [
     path('api/account/<int:pk>/switch/', AccountViewAPI().switch_account, name = "switch account"),
 
     path('api/history/', HistoryViewAPI.as_view()),
-    path('api/history/filter', HistoryViewAPI.as_view()),
-    path('api/history/<id>', HistoryViewAPI.as_view()),
-    path('api/history/<id>/filter', HistoryViewAPI.as_view()),
+    path('api/history/filter/', HistoryViewAPI.as_view()),
+    #path('api/history/<id>', HistoryViewAPI.as_view()),
+    #path('api/history/<id>/filter', HistoryViewAPI.as_view()),
 
     path('api/bookmarks/', BookmarksViewAPI.as_view()),
     path('api/bookmarks/<id>', BookmarksViewAPI.as_view()),

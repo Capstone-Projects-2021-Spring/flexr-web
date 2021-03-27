@@ -13,7 +13,6 @@ from ..forms import *
 from ..serializers import HistorySerializer
 
 
-# TODO: Gerald add delete history button
 
 class HistoryView(LoginRequiredMixin, View):
     """
@@ -122,7 +121,6 @@ class HistoryView(LoginRequiredMixin, View):
           "form": form})
 
 
-    # TODO: Gerald
     def delete(self, request, *args, **kwargs):
         """
         Delete requested history objects
@@ -148,6 +146,9 @@ class HistoryViewAPI(LoginRequiredMixin, DetailView):
     def get(self, request, *args, **kwargs):
         url = request.path.split('/')
 
+        if not url[-1]:
+            url = url[:-1]
+
         if url[-1] == 'filter':
             return self.filter_history(request, *args, **kwargs)
         else:
@@ -164,7 +165,9 @@ class HistoryViewAPI(LoginRequiredMixin, DetailView):
                     JSONRequest with success message and the SiteHistory instance or error message
         """
 
-        history = History.objects.filter(account = kwargs["id"])
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+        history = History.objects.filter(account = curr_account)
         data = HistorySerializer(history, many=True)
         return JsonResponse(data.data, safe=False)
 
@@ -177,9 +180,12 @@ class HistoryViewAPI(LoginRequiredMixin, DetailView):
                     JSONRequest with success message and the SiteHistory objects or error message
         """
 
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+
         payload = request.GET.dict()
         history = History.objects.filter(
-            account = kwargs["id"],
+            account = curr_account,
             visit_datetime__gte=payload['datetime_from'],
             visit_datetime__lte=payload['datetime_to'])
         data = HistorySerializer(history, many=True)
@@ -202,6 +208,9 @@ class HistoryViewAPI(LoginRequiredMixin, DetailView):
     def delete(self, request, *args, **kwargs):
         url = request.path.split('/')
 
+        if not url[-1]:
+            url = url[:-1]
+
         if url[-1] == 'filter':
             return self.delete_history_range(request, *args, **kwargs)
         else:
@@ -215,9 +224,11 @@ class HistoryViewAPI(LoginRequiredMixin, DetailView):
                 Returns:
                     JSONRequest with success message and the SiteHistory objects or error message
         """
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
         payload = json.loads(request.body)
         history = History.objects.filter(
-            account = kwargs["id"],
+            account = curr_account,
             visit_datetime__gte=payload['datetime_from'],
             visit_datetime__lte=payload['datetime_to']).delete()
 
@@ -231,7 +242,9 @@ class HistoryViewAPI(LoginRequiredMixin, DetailView):
                 Returns:
                     JSONRequest with success message or error message
         """
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
 
-        history = History.objects.filter(account = kwargs["id"]).delete()
+        history = History.objects.filter(account = curr_account).delete()
 
         return HttpResponse(f'{history} History objects removed')

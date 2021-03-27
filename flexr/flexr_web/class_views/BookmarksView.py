@@ -138,10 +138,9 @@ class BookmarksViewAPI(LoginRequiredMixin, DetailView):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
 
-        bookmark = Bookmark.objects.filter(account = curr_account,
-        pk = kwargs["id"])[0]
+        bookmark = Bookmark.objects.filter(account = curr_account)
     
-        data = BookmarkSerializer(bookmark)
+        data = BookmarkSerializer(bookmark, many=True)
         
         return JsonResponse(data.data, safe=False)
 
