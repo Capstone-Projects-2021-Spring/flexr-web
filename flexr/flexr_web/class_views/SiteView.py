@@ -27,6 +27,7 @@ class SiteAPIView(LoginRequiredMixin, View):
         url = request.POST.get('url')
         site = Site.objects.get_or_create(account = curr_account, url = url)
         site.save()
+
         data = SiteSerializer(site)
         return JsonResponse(data.data, safe=False)
 

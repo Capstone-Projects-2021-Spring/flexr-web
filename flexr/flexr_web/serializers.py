@@ -23,17 +23,17 @@ class SiteSerializer(serializers.ModelSerializer):
 class TabSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tab
-        fields = ['account', 'site', 'created_date', 'last_visited', 'status']
+        fields = ['account', 'site','url', 'created_date', 'last_visited', 'status']
 
 class HistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = History
-        fields = ['site', 'account', 'visit_datetime']
+        fields = ['site','url', 'account', 'visit_datetime']
 
 class BookmarkSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bookmark
-        fields = ['account', 'bookmark_name', 'created_date', 'site', 'last_visited',
+        fields = ['account','url', 'bookmark_name', 'created_date', 'site', 'last_visited',
         'recent_frequency', 'number_of_visits']
 
 class AccountPreferencesSerializer(serializers.ModelSerializer):

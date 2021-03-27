@@ -122,16 +122,19 @@ class Team(models.Model):
 class History(models.Model):
     site = models.ForeignKey("Site", on_delete=models.CASCADE, related_name="site_history")
     account = models.ForeignKey("Account", on_delete=models.CASCADE, related_name="history") # don't do foreignkey here make it so that there is a method that gets the account from the site
+    url = models.CharField(max_length=2500)
     visit_datetime = models.DateTimeField(default=timezone.now)
 
     class Meta:
         verbose_name_plural = "histories"
+        ordering = ('-visit_datetime',)
 
     def __str__(self):
         return "User " + str(self.account.account_id)+ ": " + str(self.visit_datetime) + " " + str(self.site.url)
 
     def save(self, *args, **kwargs):
         self.site.visited()
+        self.url = self.site.url
         super().save(*args, **kwargs)
 
 class Site(models.Model):
@@ -209,6 +212,7 @@ class Tab(models.Model):
 
     # TODO we should implement a setting to have tabs automatically deleted after a certain amount of time
     last_visited = models.DateTimeField(default=timezone.now) #maybe add auto now to this
+    url = models.CharField(max_length=2500)
 
     # TODO Have this be a choice field
     # TODO make the status of a tab calculated using a method
@@ -238,7 +242,7 @@ class Tab(models.Model):
             history.save()
 
         if toSave:
-            super(Tab, tab).save()
+            tab.save()
             
         return tab
 
@@ -260,11 +264,15 @@ class Tab(models.Model):
             tab.last_visited = datetime.now()
             status = "active"
             tab.save()
+            site = Site.objects.filter(account=curr_account).get(url=tab.url)
+            site.visited()
+            history = History.objects.create(account=curr_account, site=site, visit_datetime=last_visit)
+            history.save()
             try:
                 site = Site.objects.filter(account = curr_account).get(url = tab.url)[0]
             except:
                 return "Site instance doesn't exist for the current user"
-            return "successful"
+            return tab
         except:
             return "Tab instance doesn't exist for the current user"
 
@@ -276,9 +284,10 @@ class Tab(models.Model):
         # call super method to create Tab entry
         account = Account.objects.filter(pk = self.account_id)[0]
         site =  Site.objects.filter(pk = self.site_id)[0]
+        self.url = self.site.url
+        print("self.url", self.url)
         tab = Tab.open_tab(site.url, account, self.created_date, self.last_visited, toSave=False)
         super(Tab, self).save(*args, **kwargs)
-
         # create corresponding site object
 
 class Bookmark(models.Model):
@@ -289,6 +298,7 @@ class Bookmark(models.Model):
     last_visited = models.DateTimeField(default=timezone.now) #keeps track of last visited date
     recent_frequency = models.IntegerField(default=1) # number of visits in the last week
     number_of_visits = models.IntegerField(default=1)# keeps track of number of visits
+    url = models.CharField(max_length=2500)
 
     # TODO create a visited method
     #TODO create a method to calculate frequency
@@ -308,8 +318,10 @@ class Bookmark(models.Model):
         bookmark = Bookmark.objects.filter(pk=id).delete()
         print('bookmark deleted')
 
-
-    
+    def save(self, *args, **kwargs):
+        # call super method to create Tab entry
+        self.url =  self.site.url
+        super().save(*args, **kwargs)
 
 # TODO change bookmark status in the Site model on save
 # Gerald: What is bookmark status?
@@ -347,7 +359,6 @@ class Account_Preferences(models.Model):
     def __str__(self):
        return str(self.name) + " " +str(self.id)
 
-
 class Note(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="notes")
     # title = models.CharField(verbose_name="Note title", max_length=100, default="note_"+str(datetime.date()))
@@ -383,7 +394,6 @@ class sharedFolder(models.Model):
         
         super().save(*args, **kwargs)
         print(self.collaborators.all())
-
 
 class Friendship(models.Model):
     sent = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="from_friend")
