@@ -4,6 +4,9 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.views import View
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+
 import pytz
 import json
 from ..models import *
@@ -116,7 +119,7 @@ class TabsView(LoginRequiredMixin, View):
             
         return redirect('/')
 
-
+@method_decorator(csrf_exempt, name='dispatch')
 class TabAPIView(View):
 
     def get(self, request, *args, **kwargs):
@@ -125,7 +128,10 @@ class TabAPIView(View):
 
         url = request.path.split('/')
 
-        if url[-2] == 'tabs':
+        if not url[-1]:
+            url = url[:-1]
+
+        if url[-1] == 'tabs':
             return self.get_all_tabs(request, *args, **kwargs)
         else:
             return self.get_tab(request, *args, **kwargs)
