@@ -40,62 +40,64 @@
 </div>
 </div>
     <hr>
+    <p style="display: inline;">Create a Bookmark Folder</p> <img style="display:inline;" id="plus-icon" data-toggle="modal" data-target="#add_bookmark_folder" src="{% static 'icons/plus-square.svg' %}">
+
+</hr>
+<div class="modal fade" id="add_bookmark_folder" tabindex="-1" role="dialog" aria-labelledby="add_bookmark_folder_Label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="add_bookmark_folder_Label">Add a Bookmark folder</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+              <form method = "POST" action="{% url 'create_bookmark_folder' %}">
+                      {% csrf_token %}
+                      {% for field in formb %}
+                      <p>
+                          {{ field.label_tag }}<br>
+                          {{ field }}
+                          {% if field.help_text %}
+                              <small style="color: grey">{{ field.help_text }}</small>
+                          {% endif %}
+                          {% for error in field.errors %}
+                              <p style="color: red">{{ error }}</p>
+                          {% endfor %}
+                      </p>
+                      {% endfor %}
+                      <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <button type="submit" class="btn btn-primary">Create Folder</button>
+              </div>
+              </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class = "row">
+    {%for folder in Folders%}
+        <div class = "card col-lg-3">
+            <p>title:  <a href="{% url 'bookmark-folder-detail' folder.pk%}">
+                {{folder.title}}</a></p>
+            <p>Created Date: {{folder.created_date}}</p>
+            <p><a href="{% url 'delete-bookmark-folder' folder.pk%}">Delete Folder</a></p>
+            <br>
+        </div>
+    {%endfor%}
+</div>
+  <hr>
     <h3>Bookmarks:</h3>
     {%for bookmark in Bookmarks%}
     <p>Bookmark: <a href="{{bookmark.site.url}}">{{bookmark.site.url}}</a></p>
     <p>Created Date: {{bookmark.created_date}}</p>
     <p>Last Visited: {{bookmark.last_visited}}</p>
     <button onclick="window.location.href = '/delete_bookmark/{{bookmark.id}}/'">Delete Bookmark</button>
+
     <br>
     {%endfor%}
-    <p style="display: inline;">Create a Bookmark Folder</p> <img style="display:inline;" id="plus-icon" data-toggle="modal" data-target="#add_bookmark_folder" src="{% static 'icons/plus-square.svg' %}">
-
-    </hr>
-    <div class="modal fade" id="add_bookmark_folder" tabindex="-1" role="dialog" aria-labelledby="add_bookmark_folder_Label" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="add_bookmark_folder_Label">Add a Bookmark folder</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-                  <form method = "POST" action="{% url 'create_bookmark_folder' %}">
-                          {% csrf_token %}
-                          {% for field in formb %}
-                          <p>
-                              {{ field.label_tag }}<br>
-                              {{ field }}
-                              {% if field.help_text %}
-                                  <small style="color: grey">{{ field.help_text }}</small>
-                              {% endif %}
-                              {% for error in field.errors %}
-                                  <p style="color: red">{{ error }}</p>
-                              {% endfor %}
-                          </p>
-                          {% endfor %}
-                          <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                      <button type="submit" class="btn btn-primary">Create Folder</button>
-                  </div>
-                  </form>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class = "row">
-        {%for folder in Folders%}
-            <div class = "card col-lg-3">
-                <p>title:  <a href="{% url 'bookmark-folder-detail' folder.pk%}">
-                    {{folder.title}}</a></p>
-                <p>Created Date: {{folder.created_date}}</p>
-                <p><a href="{% url 'delete-bookmark-folder' folder.pk%}">Delete Folder</a></p>
-                <br>
-            </div>
-        {%endfor%}
-    </div>
-      <hr>
+ 
       
 </body>
 </html>

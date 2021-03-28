@@ -28,11 +28,13 @@ class BookmarksView(LoginRequiredMixin, View):
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
 
         # get all user's accounts
-        accounts = curr_user.accounts.all()
+        # accounts = curr_user.accounts.all()
 
         # get form object on page
         form = FilterBookmarkForm
+        formb = BookmarkFolderForm
         folders = curr_account.bookmark_folders.all()
+        formf = BookmarkOnFile
 
 
         # grab date and time information from POST form
@@ -82,7 +84,8 @@ class BookmarksView(LoginRequiredMixin, View):
         # Gerald: using redirect doesn't work here?
         return render(request, "flexr_web/bookmarks.html",
          {"Bookmarks": bookmarks, 
-          "Accounts": accounts,
+          "formb": formb,
+          "formf": formf,
           "Folders": folders,
           "form": form})
 
@@ -101,6 +104,7 @@ class BookmarksView(LoginRequiredMixin, View):
         form = FilterBookmarkForm
         formb = BookmarkFolderForm
         folders = curr_account.bookmark_folders.all()
+        formf = BookmarkOnFile
         # request messages for debugging
         if ('message' in self.request.session):
             message = self.request.session['message']
@@ -116,6 +120,7 @@ class BookmarksView(LoginRequiredMixin, View):
         return render(self.request, "flexr_web/bookmarks.html", 
         {"Bookmarks": bookmarks,
         "formb": formb,
+        "formf": formf,
         "Folders": folders,
         "form": form})
 

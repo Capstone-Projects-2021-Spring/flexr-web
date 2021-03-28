@@ -90,3 +90,10 @@ class FilterBookmarkForm(forms.Form):
 
     class Meta:
         pass
+
+class BookmarkOnFile(forms.Form):
+    class Meta:
+        model = bookmarkFolder
+        fields = ('bookmarks')
+
+
