@@ -107,8 +107,10 @@ class BookmarksViewAPI(LoginRequiredMixin, DetailView):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
 
-        data = request.POST.dict()
-        
+        #data = request.POST.dict()
+        data = json.loads(request.body)
+        #print(data)
+
         if 'url' in data:
             site = Site.objects.get_or_create(account = curr_account, url = data['url'])[0]
             data['site_id'] = site.id
