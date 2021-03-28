@@ -26,6 +26,7 @@ urlpatterns = [
 
     path('add_account/', AccountViewWeb().add_account, name = "add account"),
     path('switch_account/<id>', AccountViewWeb().switch_account, name = "switch account"),
+    path('delete_account/<int:pk>', AccountViewWeb().delete, name="delete account"),
 
     path('browsing_history/', HistoryView.as_view(), name='history'),
     path('browsing_history/delete', HistoryView().delete, name='delete history'),
@@ -76,10 +77,10 @@ urlpatterns = [
 
     path('api/site/', SiteAPIView.as_view()),
 
-    path('api/tabs/', TabAPIView.as_view()),
-    path('api/tab/<id>', TabAPIView.as_view()),
-    path('api/tab/<id>/open', TabAPIView().add_tab),
-    path('api/tab/<id>/close', TabAPIView().close_tab),
+    path('api/tabs/', TabAPIView.as_view()), # GET returns all tabs
+    path('api/tab/<id>', TabAPIView.as_view()), # GET returns a single tab
+    path('api/tab/open', TabAPIView().add_tab), # POST creates a new tab returns tab
+    path('api/tab/<id>/close', TabAPIView().close_tab), # DELETE deletes tab returns successful HTTPREquest
     path('api/tab/<id>/visit', TabAPIView().open_tab),
     path('api/tab/<id>/edit', TabAPIView().edit_tab),
 

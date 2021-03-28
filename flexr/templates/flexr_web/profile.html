@@ -25,7 +25,7 @@
     {% include "flexr_web/navbar.html" %}
     <h1>{{user.first_name}}&nbsp{{user.last_name}}&nbsp@{{user}}</h1>
     <h1>{{user.email}}</h1>
-    <h2 style="display:inline">{{current_account}}</h2><img id = "edit" src="{% static 'icons/pencil-square.svg'%}" data-toggle="modal" data-target="#view_account">
+    <h2 style="display:inline">{{curr_acc}}</h2><img id = "edit" src="{% static 'icons/pencil-square.svg'%}" data-toggle="modal" data-target="#view_account">
     <br>
     <h1 style="display:inline;" >Friends: </h1><i style="display:inline;" class="fas fa-user-plus" data-toggle="modal" data-target="#friend_search" ></i>
     <div class = "row">
@@ -117,7 +117,7 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-danger" onclick="delete_account()">Delete</button>
+                    <button type="button" class="btn btn-danger" onclick="window.location.href = '/delete_account/{{curr_acc.account_id}}'">Delete</button>
 <!--                    {% if user.accounts.all|length > 1%}-->
 
 <!--                        <button type="button" class="btn btn-danger" onclick="delete_account()">Delete</button>-->

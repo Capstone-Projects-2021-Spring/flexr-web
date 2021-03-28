@@ -86,6 +86,23 @@ class AccountViewWeb(LoginRequiredMixin, DetailView):
         # return to index page
         return redirect('/')
 
+    def delete(self, request, pk):
+        curr_user = request.user
+        if (curr_user.accounts.all().count() > 1):
+            if (request.session['account_id'] == pk):
+                curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
+                curr_account.delete()
+                new_curr_account = curr_user.accounts.all()[0]
+                request.session['account_id'] = new_curr_account.account_id
+            else:
+                del_account = curr_user.accounts.get(account_id=pk)
+                del_account.delete()
+            request.session['message'] = "Account deleted"
+            return redirect('/')
+        else:
+            request.session['err_message'] = "Can't delete your only account"
+            return redirect('/profile')
+
 @method_decorator(csrf_exempt, name='dispatch')
 class AccountViewAPI(LoginRequiredMixin, DetailView):
     """This is for a detail view of a single account"""
@@ -130,6 +147,23 @@ class AccountViewAPI(LoginRequiredMixin, DetailView):
             print("Account View API: account does not exist for that user with that id")
             return JsonResponse({"error": "account does not exist for that user with that id"})
             # need to return some json here 404 or 403
+
+
+    @method_decorator(csrf_exempt)
+    def delete(self, request, pk):
+        curr_user = request.user
+        if(curr_user.accounts.all().count() > 1):
+            if(request.session['account_id'] == pk):
+                curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+                curr_account.delete()
+                new_curr_account =  curr_user.accounts.all()[0]
+                request.session['account_id'] = new_curr_account.account_id
+            else:
+                del_account = curr_user.accounts.get(account_id =  pk)
+                del_account.delete()
+            return JsonResponse({"success": "Account deleted"})
+        else:
+            return JsonResponse({"error": "User only has 1 account and can not be deleted"})
 
     # This needs to be POST
     # def edit_account(self, request):
