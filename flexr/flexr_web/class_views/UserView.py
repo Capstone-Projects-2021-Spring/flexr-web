@@ -40,9 +40,11 @@ class UserAPIView(View):
             new_account = Account.objects.create(user=user, email=user.email, username = user.username)
             request.session['account_id'] = new_account.account_id
 
-            return HttpResponse(f'User {username} created', status=200)
+            return JsonResponse({"success": f"User {username} created"})
+
+            
+        return JsonResponse({"error": f"Error creating user"})
         
-        return HttpResponse(f'Error creating user', status=404)
 
     @method_decorator(csrf_exempt)
     def login(self, request, *args, **kwargs): 
@@ -65,7 +67,8 @@ class UserAPIView(View):
                 data = UserSerializer(user)
                 return JsonResponse(data.data, safe=False)
 
-        return HttpResponse('Error logging in', status=404)
+        return JsonResponse({"error": "Error logging in"})
+        
 
     @method_decorator(csrf_exempt)
     def logout(self, request, *args, **kwargs):
@@ -77,15 +80,13 @@ class UserAPIView(View):
                 JSONRequest with success or error message
         """
 
-        #print(request.__dict__)
-        #print(request.user)
         try:
             user = request.user
             logout(request)
-            return HttpResponse(f'User {user} logged out', status=200)
+            return JsonResponse({"success": f"User {user} logged out"})
 
         except:
-            return HttpResponse(f'Error logging out', status=404)
+            return JsonResponse({"error": "Error logging out"})
 
     @method_decorator(csrf_exempt)
     def check_status(self, request, *args, **kwargs):
@@ -103,4 +104,4 @@ class UserAPIView(View):
 
             return JsonResponse(status, safe=False)
 
-        return HttpResponse('Error checking status', status=404)
+        return JsonResponse({"error": "error checking status"})

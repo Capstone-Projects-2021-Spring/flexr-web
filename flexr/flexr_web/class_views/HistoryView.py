@@ -202,12 +202,16 @@ class HistoryViewAPI(LoginRequiredMixin, DetailView):
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
     
         # get history objects to delete
-        delete = request.POST.getlist('DELETE', [])
+        data = json.loads(request.body) #request.POST.getlist('DELETE', [])
+
+        delete = []
+        if 'DELETE' in data:
+            delete = data['DELETE']
 
         # delete requested history objects
         curr_account.history.filter(pk__in=delete).delete()
 
-        return HttpResponse(f'History objects removed')
+        return JsonResponse({"success": "histories deleted"})
 
     def delete(self, request, *args, **kwargs):
         url = request.path.split('/')
@@ -236,7 +240,7 @@ class HistoryViewAPI(LoginRequiredMixin, DetailView):
             visit_datetime__gte=payload['datetime_from'],
             visit_datetime__lte=payload['datetime_to']).delete()
 
-        return HttpResponse(f'{history} History objects removed')
+        return JsonResponse({"success": "histories deleted"})
 
     def delete_all_history(self, request, *args, **kwargs):
         """
@@ -251,4 +255,4 @@ class HistoryViewAPI(LoginRequiredMixin, DetailView):
 
         history = History.objects.filter(account = curr_account).delete()
 
-        return HttpResponse(f'{history} History objects removed')
+        return JsonResponse({"success": "all history deleted"})

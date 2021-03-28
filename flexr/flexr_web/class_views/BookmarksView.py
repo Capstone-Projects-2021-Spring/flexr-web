@@ -107,9 +107,7 @@ class BookmarksViewAPI(LoginRequiredMixin, DetailView):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
 
-        #data = request.POST.dict()
         data = json.loads(request.body)
-        #print(data)
 
         if 'url' in data:
             site = Site.objects.get_or_create(account = curr_account, url = data['url'])[0]
@@ -117,7 +115,7 @@ class BookmarksViewAPI(LoginRequiredMixin, DetailView):
 
         bookmark = Bookmark.objects.create(account=curr_account, **data)
 
-        return HttpResponse(f'{bookmark} bookmark object created')
+        return JsonResponse({"success": "bookmark created"})
 
 
     def put(self, request, *args, **kwargs):
@@ -140,7 +138,7 @@ class BookmarksViewAPI(LoginRequiredMixin, DetailView):
 
         result = Bookmark.objects.filter(pk = kwargs["id"]).update(**data)
 
-        return HttpResponse(f'Bookmark object edited')
+        return JsonResponse({"success": "bookmark edited"})
 
     def get(self, request, *args, **kwargs):
         """
@@ -183,7 +181,7 @@ class BookmarksViewAPI(LoginRequiredMixin, DetailView):
 
         bookmark = Bookmark.objects.filter(account = curr_account, pk = kwargs["id"]).delete()
 
-        return HttpResponse(f'{bookmark} Bookmark object removed')
+        return JsonResponse({"success": "bookmark deleted"})
 
         
 
@@ -200,4 +198,4 @@ class BookmarksViewAPI(LoginRequiredMixin, DetailView):
 
         bookmarks = Bookmark.objects.filter(account = curr_account).delete()
 
-        return HttpResponse(f'{bookmarks} Bookmark object removed')
+        return JsonResponse({"success": "all bookmarks deleted"})

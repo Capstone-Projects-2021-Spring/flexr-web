@@ -124,11 +124,11 @@ class AccountViewAPI(LoginRequiredMixin, DetailView):
         if(curr_user.accounts.filter(account_id = pk).count() == 1):
             request.session['account_id'] = pk
             print("Account View API: account switched")
-            return HttpResponse(status=200)
+            return JsonResponse({"status": "account switched"})
             # need to return some json
         else:
             print("Account View API: account does not exist for that user with that id")
-            return HttpResponse(status = 404)
+            return JsonResponse({"error": "account does not exist for that user with that id"})
             # need to return some json here 404 or 403
 
     # This needs to be POST
