@@ -1,9 +1,17 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.validators import EMPTY_VALUES
+from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.views import View
+from django.views.generic import DetailView
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+
+from ..serializers import NoteSerializer
+
+import json
 import pytz
 
 from ..models import *
@@ -111,3 +119,33 @@ class NoteView(LoginRequiredMixin, View):
 
         # display requested note after unlock attempt
         return redirect('/opennote/' + str(kwargs['pk']))
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class NoteViewAPI(LoginRequiredMixin, DetailView):
+
+    def post(self, request, *args, **kwargs):
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
+
+        data = json.loads(request.body)
+        note = Note.objects.get_or_create(account=curr_account, url=data['url'])[0]
+        data['note_id'] = note.id
+
+        note = Note.objects.create(account=curr_account, **data)
+
+        data = NoteSerializer(note)
+
+        return JsonResponse(data.data, safe=False)
+
+    def get(self, request, *args, **kwargs):
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
+
+        note = Note.objects.filter(account=curr_account)
+
+        data = NoteSerializer(note, many=True)
+
+        return JsonResponse(data.data, safe=False)
+
+    def
