@@ -36,7 +36,7 @@ class AccountPreferencesAPIView(LoginRequiredMixin, DetailView):
         request_data = json.loads(request.body)
         edit_home_url = request_data['home_page_url']
         edit_home_site = curr_acc.sites.get_or_create(url = edit_home_url)
-        acc_pref.home_page = edit_home_site
+        acc_pref.home_page = edit_home_site[0]
         acc_pref.sync_enabled = request_data['sync_enabled']
         acc_pref.searchable_profile = request_data['searchable_profile']
         acc_pref.cookies_enabled = request_data['cookies_enabled']
