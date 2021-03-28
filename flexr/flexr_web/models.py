@@ -294,7 +294,7 @@ class Bookmark(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="bookmarks")
     bookmark_name = models.CharField(verbose_name= "Bookmark name", max_length=50)
     created_date = models.DateTimeField(default=timezone.now) #keeps track of creation date
-    site = models.OneToOneField(Site, on_delete=models.CASCADE) #if the site gets deleted the bookmark gets deleted
+    site = models.ForeignKey(Site, on_delete=models.CASCADE) #if the site gets deleted the bookmark gets deleted
     last_visited = models.DateTimeField(default=timezone.now) #keeps track of last visited date
     recent_frequency = models.IntegerField(default=1) # number of visits in the last week
     number_of_visits = models.IntegerField(default=1)# keeps track of number of visits
