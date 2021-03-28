@@ -124,7 +124,7 @@ class AccountViewAPI(LoginRequiredMixin, DetailView):
         current_account = curr_user.accounts.get(account_id = request.session['account_id'])
 
 
-        account = Account.objects.filter(pk = kwargs['id'])
+        account = Account.objects.filter(account_id = kwargs['id'])
 
         data = AccountSerializer(account)
         return JsonResponse(data.data, safe=False)
