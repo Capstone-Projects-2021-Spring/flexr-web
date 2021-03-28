@@ -331,7 +331,7 @@ class Bookmark(models.Model):
 class Account_Preferences(models.Model):
     name = models.CharField(default="Account Preferences", max_length=10)
     home_page = models.ForeignKey(Site, on_delete=models.CASCADE, null= True)
-
+    home_page_url = models.URLField()
     # sync
     sync_enabled = models.BooleanField(default=True) # not sure if this is possible or useful
     # sharing
@@ -347,10 +347,8 @@ class Account_Preferences(models.Model):
     #     Dark mode
     is_dark_mode = models.BooleanField(default=False)
     #     font-size
-
     # syncing
     #   sync_on?
-
     # sharing
     #   searchable profile?
     # security
@@ -358,6 +356,12 @@ class Account_Preferences(models.Model):
         # Popups
     def __str__(self):
        return str(self.name) + " " +str(self.id)
+
+    def save(self, *args, **kwargs):
+        # call super method to create Tab entry
+        self.home_page_url =  self.home_page.url
+        super().save(*args, **kwargs)
+
 
 class Note(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="notes")

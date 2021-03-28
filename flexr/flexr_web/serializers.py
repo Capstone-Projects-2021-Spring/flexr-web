@@ -39,8 +39,8 @@ class BookmarkSerializer(serializers.ModelSerializer):
 class AccountPreferencesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account_Preferences
-        fields = ['id', 'name', 'home_page', 'sync_enabled', 'searchable_profile ', 
-        'cookies_enabled ', 'popups_enabled ', 'is_dark_mode ']
+        fields = ['id','name', 'home_page','home_page_url', 'sync_enabled', 'searchable_profile',
+        'cookies_enabled', 'popups_enabled', 'is_dark_mode']
 
 ### TODO: These models need to be finalized
 class NoteSerializer(serializers.ModelSerializer):

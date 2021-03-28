@@ -1,3 +1,5 @@
+import json
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect, render
@@ -153,13 +155,13 @@ class AccountViewAPI(LoginRequiredMixin, DetailView):
     def delete(self, request , *args, **kwargs):
         curr_user = request.user
         if(curr_user.accounts.all().count() > 1):
-            if(request.session['account_id'] == pk):
+            if(request.session['account_id'] == kwargs['id']):
                 curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
                 curr_account.delete()
                 new_curr_account =  curr_user.accounts.all()[0]
                 request.session['account_id'] = new_curr_account.account_id
             else:
-                del_account = curr_user.accounts.get(account_id =  pk)
+                del_account = curr_user.accounts.get(account_id =  kwargs['id'])
                 del_account.delete()
             return JsonResponse({"success": "Account deleted"})
         else:
@@ -168,30 +170,26 @@ class AccountViewAPI(LoginRequiredMixin, DetailView):
     @method_decorator(csrf_exempt)
     def post(self, request):
         curr_user = request.user
-        data = request.POST
-        username = data.get('username')
-        email = data.get('email')
-        phone_number = data.get('phone_number')
-        type_of_account = data.get("type_of_account")
-        new_account = Account.objects.create(user = curr_user, username = username, email = email,
-                                             phone_number = phone_number, type_of_account = type_of_account)
+        data = json.loads(request.body)
+
+        new_account = Account.objects.create(user = curr_user, **data)
         new_account.save()
         data = AccountSerializer(new_account)
-        return JsonResponse({data: data})
+        return JsonResponse(data.data, safe=False)
 
     @method_decorator(csrf_exempt)
     def put(self, request, *args, **kwargs):
         curr_user = request.user
-        data = request.PUT
+        data = json.loads(request.body)
         try:
             edit_acc = curr_user.accounts.get(account_id = kwargs['id'])
-            edit_acc.username = data.get('username')
-            edit_acc.email = data.get('email')
-            edit_acc.phone_number = data.get('phone_number')
-            edit_acc.type_of_account = data.get("type_of_account")
+            edit_acc.username = data['username']
+            edit_acc.email = data['email']
+            edit_acc.phone_number = data['phone_number']
+            edit_acc.type_of_account = data["type_of_account"]
             edit_acc.save()
             data = AccountSerializer(edit_acc)
-            return JsonResponse({data: data})
+            return JsonResponse(data.data, safe=False)
         except:
             return JsonResponse({"error": "Account doesn't exist for this user"})
 
