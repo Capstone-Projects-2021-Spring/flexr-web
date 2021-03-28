@@ -115,7 +115,9 @@ class BookmarksViewAPI(LoginRequiredMixin, DetailView):
 
         bookmark = Bookmark.objects.create(account=curr_account, **data)
 
-        return JsonResponse({"success": "bookmark created"})
+        data = BookmarkSerializer(bookmark)
+        
+        return JsonResponse(data.data, safe=False)
 
 
     def put(self, request, *args, **kwargs):
@@ -138,7 +140,9 @@ class BookmarksViewAPI(LoginRequiredMixin, DetailView):
 
         result = Bookmark.objects.filter(pk = kwargs["id"]).update(**data)
 
-        return JsonResponse({"success": "bookmark edited"})
+        data = BookmarkSerializer(bookmark)
+        
+        return JsonResponse(data.data, safe=False)
 
     def get(self, request, *args, **kwargs):
         """

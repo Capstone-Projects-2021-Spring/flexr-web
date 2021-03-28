@@ -94,8 +94,8 @@ urlpatterns = [
     #path('api/history/<id>/filter', HistoryViewAPI.as_view()),
 
     path('api/bookmarks/', BookmarksViewAPI.as_view()),
-    path('api/bookmarks/<id>', BookmarksViewAPI.as_view()),
-    path('api/bookmarks/all', BookmarksViewAPI.as_view()),
+    path('api/bookmarks/<id>/', BookmarksViewAPI.as_view()),
+    path('api/bookmarks/all/', BookmarksViewAPI.as_view()),
 
 ]
 
