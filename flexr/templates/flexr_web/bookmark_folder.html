@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flexr | Shared Folder</title>
+</head>
+<body>
+    {% include "flexr_web/navbar.html" %}
+    <h1>Folder title: {{bookmark_folder.title}}</h1>
+    <h1>Folder owner: {{bookmark_folder.owner}}</h1>
+    <h3>Bookmarks:</h3>
+    {%for bookmark in Bookmarks%}
+    <p>Bookmark: <a href="{{bookmark.site.url}}">{{bookmark.site.url}}</a></p>
+    <p>Created Date: {{bookmark.created_date}}</p>
+    <p>Last Visited: {{bookmark.last_visited}}</p>
+    <button onclick="window.location.href = '/delete_bookmark/{{bookmark.id}}/'">Delete Bookmark</button>
+    <br>
+    {%endfor%}
+</body>
+</html>

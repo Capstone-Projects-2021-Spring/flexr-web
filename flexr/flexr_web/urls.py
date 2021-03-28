@@ -13,6 +13,7 @@ from .class_views.NoteView import NoteView
 from .class_views.NotesView import NotesView
 from .class_views.ProfileView import ProfileView
 from .class_views.SharedFolderView import SharedFolderView
+from .class_views.BookmarkFolderView import BookmarkFolderView
 from .class_views.SharedFoldersView import SharedFoldersView
 from .class_views.TabsView import TabsView
 from .class_views.UserView import UserAPIView
@@ -48,6 +49,8 @@ urlpatterns = [
     path('bookmarks/', BookmarksView.as_view(), name = "bookmarks"), #broken
     path('add_bookmark/<id>/', BookmarksView().add_bookmark, name = "add bookmark"),
     path('delete_bookmark/<id>/', BookmarksView().delete_bookmark, name = "delete bookmark"),
+    path('create_bookmark_folder/', views.create_bookmark_folder_web, name='create_bookmark_folder'),
+    path('bookmark_folder/<int:pk>/', BookmarkFolderView.as_view(), name='bookmark-folder-detail'),
 
     path('shared_folders/', SharedFoldersView.as_view(), name = "shared folders"),
     path('add_shared_folder/', SharedFoldersView().create_shared_folder, name = "add shared folder"),

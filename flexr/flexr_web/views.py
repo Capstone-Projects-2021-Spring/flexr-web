@@ -314,6 +314,35 @@ def create_shared_folder_web(request):
         return redirect('/shared_folders')
 
 @login_required
+def create_bookmark_folder_web(request):
+    form = BookmarkFolderForm(request.POST)
+
+    # check that the form is valid
+    if form.is_valid():
+        # form.save()
+        #print(request.POST)
+
+        # grab information from the form
+        title = form.cleaned_data['title']
+        owner = request.user.accounts.get(account_id = request.session['account_id'])
+        bookmarks = form.cleaned_data['bookmarks']
+
+        # create shared folder object and set its attributes
+        folder = bookmarkFolder.objects.create(title = title, owner = owner)
+        folder.bookmarks.set(bookmarks)
+        folder.save()
+
+    # request message for debugging
+        request.session['message'] = "Bookmark Folder created"
+
+    else:
+        request.session['err_message'] = "Bookmark Folder not created."
+        #print(form.errors)
+
+    # return to shared folders page
+    return redirect('/bookmarks')
+
+@login_required
 def notes_hub_web(request):
     curr_user = request.user
     print(curr_user)

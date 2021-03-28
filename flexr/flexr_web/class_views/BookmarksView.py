@@ -32,6 +32,8 @@ class BookmarksView(LoginRequiredMixin, View):
 
         # get form object on page
         form = FilterBookmarkForm
+        folders = curr_account.bookmark_folders.all()
+
 
         # grab date and time information from POST form
         # site = request.POST['site']
@@ -81,6 +83,7 @@ class BookmarksView(LoginRequiredMixin, View):
         return render(request, "flexr_web/bookmarks.html",
          {"Bookmarks": bookmarks, 
           "Accounts": accounts,
+          "Folders": folders,
           "form": form})
 
 
@@ -96,7 +99,8 @@ class BookmarksView(LoginRequiredMixin, View):
         # get all bookmarks for current user
         bookmarks = curr_account.bookmarks.all()
         form = FilterBookmarkForm
-
+        formb = BookmarkFolderForm
+        folders = curr_account.bookmark_folders.all()
         # request messages for debugging
         if ('message' in self.request.session):
             message = self.request.session['message']
@@ -111,6 +115,8 @@ class BookmarksView(LoginRequiredMixin, View):
         # display the page
         return render(self.request, "flexr_web/bookmarks.html", 
         {"Bookmarks": bookmarks,
+        "formb": formb,
+        "Folders": folders,
         "form": form})
 
 
