@@ -25,25 +25,25 @@ urlpatterns = [
     path('', IndexView.as_view(), name='index'), #broken
 
     path('add_account/', AccountViewWeb().add_account, name = "add account"),
-    path('switch_account/<id>', AccountViewWeb().switch_account, name = "switch account"),
-    path('delete_account/<int:pk>', AccountViewWeb().delete, name="delete account"),
+    path('switch_account/<id>/', AccountViewWeb().switch_account, name = "switch account"),
+    path('delete_account/<int:pk>/', AccountViewWeb().delete, name="delete account"),
 
     path('browsing_history/', HistoryView.as_view(), name='history'),
-    path('browsing_history/delete', HistoryView().delete, name='delete history'),
+    path('browsing_history/delete/', HistoryView().delete, name='delete history'),
     #path('filter_history/', HistoryView().filter, name = "filter history"),
 
     path('notes/', NotesView.as_view(), name='notes'), #broken
-    path('create_note', NotesView().create_note, name='create_note'),
+    path('create_note/', NotesView().create_note, name='create_note'),
     path('note/<int:pk>/', NoteView.as_view(), name='note-detail'),
     path('delete-note/<int:pk>/', NotesView().delete_note, name='delete_note'),
 
-    path('opennote/<int:pk>', NoteView.as_view(), name='note-detail'), #broken
-    path('edit_note/<int:pk>', NoteView().edit_note, name='edit_note'),
+    path('opennote/<int:pk>/', NoteView.as_view(), name='note-detail'), #broken
+    path('edit_note/<int:pk>/', NoteView().edit_note, name='edit_note'),
     path('unlock_note/<int:pk>/', NoteView().unlock_note, name='unlock note'),
 
     path('open_tabs/', TabsView.as_view(), name='tabs'), #broken
     path('add_tab/', TabsView().add_tab, name = "add tab"),
-    path('close_tab/<id>', TabsView().close_tab, name = "close tab"),
+    path('close_tab/<id>/', TabsView().close_tab, name = "close tab"),
 
     path('bookmarks/', BookmarksView.as_view(), name = "bookmarks"), #broken
     path('add_bookmark/<id>/', BookmarksView().add_bookmark, name = "add bookmark"),
@@ -51,8 +51,8 @@ urlpatterns = [
 
     path('shared_folders/', SharedFoldersView.as_view(), name = "shared folders"),
     path('add_shared_folder/', SharedFoldersView().create_shared_folder, name = "add shared folder"),
-    path('delete_shared_folder/<int:pk>', SharedFoldersView().delete_shared_folder, name = "delete_shared_folder"),
-    path('edit_shared_folder/<int:pk>', SharedFolderView().edit_shared_folder, name = "edit_shared_folder"),
+    path('delete_shared_folder/<int:pk>/', SharedFoldersView().delete_shared_folder, name = "delete_shared_folder"),
+    path('edit_shared_folder/<int:pk>/', SharedFolderView().edit_shared_folder, name = "edit_shared_folder"),
 
     path('shared_folder/<int:pk>/', SharedFolderView.as_view(), name = "shared folder"),
 
@@ -78,13 +78,13 @@ urlpatterns = [
     path('api/site/', SiteAPIView.as_view()),
 
     path('api/tabs/', TabAPIView.as_view()), # GET returns all tabs
-    path('api/tab/<id>', TabAPIView.as_view()), # GET returns a single tab
-    path('api/tab/open', TabAPIView().add_tab), # POST creates a new tab returns tab
-    path('api/tab/<id>/close', TabAPIView().close_tab), # DELETE deletes tab returns successful HTTPREquest
-    path('api/tab/<id>/visit', TabAPIView().open_tab),
-    path('api/tab/<id>/edit', TabAPIView().edit_tab),
+    path('api/tab/<id>/', TabAPIView.as_view()), # GET returns a single tab
+    path('api/tab/open/', TabAPIView().add_tab), # POST creates a new tab returns tab
+    path('api/tab/<id>/close/', TabAPIView().close_tab), # DELETE deletes tab returns successful HTTPREquest
+    path('api/tab/<id>/visit/', TabAPIView().open_tab),
+    path('api/tab/<id>/edit/', TabAPIView().edit_tab),
 
-    path('api/account/<id>', AccountViewAPI.as_view()),
+    path('api/account/<id>/', AccountViewAPI.as_view()),
     path('api/accounts/', AccountViewAPI.as_view()),
     path('api/account/<int:pk>/switch/', AccountViewAPI().switch_account, name = "switch account"),
 
