@@ -15,6 +15,7 @@ from ..models import *
 from ..forms import *
 from ..serializers import *
 
+@method_decorator(csrf_exempt, name='dispatch')
 class AccountPreferencesAPIView(LoginRequiredMixin, DetailView):
 
     # not sure what the id is?
@@ -27,6 +28,7 @@ class AccountPreferencesAPIView(LoginRequiredMixin, DetailView):
         data = AccountPreferencesSerializer(acc_pref)
         return JsonResponse(data.data, safe=False)
 
+    @method_decorator(csrf_exempt)
     def put(self, request):
         curr_user = request.user
         curr_acc = curr_user.accounts.get(account_id=request.session['account_id'])

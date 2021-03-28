@@ -140,8 +140,8 @@ class AccountViewAPI(LoginRequiredMixin, DetailView):
     @method_decorator(csrf_exempt)
     def switch_account(self, request, *args, **kwargs):
         curr_user = request.user
-        if(curr_user.accounts.filter(account_id = pk).count() == 1):
-            request.session['account_id'] = pk
+        if(curr_user.accounts.filter(account_id = kwargs['id']).count() == 1):
+            request.session['account_id'] = kwargs['id']
             print("Account View API: account switched")
             return JsonResponse({"status": "account switched"})
             # need to return some json
