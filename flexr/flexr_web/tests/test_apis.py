@@ -164,19 +164,21 @@ class BookmarkAPITestCase(TestCase):
         c.login(username='foo', password='bar')
         c.get(path='/switch_account/1')
 
-        site = Site.objects.create(account = self.acc, url = 'https://www.twitter.com')
+        #site = Site.objects.create(account = self.acc, url = 'https://www.twitter.com')
 
-        payload = {
-            'site_id': site.id,
-        }
+        payload = json.dumps({
+            'url': 'https://www.twitter.com',
+        })
 
-        c.post(path='/api/bookmarks/', data=payload)
+        c.post(path='/api/bookmarks/', data=payload, content_type='application/json')
 
         bookmark_count = Bookmark.objects.all().count()
         bookmark = Bookmark.objects.all()[3]
+        #print(bookmark.site.url)
+
 
         self.assertEqual(bookmark_count, 4)
-        self.assertEqual(bookmark.site_id, payload['site_id'])
+        self.assertEqual(bookmark.site_id, 4)
     
 
 
@@ -198,6 +200,7 @@ class BookmarkAPITestCase(TestCase):
         
 
         bookmark = Bookmark.objects.get(pk = 2)
+        print(bookmark.site.url)
 
         self.assertEquals(bookmark.bookmark_name, 'bookmark')
         self.assertEquals(bookmark.site_id, 4)
