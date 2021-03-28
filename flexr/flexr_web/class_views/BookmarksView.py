@@ -5,6 +5,9 @@ from django.shortcuts import redirect, render
 from django.views import View
 from django.views.generic import DetailView
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+
 import json
 import pytz
 
@@ -89,7 +92,7 @@ class BookmarksView(LoginRequiredMixin, View):
         # return to bookmarks page
         return redirect('/bookmarks')
 
-
+@method_decorator(csrf_exempt, name='dispatch')
 class BookmarksViewAPI(LoginRequiredMixin, DetailView):
 
     def post(self, request, *args, **kwargs):
@@ -146,6 +149,9 @@ class BookmarksViewAPI(LoginRequiredMixin, DetailView):
 
     def delete(self, request, *args, **kwargs):
         url = request.path.split('/')
+
+        if not url[-1]:
+            url = url[:-1]
 
         if url[-1] == 'all':
             return self.delete_all_bookmarks(request, *args, **kwargs)

@@ -6,6 +6,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView
 from django.http import HttpResponse, JsonResponse
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+
 import pytz
 
 from ..models import *
@@ -85,7 +88,7 @@ class AccountViewWeb(LoginRequiredMixin, DetailView):
         # return to index page
         return redirect('/')
 
-
+@method_decorator(csrf_exempt, name='dispatch')
 class AccountViewAPI(LoginRequiredMixin, DetailView):
     """This is for a detail view of a single account"""
 
@@ -94,7 +97,10 @@ class AccountViewAPI(LoginRequiredMixin, DetailView):
 
         url = request.path.split('/')
 
-        if url[-2] == 'accounts':
+        if not url[-1]:
+            url = url[:-1]
+
+        if url[-1] == 'accounts':
             return self.get_all(request, *args, **kwargs)
         else:
             return self.get_account(request, *args, **kwargs)
@@ -161,7 +167,7 @@ class AccountViewAPI(LoginRequiredMixin, DetailView):
 
 
 
-
+    @method_decorator(csrf_exempt)
     def switch_account(self, request, pk):
         curr_user = request.user
         if(curr_user.accounts.filter(account_id = pk).count() == 1):

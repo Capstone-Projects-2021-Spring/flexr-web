@@ -5,6 +5,9 @@ from django.shortcuts import redirect, render
 from django.views import View
 from django.views.generic import DetailView
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+
 import json
 import pytz
 
@@ -141,7 +144,8 @@ class HistoryView(LoginRequiredMixin, View):
 
         # return to history page
         return redirect('/browsing_history/')
-
+        
+@method_decorator(csrf_exempt, name='dispatch')
 class HistoryViewAPI(LoginRequiredMixin, DetailView):
     def get(self, request, *args, **kwargs):
         url = request.path.split('/')
