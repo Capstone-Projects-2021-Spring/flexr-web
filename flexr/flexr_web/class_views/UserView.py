@@ -6,6 +6,9 @@ from django.shortcuts import redirect, render
 from django.views import View
 from django.views.generic import DetailView
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+
 import json
 import pytz
 
@@ -16,6 +19,7 @@ from ..serializers import *
 
 class UserAPIView(View):
 
+    @method_decorator(csrf_exempt)
     def sign_up(self, request, *args, **kwargs):
         """
         Creates the User in the database, allowing them to sign in
@@ -40,7 +44,7 @@ class UserAPIView(View):
         
         return HttpResponse(f'Error creating user', status=404)
 
-
+    @method_decorator(csrf_exempt)
     def login(self, request, *args, **kwargs): 
         """
         Takes in a form and checks the database against the provided username and password to provide access to the app
@@ -63,6 +67,7 @@ class UserAPIView(View):
 
         return HttpResponse('Error logging in', status=404)
 
+    @method_decorator(csrf_exempt)
     def logout(self, request, *args, **kwargs):
         """
         Logs the user out of flexr. Erases session data and does not allow access
@@ -82,7 +87,7 @@ class UserAPIView(View):
         except:
             return HttpResponse(f'Error logging out', status=404)
 
-
+    @method_decorator(csrf_exempt)
     def check_status(self, request, *args, **kwargs):
         """
         Checks whether a user is logged in or not

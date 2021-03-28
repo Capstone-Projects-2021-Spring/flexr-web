@@ -4,6 +4,9 @@ from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.views import View
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+
 import pytz
 
 from ..models import *
@@ -11,6 +14,7 @@ from ..forms import *
 from ..serializers import SiteSerializer
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class SiteAPIView(LoginRequiredMixin, View):
 
     def get(self, request):
