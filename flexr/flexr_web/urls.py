@@ -77,10 +77,13 @@ urlpatterns = [
 
     path('api/site/', SiteAPIView.as_view()),
 
-    path('api/tabs/', AllTabsView.as_view()),
+    #path('api/tabs/', AllTabsView.as_view()),
+    #path('api/tab/<id>', TabView.as_view()),
+    #path('api/tab/open', TabView.as_view()),
+    #path('api/tab/open', TabView.as_view()),
+
+    path('api/tabs/', TabView.as_view()),
     path('api/tab/<id>', TabView.as_view()),
-    path('api/tab/open', TabView.as_view()),
-    path('api/tab/open', TabView.as_view()),
 
     path('api/account/<id>', AccountViewAPI.as_view()),
     path('api/accounts/', AccountViewAPI.as_view()),
