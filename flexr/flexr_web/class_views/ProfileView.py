@@ -91,12 +91,20 @@ class ProfileView(LoginRequiredMixin, View):
             messages.error(self.request, message)
 
         # display the profile page
-        return render(self.request, "flexr_web/profile.html", 
-        {"current_account":curr_account, 
-         "Accounts": accounts, 
-         "Preferences":acc_pref, 
-         "pref_form": pref_form, 
-         "account_form": account_form})
+        friends = curr_account.all_friends.all()
+        friend_requests = curr_account.to_friend.all().filter(status="Pending")
+        print("friend requests", friend_requests)
+        pending_friends = curr_account.all_pending_friends.all()
+        print(pending_friends)
+        all_accounts = Account.objects.filter(~Q(account_id__in=[o.account_id for o in
+                                                                 accounts]))  # this needs to be filter on account preferences searchable
+        # all_accounts = accounts
+        print(all_accounts)
+        return render(self.request, "flexr_web/profile.html", {"curr_acc": curr_account, "Accounts": accounts,
+                                                               "Preferences": acc_pref, "pref_form": pref_form,
+                                                               "account_form": account_form, "Friends": friends,
+                                                               "AllAccounts": all_accounts,
+                                                               "friend_requests": friend_requests})
 
     def edit_account(self, request, *args, **kwargs):
         """
@@ -133,20 +141,7 @@ class ProfileView(LoginRequiredMixin, View):
 
             # return to profile page
             return redirect('/profile')
-          
-        friends = curr_account.all_friends.all()
-        friend_requests = curr_account.to_friend.all().filter(status="Pending")
-        print("friend requests", friend_requests)
-        pending_friends = curr_account.all_pending_friends.all()
-        print(pending_friends)
-        all_accounts =  Account.objects.filter(~Q(account_id__in=[o.account_id for o in accounts])) #this needs to be filter on account preferences searchable
-        # all_accounts = accounts
-        print(all_accounts)
-        return render(self.request, "flexr_web/profile.html", {"curr_acc": curr_account, "Accounts": accounts,
-                                                          "Preferences": acc_pref, "pref_form": pref_form,
-                                                          "account_form": account_form, "Friends": friends,
-                                                          "AllAccounts": all_accounts,
-                                                          "friend_requests": friend_requests})
+
 
 
 

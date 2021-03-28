@@ -14,7 +14,7 @@ from .class_views.NotesView import NotesView
 from .class_views.ProfileView import ProfileView
 from .class_views.SharedFolderView import SharedFolderView
 from .class_views.SharedFoldersView import SharedFoldersView
-from .class_views.TabsView import TabsView
+from .class_views.TabsView import TabsView, TabAPIView
 from .class_views.UserView import UserAPIView
 from .class_views.FriendView import FriendView
 from .class_views.SiteView import SiteAPIView
@@ -42,7 +42,6 @@ urlpatterns = [
 
     path('open_tabs/', TabsView.as_view(), name='tabs'), #broken
     path('add_tab/', TabsView().add_tab, name = "add tab"),
-    #path('open_tab/', TabsView().open_tab, name = "open tab"),
     path('close_tab/<id>', TabsView().close_tab, name = "close tab"),
 
     path('bookmarks/', BookmarksView.as_view(), name = "bookmarks"), #broken
@@ -77,10 +76,11 @@ urlpatterns = [
 
     path('api/site/', SiteAPIView.as_view()),
 
-    path('api/tabs/', AllTabsView.as_view()),
-    path('api/tab/<id>', TabView.as_view()),
-    path('api/tab/open', TabView.as_view()),
-    path('api/tab/open', TabView.as_view()),
+    path('api/tabs/', TabAPIView.as_view()),
+    path('api/tab/<id>', TabAPIView.as_view()),
+    path('api/tab/<id>/open', TabAPIView().add_tab),
+    path('api/tab/<id>/close', TabAPIView().close_tab),
+    path('api/tab/<id>/visit', TabAPIView().open_tab),
 
     path('api/account/<id>', AccountViewAPI.as_view()),
     path('api/accounts/', AccountViewAPI.as_view()),
