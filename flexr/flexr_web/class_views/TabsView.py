@@ -133,12 +133,13 @@ class TabsViewAPI(LoginRequiredMixin, DetailView):
                   :return:
                       JSONRequest with tab data
         """
-        tab = self.get_queryset().filter(pk = kwargs["id"])[0]
-        # print(self.tab)
+
         curr_account = Account.objects.filter(user = self.request.user)[0]
-        message = Tab.visit_tab(kwargs["id"], curr_account)
-        data = TabSerializer(tab)
+        #message = Tab.visit_tab(kwargs["id"], curr_account)
+        tabs = curr_account.tabs.all()
+        data = TabSerializer(tabs, many=True)
         return JsonResponse(data.data, safe=False)
+        
 
     # This method is used to close a tab
     def delete(self, request, *args, **kwargs):
