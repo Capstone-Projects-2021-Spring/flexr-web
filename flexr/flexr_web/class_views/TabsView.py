@@ -181,6 +181,6 @@ class TabsViewAPI(LoginRequiredMixin, DetailView):
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
 
         data = json.loads(request.body)
-        result = Bookmark.objects.filter(pk = kwargs["id"]).update(**data)
+        result = Tab.objects.filter(pk = kwargs["id"]).update(**data)
 
-        return HttpResponse(f'Bookmark object edited')
+        return HttpResponse(f'Tab object edited')
