@@ -343,6 +343,16 @@ def create_bookmark_folder_web(request):
     return redirect('/bookmarks')
 
 @login_required
+def delete_bookmark_folder_web(request, pk):
+    current_acc = request.user.accounts.get(account_id = request.session['account_id'])
+    obj = current_acc.bookmark_folders.get(id = pk)
+        # delete note object
+    obj.delete()
+
+        # return to notes page
+    return redirect('/bookmarks')
+
+@login_required
 def notes_hub_web(request):
     curr_user = request.user
     print(curr_user)

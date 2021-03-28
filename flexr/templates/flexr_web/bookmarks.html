@@ -90,6 +90,7 @@
                 <p>title:  <a href="{% url 'bookmark-folder-detail' folder.pk%}">
                     {{folder.title}}</a></p>
                 <p>Created Date: {{folder.created_date}}</p>
+                <p><a href="{% url 'delete-bookmark-folder' folder.pk%}">Delete Folder</a></p>
                 <br>
             </div>
         {%endfor%}
