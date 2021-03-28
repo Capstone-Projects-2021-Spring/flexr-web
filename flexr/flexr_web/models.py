@@ -50,10 +50,12 @@ class Account(models.Model):
     account_id = models.AutoField(primary_key=True)
 
     def save(self,  *args, **kwargs):
-
-        if self.pk is None: #new users
-            self.account_preferences = Account_Preferences.objects.create()
         super().save(*args, **kwargs)  # Call the "real" save() method.
+
+        if self.account_preferences is None: #new users
+            site = Site.objects.create(account=self, url="https://google.com")
+            site.save()
+            self.account_preferences = Account_Preferences.objects.create(home_page = site)
 
     def __str__(self):
         return str(self.username)+str(self.account_id) + " " + str(self.type_of_account)
@@ -339,21 +341,9 @@ class Account_Preferences(models.Model):
     # security
     cookies_enabled = models.BooleanField(default=True)
     popups_enabled = models.BooleanField(default=True)
-    # maybe split into device preferences too?
-    # Misc
-    #   home page
 
-    # Display?
-    #     Dark mode
     is_dark_mode = models.BooleanField(default=False)
-    #     font-size
-    # syncing
-    #   sync_on?
-    # sharing
-    #   searchable profile?
-    # security
-        # Cookies
-        # Popups
+
     def __str__(self):
        return str(self.name) + " " +str(self.id)
 
@@ -361,7 +351,6 @@ class Account_Preferences(models.Model):
         # call super method to create Tab entry
         self.home_page_url =  self.home_page.url
         super().save(*args, **kwargs)
-
 
 class Note(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="notes")
