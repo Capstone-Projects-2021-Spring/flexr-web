@@ -136,7 +136,7 @@ class AccountViewAPI(LoginRequiredMixin, DetailView):
         return JsonResponse(data.data, safe=False)
 
     @method_decorator(csrf_exempt)
-    def switch_account(self, request, pk):
+    def switch_account(self, request, *args, **kwargs):
         curr_user = request.user
         if(curr_user.accounts.filter(account_id = pk).count() == 1):
             request.session['account_id'] = pk
@@ -150,7 +150,7 @@ class AccountViewAPI(LoginRequiredMixin, DetailView):
 
 
     @method_decorator(csrf_exempt)
-    def delete(self, request, pk):
+    def delete(self, request , *args, **kwargs):
         curr_user = request.user
         if(curr_user.accounts.all().count() > 1):
             if(request.session['account_id'] == pk):
@@ -164,6 +164,20 @@ class AccountViewAPI(LoginRequiredMixin, DetailView):
             return JsonResponse({"success": "Account deleted"})
         else:
             return JsonResponse({"error": "User only has 1 account and can not be deleted"})
+
+    @method_decorator(csrf_exempt)
+    def post(self, request, *args, **kwargs):
+        curr_user = request.user
+        data = request.POST
+        username = data.get('username')
+        email = data.get('email')
+        phone_number = data.get('phone_number')
+        type_of_account = data.get("type_of_account")
+        new_account = Account.objects.create(user = curr_user, username = username, email = email,
+                                             phone_number = phone_number, type_of_account = type_of_account)
+        new_account.save()
+        data = AccountSerializer(new_account)
+        return JsonResponse({data: data})
 
     # This needs to be POST
     # def edit_account(self, request):
