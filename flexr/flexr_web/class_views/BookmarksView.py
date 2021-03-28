@@ -126,6 +126,11 @@ class BookmarksViewAPI(LoginRequiredMixin, DetailView):
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
 
         data = json.loads(request.body)
+
+        if 'url' in data:
+            site = Site.objects.get_or_create(account = curr_account, url = data['url'])[0]
+            data['site_id'] = site.id
+
         result = Bookmark.objects.filter(pk = kwargs["id"]).update(**data)
 
         return HttpResponse(f'Bookmark object edited')
