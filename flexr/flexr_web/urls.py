@@ -14,8 +14,10 @@ from .class_views.NotesView import NotesView
 from .class_views.ProfileView import ProfileView
 from .class_views.SharedFolderView import SharedFolderView
 from .class_views.SharedFoldersView import SharedFoldersView
-from .class_views.TabsView import TabsView
+from .class_views.TabsView import TabsView, TabAPIView
+from .class_views.UserView import UserAPIView
 from .class_views.FriendView import FriendView
+from .class_views.SiteView import SiteAPIView
 
 urlpatterns = [
     path('register', views.register_web, name='register'),
@@ -24,9 +26,11 @@ urlpatterns = [
 
     path('add_account/', AccountViewWeb().add_account, name = "add account"),
     path('switch_account/<id>', AccountViewWeb().switch_account, name = "switch account"),
+    path('delete_account/<int:pk>', AccountViewWeb().delete, name="delete account"),
 
     path('browsing_history/', HistoryView.as_view(), name='history'),
-    path('filter_history/', HistoryView().filter, name = "filter history"),
+    path('browsing_history/delete', HistoryView().delete, name='delete history'),
+    #path('filter_history/', HistoryView().filter, name = "filter history"),
 
     path('notes/', NotesView.as_view(), name='notes'), #broken
     path('create_note', NotesView().create_note, name='create_note'),
@@ -39,7 +43,6 @@ urlpatterns = [
 
     path('open_tabs/', TabsView.as_view(), name='tabs'), #broken
     path('add_tab/', TabsView().add_tab, name = "add tab"),
-    #path('open_tab/', TabsView().open_tab, name = "open tab"),
     path('close_tab/<id>', TabsView().close_tab, name = "close tab"),
 
     path('bookmarks/', BookmarksView.as_view(), name = "bookmarks"), #broken
@@ -48,6 +51,8 @@ urlpatterns = [
 
     path('shared_folders/', SharedFoldersView.as_view(), name = "shared folders"),
     path('add_shared_folder/', SharedFoldersView().create_shared_folder, name = "add shared folder"),
+    path('delete_shared_folder/<int:pk>', SharedFoldersView().delete_shared_folder, name = "delete_shared_folder"),
+    path('edit_shared_folder/<int:pk>', SharedFolderView().edit_shared_folder, name = "edit_shared_folder"),
 
     path('shared_folder/<int:pk>/', SharedFolderView.as_view(), name = "shared folder"),
 
@@ -62,26 +67,35 @@ urlpatterns = [
     path('accept_friend/<int:pk>', FriendView().accept_friend, name="accept friend"),
     path('remove_friend/<int:pk>', FriendView().remove_friend, name="remove friend"),
     path('remove_notif/<int:pk>', FriendView().remove_notif, name="remove notif"),
+
     #API Endpoints
 
-    # path('api/login/', ),
-    # path('api/register/', ),
+    path('api/login/', UserAPIView().login),
+    path('api/register/', UserAPIView().sign_up),
+    path('api/logout/', UserAPIView().logout),
+    path('api/status/', UserAPIView().check_status),
 
-    path('api/tabs/', AllTabsView.as_view()),
-    path('api/tab/<id>', TabView.as_view()),
-    path('api/tab/open', TabView.as_view()),
-    path('api/tab/open', TabView.as_view()),
+    path('api/site/', SiteAPIView.as_view()),
+
+    path('api/tabs/', TabAPIView.as_view()), # GET returns all tabs
+    path('api/tab/<id>', TabAPIView.as_view()), # GET returns a single tab
+    path('api/tab/open', TabAPIView().add_tab), # POST creates a new tab returns tab
+    path('api/tab/<id>/close', TabAPIView().close_tab), # DELETE deletes tab returns successful HTTPREquest
+    path('api/tab/<id>/visit', TabAPIView().open_tab),
+    path('api/tab/<id>/edit', TabAPIView().edit_tab),
 
     path('api/account/<id>', AccountViewAPI.as_view()),
     path('api/accounts/', AccountViewAPI.as_view()),
     path('api/account/<int:pk>/switch/', AccountViewAPI().switch_account, name = "switch account"),
 
-    path('api/history/<id>', HistoryViewAPI.as_view()),
-    path('api/history/<id>/filter', HistoryViewAPI.as_view()),
+    path('api/history/', HistoryViewAPI.as_view()),
+    path('api/history/filter/', HistoryViewAPI.as_view()),
+    #path('api/history/<id>', HistoryViewAPI.as_view()),
+    #path('api/history/<id>/filter', HistoryViewAPI.as_view()),
 
     path('api/bookmarks/', BookmarksViewAPI.as_view()),
-    path('api/bookmarks/<id>', BookmarksViewAPI.as_view()),
-    path('api/bookmarks/all', BookmarksViewAPI.as_view()),
+    path('api/bookmarks/<id>/', BookmarksViewAPI.as_view()),
+    path('api/bookmarks/all/', BookmarksViewAPI.as_view()),
 
 ]
 

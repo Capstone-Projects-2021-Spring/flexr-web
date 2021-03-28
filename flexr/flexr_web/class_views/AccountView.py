@@ -2,14 +2,16 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect, render
 from django.views import View
+from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 
 import pytz
 
 from ..models import *
 from ..forms import *
+from ..serializers import *
 
 # TODO: Gerald add request messages
 # TODO: Gerald add comments
@@ -84,27 +86,84 @@ class AccountViewWeb(LoginRequiredMixin, DetailView):
         # return to index page
         return redirect('/')
 
+    def delete(self, request, pk):
+        curr_user = request.user
+        if (curr_user.accounts.all().count() > 1):
+            if (request.session['account_id'] == pk):
+                curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
+                curr_account.delete()
+                new_curr_account = curr_user.accounts.all()[0]
+                request.session['account_id'] = new_curr_account.account_id
+            else:
+                del_account = curr_user.accounts.get(account_id=pk)
+                del_account.delete()
+            request.session['message'] = "Account deleted"
+            return redirect('/')
+        else:
+            request.session['err_message'] = "Can't delete your only account"
+            return redirect('/profile')
 
+@method_decorator(csrf_exempt, name='dispatch')
 class AccountViewAPI(LoginRequiredMixin, DetailView):
     """This is for a detail view of a single account"""
 
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
         """This returns the user's current account"""
+
+        url = request.path.split('/')
+
+        if url[-2] == 'accounts':
+            return self.get_all(request, *args, **kwargs)
+        else:
+            return self.get_account(request, *args, **kwargs)
+
+    def get_account(self, request, *args, **kwargs):
         curr_user = request.user
         current_account = curr_user.accounts.get(account_id = request.session['account_id'])
-        print("AccountViewAPI current account: ", current_account)
 
+
+        account = Account.objects.filter(pk = kwargs['id'])
+
+        data = AccountSerializer(account)
+        return JsonResponse(data.data, safe=False)
+
+    def get_all(self, request, *args, **kwargs):
+        curr_user = request.user
+
+        accounts = curr_user.accounts.all()
+
+        data = AccountSerializer(accounts, many = True)
+        return JsonResponse(data.data, safe=False)
+
+    @method_decorator(csrf_exempt)
     def switch_account(self, request, pk):
         curr_user = request.user
         if(curr_user.accounts.filter(account_id = pk).count() == 1):
             request.session['account_id'] = pk
             print("Account View API: account switched")
-            return HttpResponse(status=200)
+            return JsonResponse({"status": "account switched"})
             # need to return some json
         else:
             print("Account View API: account does not exist for that user with that id")
-            return HttpResponse(status = 404)
+            return JsonResponse({"error": "account does not exist for that user with that id"})
             # need to return some json here 404 or 403
+
+
+    @method_decorator(csrf_exempt)
+    def delete(self, request, pk):
+        curr_user = request.user
+        if(curr_user.accounts.all().count() > 1):
+            if(request.session['account_id'] == pk):
+                curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+                curr_account.delete()
+                new_curr_account =  curr_user.accounts.all()[0]
+                request.session['account_id'] = new_curr_account.account_id
+            else:
+                del_account = curr_user.accounts.get(account_id =  pk)
+                del_account.delete()
+            return JsonResponse({"success": "Account deleted"})
+        else:
+            return JsonResponse({"error": "User only has 1 account and can not be deleted"})
 
     # This needs to be POST
     # def edit_account(self, request):

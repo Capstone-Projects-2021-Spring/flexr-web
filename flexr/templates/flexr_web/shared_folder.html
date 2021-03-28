@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Flexr | Shared Folder</title>
+    {% load static %}
 </head>
 <body>
     {% include "flexr_web/navbar.html" %}
@@ -24,5 +25,42 @@
     {% for tab in Tabs %}
         <p>{{tab}}</p>
     {% endfor %}
+    <a href="{% url 'delete_shared_folder' shared_folder.pk%}"><p>Delete Folder</p> </a>
+    Edit Folder <img id="plus-icon" data-toggle="modal" data-target="#edit_folder" src="{% static 'icons/plus-square.svg' %}">
+
+        <div class="modal fade" id="edit_folder" tabindex="-1" role="dialog" aria-labelledby="edit_folderLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="edit_folderLabel">Edit your folder</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                    <form method = "POST" action="{% url 'edit_shared_folder' shared_folder.pk%}">
+                            {% csrf_token %}
+                            {% for field in form %}
+                            <p>
+                                {{ field.label_tag }}<br>
+                                {{ field }}
+                                {% if field.help_text %}
+                                    <small style="color: grey">{{ field.help_text }}</small>
+                                {% endif %}
+                                {% for error in field.errors %}
+                                    <p style="color: red">{{ error }}</p>
+                                {% endfor %}
+                            </p>
+                            {% endfor %}
+                            <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Confirm edit</button>
+                    </div>
+                    </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
 </body>
 </html>
