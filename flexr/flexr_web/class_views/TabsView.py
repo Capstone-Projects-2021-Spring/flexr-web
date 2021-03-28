@@ -155,6 +155,7 @@ class TabAPIView(View):
         data = TabSerializer(tabs, many = True)
         return JsonResponse(data.data, safe=False)
 
+    @method_decorator(csrf_exempt)
     def add_tab(self, request, *args, **kwargs):
         """
         Add a tab to the current account
@@ -179,6 +180,7 @@ class TabAPIView(View):
         except:
             return JsonResponse({"error": "Could not open tab"})
 
+    @method_decorator(csrf_exempt)
     def close_tab(self, request, *args, **kwargs):
         """
         Close a tab for the current account
@@ -196,7 +198,23 @@ class TabAPIView(View):
         except:
             return JsonResponse({"error": "Could not close tab"})
 
+    @method_decorator(csrf_exempt)
+    def edit_tab(self, request, *args, **kwargs):
+        # get the current user and current account
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
 
+        data = json.loads(request.body)
+
+        if 'url' in data:
+            site = Site.objects.get_or_create(account = curr_account, url = data['url'])[0]
+            data['site_id'] = site.id
+
+        result = Tab.objects.filter(pk = kwargs["id"]).update(**data)
+
+        return JsonResponse({"success": "tab edited"})
+
+    @method_decorator(csrf_exempt)
     def open_tab(self, request, *args, **kwargs):
         """
         Gerald: This seems to do the same thing as self.add_tab

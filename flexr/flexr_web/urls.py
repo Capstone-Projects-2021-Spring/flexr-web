@@ -81,6 +81,7 @@ urlpatterns = [
     path('api/tab/<id>/open', TabAPIView().add_tab),
     path('api/tab/<id>/close', TabAPIView().close_tab),
     path('api/tab/<id>/visit', TabAPIView().open_tab),
+    path('api/tab/<id>/edit'), TabAPIView().edit_tab(),
 
     path('api/account/<id>', AccountViewAPI.as_view()),
     path('api/accounts/', AccountViewAPI.as_view()),
