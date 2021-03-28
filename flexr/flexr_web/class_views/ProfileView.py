@@ -13,7 +13,7 @@ from ..forms import *
 # helper for determining if a checkbox is selected or not
 CHECKBOX_MAPPING = {'on':True,
                     None:False,}
-                    
+
 class ProfileView(LoginRequiredMixin, View):
     """
     View class for the profile page
@@ -54,6 +54,7 @@ class ProfileView(LoginRequiredMixin, View):
                 # This isn't good for a first time user
                 pref_form.fields['home_page'].initial = curr_account.sites.all()[0] 
 
+            # This is dead code
             # worst case scenario no sites found and set to google
             except:
                 site = Site.objects.create(account=curr_account, url="https://google.com")
