@@ -262,7 +262,7 @@ class HistoryViewAPI(LoginRequiredMixin, DetailView):
         return JsonResponse({"success": "all history deleted"})
 
 
-    def delete_single(self, request, *args, **kwargs):
+    def delete_history_single(self, request, *args, **kwargs):
 
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
