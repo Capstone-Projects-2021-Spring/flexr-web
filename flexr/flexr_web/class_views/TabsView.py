@@ -197,7 +197,7 @@ class TabAPIView(View):
             tab = Tab.close_tab(tabID=kwargs['id'], curr_account=curr_account)
             return JsonResponse({"success": "tab closed"})
         except:
-            return JsonResponse({"error": "Could not close tab"})
+            return JsonResponse({"error": "Could not close tab"}, status = 400)
 
     # @method_decorator(csrf_exempt)
     # def edit_tab(self, request, *args, **kwargs):
