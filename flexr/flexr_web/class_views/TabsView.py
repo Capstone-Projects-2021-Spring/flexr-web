@@ -169,11 +169,7 @@ class TabAPIView(View):
         data = json.loads(request.body)
         site_url = data["url"]
 
-        # open the requested tab
-        tab = Tab.open_tab(site_url=site_url, curr_account=curr_account)
-
         try:
-            site_url = curr_account.sites.get(id=kwargs['id']).url
             tab = Tab.open_tab(site_url=site_url, curr_account=curr_account)
             data = TabSerializer(tab)
             return JsonResponse(data.data, safe=False)
