@@ -253,7 +253,6 @@ class Tab(models.Model):
         try:
             # print("Models", tabID)
             tab = Tab.objects.filter(account = curr_account).get(id = tabID)
-
             tab.delete()
             return "successful"
         except:

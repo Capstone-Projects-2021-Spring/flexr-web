@@ -194,7 +194,9 @@ class TabAPIView(View):
         try:
             # try to close requested tab
             tab = curr_account.tabs.get(id=kwargs['id'])
+            print("TabAPI: Delete: tab object", tab)
             tab = Tab.close_tab(tabID=kwargs['id'], curr_account=curr_account)
+            print("TabAPI: Delete: close tab return", tab)
             return JsonResponse({"success": "tab closed"})
         except:
             return JsonResponse({"error": "Could not close tab"}, status = 400)
