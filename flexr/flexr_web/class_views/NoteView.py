@@ -147,5 +147,3 @@ class NoteViewAPI(LoginRequiredMixin, DetailView):
         data = NoteSerializer(note, many=True)
 
         return JsonResponse(data.data, safe=False)
-
-    def

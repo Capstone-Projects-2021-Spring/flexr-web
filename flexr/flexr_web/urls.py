@@ -19,6 +19,7 @@ from .class_views.TabsView import TabsView, TabAPIView
 from .class_views.UserView import UserAPIView
 from .class_views.FriendView import FriendView
 from .class_views.SiteView import SiteAPIView
+from .class_views.NoteView import NoteViewAPI
 
 urlpatterns = [
     path('register', views.register_web, name='register'),
@@ -95,7 +96,10 @@ urlpatterns = [
     path('api/bookmarks/<id>/', BookmarksViewAPI.as_view()),
     path('api/bookmarks/all/', BookmarksViewAPI.as_view()),
 
-    path('api/account_preferences/', AccountPreferencesAPIView.as_view())
+    path('api/account_preferences/', AccountPreferencesAPIView.as_view()),
+
+    path('api/opennote', NoteViewAPI.as_view()),
+    path('api/opennote/<id>/', NoteViewAPI.as_view())
 
 ]
 
