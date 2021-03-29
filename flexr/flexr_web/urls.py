@@ -88,7 +88,7 @@ urlpatterns = [
 
     path('api/history/', HistoryViewAPI.as_view()),
     path('api/history/filter/', HistoryViewAPI.as_view()),
-    path('api/history/<id>', HistoryViewAPI.as_view()),
+    path('api/history/<id>/', HistoryViewAPI.as_view()),
     #path('api/history/<id>/filter', HistoryViewAPI.as_view()),
 
     path('api/bookmarks/', BookmarksViewAPI.as_view()),
