@@ -76,3 +76,14 @@ class EditSharedFolder(ModelForm):
     class Meta:
         model = sharedFolder
         fields = ('title', 'description', 'collaborators', 'bookmarks', 'tabs', 'notes')
+
+class FilterNotesForm(forms.Form):
+    title = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}), required=False)
+    content = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}), required=False)
+    start_date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), required=False)
+    start_time = forms.DateField(widget=forms.widgets.TimeInput(attrs={'type': 'time'}), required=False)
+    end_date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), required=False)
+    end_time = forms.DateField(widget=forms.widgets.TimeInput(attrs={'type': 'time'}), required=False)
+
+    class Meta:
+        pass

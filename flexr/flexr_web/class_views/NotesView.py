@@ -104,3 +104,53 @@ class NotesView(LoginRequiredMixin, View):
 
         # return to notes page
         return redirect('/notes')
+
+    def post(self, request, *args, **kwargs):
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
+        accounts = curr_user.accounts.all()
+        form = FilterNotesForm
+
+        title = request.POST['title']
+        content = request.POST['content']
+        start_date = request.POST['start_date']
+        start_time = request.POST['start_time']
+        end_date = request.POST['end_date']
+        end_time = request.POST['end_time']
+
+        # set default time if None
+        if not start_time:
+            start_time = '00:00'
+
+        # set default time if None
+        if not end_time:
+            end_time = '00:00'
+
+        # concat to datetime format
+        start_datetime = start_date + ' ' + start_time
+        end_datetime = end_date + ' ' + end_time
+
+        notes = curr_account.notes.all()
+
+        if title:
+            notes = notes.filter(notes__title__icontains=title)
+
+        if content:
+            notes = notes.filter(notes__content__icontains=content)
+
+        # filter based on start if given
+        if start_date:
+            start = datetime.strptime(start_datetime, '%Y-%m-%d %H:%M').replace(tzinfo = pytz.UTC)
+            notes = notes.filter(
+            create_datetime__gte=start)
+
+        if end_date:
+            end = datetime.strptime(end_datetime, '%Y-%m-%d %H:%M').replace(tzinfo = pytz.UTC)
+            notes = notes.filter(
+            create_datetime__lte=end
+        )
+
+        return render(request, "flexr_web/notes.html",
+                      {"Notes": notes,
+                       "Accounts": accounts,
+                       "form2": form})
