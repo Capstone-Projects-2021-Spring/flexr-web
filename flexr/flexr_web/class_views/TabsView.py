@@ -191,15 +191,16 @@ class TabAPIView(View):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
 
-        try:
+        # try:
             # try to close requested tab
-            tab = curr_account.tabs.get(id=kwargs['id'])
-            print("TabAPI: Delete: tab object", tab)
-            tab = Tab.close_tab(tabID=kwargs['id'], curr_account=curr_account)
-            print("TabAPI: Delete: close tab return", tab)
-            return JsonResponse({"success": "tab closed"})
-        except:
-            return JsonResponse({"error": "Could not close tab"}, status = 400)
+        print(kwargs['id'])
+        tab = curr_account.tabs.get(id=kwargs['id'])
+        print("TabAPI: Delete: tab object", tab)
+        tab = Tab.close_tab(tabID=kwargs['id'], curr_account=curr_account)
+        print("TabAPI: Delete: close tab return", tab)
+        return JsonResponse({"success": "tab closed"})
+        # except:
+        #     return JsonResponse({"error": "Could not close tab"}, status = 400)
 
     # @method_decorator(csrf_exempt)
     # def edit_tab(self, request, *args, **kwargs):
