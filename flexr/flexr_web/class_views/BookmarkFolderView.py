@@ -95,7 +95,7 @@ class BookmarkFolderView(LoginRequiredMixin, View):
         current_acc = self.request.user.accounts.get(account_id = self.request.session['account_id'])
         bookmark_folder = current_acc.bookmark_folders.get(id = kwargs['pk'])
         form = FilterBookmarkForm
-        formb = BookmarkFolderForm
+        formb = EditBookmarkForm
 
         # grab attributes for the shared folder
         owner = bookmark_folder.owner
@@ -115,3 +115,36 @@ class BookmarkFolderView(LoginRequiredMixin, View):
           "formb": formb,
           "form": form,
           "Bookmarks": bookmarks})
+          
+    def edit_bookmark_folder(self, request, *args, **kwargs):
+        """
+        Edit a note
+        """
+
+        # get form object on the page
+        form = EditBookmarkForm(request.POST)
+        #print("Note edited")
+
+        # check if form is valid
+        if form.is_valid():
+
+            # get current account
+            curr_acc = Account.objects.get(account_id = request.session['account_id'])
+            
+            # get information from form
+            title = request.POST.get('title')
+            # bookmarks.set(request.POST.get('bookmarks'))
+            
+            # get requested note and update with requested data
+            obj = curr_acc.bookmark_folders.get(pk=kwargs['pk'])
+            obj.title = title
+            if (request.POST.get('bookmarks')):
+                obj.bookmarks.set(request.POST.get('bookmarks'))
+            obj.save()
+
+        # request messages for debugging
+            request.session['message'] = "Bookmark edited"
+        # request.session['err_message'] = "Bookmark could not be edited"
+
+        # display requested note after editing 
+        return redirect('/bookmark_folder/'+str(obj.id))

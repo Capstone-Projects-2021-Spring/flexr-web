@@ -96,4 +96,8 @@ class BookmarkOnFile(forms.Form):
         model = bookmarkFolder
         fields = ('bookmarks')
 
-
+class EditBookmarkForm(ModelForm):
+    class Meta:
+        model = bookmarkFolder
+        # Make homepage a url field? may need to apppend https://www.
+        fields = ('title', 'bookmarks')

@@ -3,6 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Flexr | Bookmark Folder</title>
+    {% load static %}
+    <style>
+        #plus-icon:hover{
+            cursor: pointer;
+        }
+
+    </style>
 </head>
 <body>
     {% include "flexr_web/navbar.html" %}
@@ -29,6 +36,43 @@
    </div>
 </div>
 </div>
+Edit Folder <img id="plus-icon" data-toggle="modal" data-target="#edit_folder" src="{% static 'icons/plus-square.svg' %}">
+
+<div class="modal fade" id="edit_folder" tabindex="-1" role="dialog" aria-labelledby="edit_folderLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="edit_noteLabel">Edit a note!</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+            <form method = "POST" action="{% url 'edit_bookmark_folder' bookmark_folder.pk%}">
+                    {% csrf_token %}
+                    {% for field in formb %}
+                    <p>
+                        {{ field.label_tag }}<br>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <small style="color: grey">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <p style="color: red">{{ error }}</p>
+                        {% endfor %}
+                    </p>
+                    {% endfor %}
+                    <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Confirm edit</button>
+            </div>
+            </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr>
     <h1>Folder title: {{bookmark_folder.title}}</h1>
     <!-- <h1>Folder owner: {{bookmark_folder.owner}}</h1> -->
     <h3>Bookmarks:</h3>
