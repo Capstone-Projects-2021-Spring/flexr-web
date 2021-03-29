@@ -166,7 +166,7 @@ class TabAPIView(View):
         curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
 
         # get site url
-        data = json.loads(request.POST)
+        data = json.loads(request.body)
         site_url = data["url"]
 
         # open the requested tab
