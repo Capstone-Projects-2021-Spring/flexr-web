@@ -100,7 +100,6 @@ urlpatterns = [
 
     path('api/opennote', NoteViewAPI.as_view()),
     path('api/opennote/<id>/', NoteViewAPI.as_view())
-
 ]
 
 # old patterns
