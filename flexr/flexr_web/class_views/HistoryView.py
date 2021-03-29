@@ -221,6 +221,10 @@ class HistoryViewAPI(LoginRequiredMixin, DetailView):
 
         if url[-1] == 'filter':
             return self.delete_history_range(request, *args, **kwargs)
+
+        elif url[-1].isdigit():
+            return self.delete_history_single(request, *args, **kwargs)
+
         else:
             return self.delete_all_history(request, *args, **kwargs)
 
@@ -256,3 +260,13 @@ class HistoryViewAPI(LoginRequiredMixin, DetailView):
         history = History.objects.filter(account = curr_account).delete()
 
         return JsonResponse({"success": "all history deleted"})
+
+
+    def delete_single(self, request, *args, **kwargs):
+
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+
+        History.objects.filter(account = curr_account, id=kwargs['id']).delete()
+
+        return JsonResponse({"success": "history object deleted"})
