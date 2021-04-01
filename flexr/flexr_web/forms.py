@@ -76,3 +76,28 @@ class EditSharedFolder(ModelForm):
     class Meta:
         model = sharedFolder
         fields = ('title', 'description', 'collaborators', 'bookmarks', 'tabs', 'notes')
+
+class BookmarkFolderForm(ModelForm):
+    class Meta:
+        model = bookmarkFolder
+        fields = ('title', 'bookmarks')
+
+class FilterBookmarkForm(forms.Form):
+    start_date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), required=False)
+    start_time = forms.DateField(widget=forms.widgets.TimeInput(attrs={'type': 'time'}), required=False)
+    end_date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), required=False)
+    end_time = forms.DateField(widget=forms.widgets.TimeInput(attrs={'type': 'time'}), required=False)
+
+    class Meta:
+        pass
+
+class BookmarkOnFile(forms.Form):
+    class Meta:
+        model = bookmarkFolder
+        fields = ('bookmarks')
+
+class EditBookmarkForm(ModelForm):
+    class Meta:
+        model = bookmarkFolder
+        # Make homepage a url field? may need to apppend https://www.
+        fields = ('title', 'bookmarks')

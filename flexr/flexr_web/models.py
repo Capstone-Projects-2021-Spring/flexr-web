@@ -387,6 +387,12 @@ class sharedFolder(models.Model):
         super().save(*args, **kwargs)
         print(self.collaborators.all())
 
+class bookmarkFolder(models.Model):
+    title = models.CharField(verbose_name="Bookmark Folder Title", max_length=100)
+    created_date = models.DateTimeField(default= timezone.now)
+    owner = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="bookmark_folders")
+    bookmarks = models.ManyToManyField(Bookmark, blank=True)
+
 class Friendship(models.Model):
     sent = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="from_friend")
     received = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="to_friend")
