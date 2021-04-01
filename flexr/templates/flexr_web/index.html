@@ -101,9 +101,12 @@
         </div>
         </div>
 
-        <div class="row justify-content-center">
+        <div class=" bm-tabs row justify-content-center">
+            
             <div id = "tabs" class="col-lg-4">
-                <h2 style="display:inline">Open tabs</h2><img id="plus-icon" class="plus-icon" width = 20px; data-toggle="modal" data-target="#add_tab" src="{% static 'icons/plus.png' %}">
+                <div class = "header">
+                    <h2 style="display:inline">Open tabs</h2><img id="plus-icon" class="plus-icon" width = 20px; data-toggle="modal" data-target="#add_tab" src="{% static 'icons/plus.png' %}">
+                </div>
                 <script>
                     $(document).ready(function(){
                         $('.plus-icon').hover(function() {
@@ -113,7 +116,9 @@
                         });
                     });
                 </script>
+                
                 <div class = "row  justify-content-center">
+                    
                     {%for tab in Tabs%}
 
                         <div id = "tab" class = "tab card col-lg-5 "  >
@@ -136,9 +141,10 @@
                     {%endfor%}
                 </div>
             </div>
-
             <div id = "bookmarks" class="col-lg-4">
-                <h2>Bookmarks</h2>
+                <div class = "header">
+                    <h2>Bookmarks</h2>
+                </div>
                 <div class = "row justify-content-center">
                     {%for bm in Bookmarks%}
                         <div id = "bookmark" class = "tab card col-lg-5"  onclick="window.open('{{bm.site.url}}')">

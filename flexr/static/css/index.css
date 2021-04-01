@@ -33,7 +33,7 @@ body {
     box-shadow: 1px 5px 15px 1px #e5e8f3;
     border-radius: 7px;
     margin-bottom: 2%;
-    padding: 1%;
+    overflow-y: scroll !important;
     transition: all 1s ease;
 }
 
@@ -45,13 +45,23 @@ body {
 	-ms-transform: all 1s ease;
 }
 
-#tabs, #bookmarks{
+#tabs, #bookmarks, .header{
     width: 45%;
-    height: 30%;
-    overflow:auto;
+}
+.bm-tabs{
+    height: 70rem;
 }
 #tabs{
     margin-right: 2%;
+}
+
+.header{
+    position: sticky;
+    background-color: #f7fdff !important;
+    z-index: 1;
+    top: 5px;
+    width: 100%;
+    margin-bottom: 10px;
 }
 
 h2{
@@ -66,9 +76,6 @@ h2{
     text-align:center;
     margin: 1%;
     max-height: 8rem;
-    overflow: hidden;
-    word-wrap: break-word;
-    text-overflow: ellipsis;
 }
 
 #account:hover, #tab:hover, #note:hover, #site:hover, #history:hover, #bookmark:hover, #sf:hover{
