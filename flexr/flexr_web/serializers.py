@@ -45,7 +45,8 @@ class AccountPreferencesSerializer(serializers.ModelSerializer):
 ### TODO: These models need to be finalized
 class NoteSerializer(serializers.ModelSerializer):
     class Meta:
-        pass
+        model = Note
+        fields = ['id', 'account', 'title', 'created_date', 'content', 'lock', 'password']
 
 class Device(serializers.ModelSerializer):
     class Meta:

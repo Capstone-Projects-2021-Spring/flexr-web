@@ -1,9 +1,17 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.validators import EMPTY_VALUES
+from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.views import View
+from django.views.generic import DetailView
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+
+from ..serializers import NoteSerializer
+
+import json
 import pytz
 
 from ..models import *
@@ -111,3 +119,51 @@ class NoteView(LoginRequiredMixin, View):
 
         # display requested note after unlock attempt
         return redirect('/opennote/' + str(kwargs['pk']))
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class NoteViewAPI(LoginRequiredMixin, DetailView):
+
+    def post(self, request, *args, **kwargs):
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
+
+        data = json.loads(request.body)
+        # TODO: make this work
+        note = curr_account.notes.get(pk=kwargs['pk'])
+        data['id'] = note.id
+        note = Note.objects.create(account=curr_account, **data)
+        data = NoteSerializer(note)
+        return JsonResponse(data.data, safe=False)
+
+    def get(self, request, *args, **kwargs):
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
+        note = Note.objects.filter(account=curr_account)
+        data = NoteSerializer(note, many=True)
+        return JsonResponse(data.data, safe=False)
+
+    @method_decorator(csrf_exempt)
+    def put (self, request, *args, **kwargs):
+        curr_user = request.user
+        curr_acc = curr_user.accounts.get(account_id=request.session['account_id'])
+
+        # TODO: make this access and update properly
+        note = curr_acc.notes.get(pk=kwargs['pk'])
+        request_data = json.loads(request.body)
+        note.edit_title = request_data['title']
+        note.edit_content = request_data['content']
+        note.edit_lock = request_data['lock']
+        note.edit_password = request_data['password']
+        note.save()
+
+        data = NoteSerializer(note)
+        return JsonResponse(data.data, safe=False)
+
+    def delete_note(self, request, *args, **kwargs):
+        curr_user = request.user
+        curr_acc = curr_user.accounts.get(account_id=request.session['account_id'])
+        note = curr_acc.notes.get(pk=kwargs['pk']).delete()
+        return JsonResponse({"success": "bookmark deleted"})
+
+
