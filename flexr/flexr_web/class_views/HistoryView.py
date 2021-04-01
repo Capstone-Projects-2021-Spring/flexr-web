@@ -5,6 +5,9 @@ from django.shortcuts import redirect, render
 from django.views import View
 from django.views.generic import DetailView
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+
 import json
 import pytz
 
@@ -13,7 +16,6 @@ from ..forms import *
 from ..serializers import HistorySerializer
 
 
-# TODO: Gerald add delete history button
 
 class HistoryView(LoginRequiredMixin, View):
     """
@@ -122,7 +124,6 @@ class HistoryView(LoginRequiredMixin, View):
           "form": form})
 
 
-    # TODO: Gerald
     def delete(self, request, *args, **kwargs):
         """
         Delete requested history objects
@@ -143,10 +144,14 @@ class HistoryView(LoginRequiredMixin, View):
 
         # return to history page
         return redirect('/browsing_history/')
-
+        
+@method_decorator(csrf_exempt, name='dispatch')
 class HistoryViewAPI(LoginRequiredMixin, DetailView):
     def get(self, request, *args, **kwargs):
         url = request.path.split('/')
+
+        if not url[-1]:
+            url = url[:-1]
 
         if url[-1] == 'filter':
             return self.filter_history(request, *args, **kwargs)
@@ -164,7 +169,9 @@ class HistoryViewAPI(LoginRequiredMixin, DetailView):
                     JSONRequest with success message and the SiteHistory instance or error message
         """
 
-        history = History.objects.filter(account = kwargs["id"])
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+        history = History.objects.filter(account = curr_account)
         data = HistorySerializer(history, many=True)
         return JsonResponse(data.data, safe=False)
 
@@ -177,9 +184,12 @@ class HistoryViewAPI(LoginRequiredMixin, DetailView):
                     JSONRequest with success message and the SiteHistory objects or error message
         """
 
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+
         payload = request.GET.dict()
         history = History.objects.filter(
-            account = kwargs["id"],
+            account = curr_account,
             visit_datetime__gte=payload['datetime_from'],
             visit_datetime__lte=payload['datetime_to'])
         data = HistorySerializer(history, many=True)
@@ -192,18 +202,29 @@ class HistoryViewAPI(LoginRequiredMixin, DetailView):
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
     
         # get history objects to delete
-        delete = request.POST.getlist('DELETE', [])
+        data = json.loads(request.body) #request.POST.getlist('DELETE', [])
+
+        delete = []
+        if 'DELETE' in data:
+            delete = data['DELETE']
 
         # delete requested history objects
         curr_account.history.filter(pk__in=delete).delete()
 
-        return HttpResponse(f'History objects removed')
+        return JsonResponse({"success": "histories deleted"})
 
     def delete(self, request, *args, **kwargs):
         url = request.path.split('/')
 
+        if not url[-1]:
+            url = url[:-1]
+
         if url[-1] == 'filter':
             return self.delete_history_range(request, *args, **kwargs)
+
+        elif url[-1].isdigit():
+            return self.delete_history_single(request, *args, **kwargs)
+
         else:
             return self.delete_all_history(request, *args, **kwargs)
 
@@ -215,13 +236,15 @@ class HistoryViewAPI(LoginRequiredMixin, DetailView):
                 Returns:
                     JSONRequest with success message and the SiteHistory objects or error message
         """
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
         payload = json.loads(request.body)
         history = History.objects.filter(
-            account = kwargs["id"],
+            account = curr_account,
             visit_datetime__gte=payload['datetime_from'],
             visit_datetime__lte=payload['datetime_to']).delete()
 
-        return HttpResponse(f'{history} History objects removed')
+        return JsonResponse({"success": "histories deleted"})
 
     def delete_all_history(self, request, *args, **kwargs):
         """
@@ -231,7 +254,19 @@ class HistoryViewAPI(LoginRequiredMixin, DetailView):
                 Returns:
                     JSONRequest with success message or error message
         """
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
 
-        history = History.objects.filter(account = kwargs["id"]).delete()
+        history = History.objects.filter(account = curr_account).delete()
 
-        return HttpResponse(f'{history} History objects removed')
+        return JsonResponse({"success": "all history deleted"})
+
+
+    def delete_history_single(self, request, *args, **kwargs):
+
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+
+        History.objects.filter(account = curr_account, id=kwargs['id']).delete()
+
+        return JsonResponse({"success": "history object deleted"})

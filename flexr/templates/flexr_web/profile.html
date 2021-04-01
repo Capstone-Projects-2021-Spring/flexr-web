@@ -6,11 +6,18 @@
     <meta charset="UTF-8">
     <title>Flexr | Profile</title>
     <style>
-        #edit:hover{
+        #edit:hover, #friend_delete:hover{
             cursor: pointer;
         }
         .fa-user-plus:hover{
             cursor: pointer;
+        }
+        #friend_delete{
+            width: 10%;
+            display: inline;
+        }
+        .friend{
+            display: inline;
         }
     </style>
 </head>
@@ -18,14 +25,14 @@
     {% include "flexr_web/navbar.html" %}
     <h1>{{user.first_name}}&nbsp{{user.last_name}}&nbsp@{{user}}</h1>
     <h1>{{user.email}}</h1>
-    <h2 style="display:inline">{{current_account}}</h2><img id = "edit" src="{% static 'icons/pencil-square.svg'%}" data-toggle="modal" data-target="#view_account">
+    <h2 style="display:inline">{{curr_acc}}</h2><img id = "edit" src="{% static 'icons/pencil-square.svg'%}" data-toggle="modal" data-target="#view_account">
     <br>
     <h1 style="display:inline;" >Friends: </h1><i style="display:inline;" class="fas fa-user-plus" data-toggle="modal" data-target="#friend_search" ></i>
     <div class = "row">
         {% for friend in Friends %}
-            <div class = "folder card col-md-3" >
-                <p>{{friend}}</p>
-                <button type="button" style="width: 35%; display: inline;" class="btn btn-danger" onclick="window.location.href = '/remove_friend/{{friend.account_id}}'">Delete</button>
+            <div class = "friend card col-md-3" >
+                <p style="display: inline;">{{friend}}</p>
+                <img src="{% static 'icons/remove-user.png'%}" style="display: inline;" id = "friend_delete" onclick="window.location.href = '/remove_friend/{{friend.account_id}}'">
             </div>
         {% endfor %}
     </div>
@@ -34,7 +41,7 @@
     {% for request in friend_requests %}
         <div class = "folder card col-md-3" >
             <p style="display: inline;">{{request.sent.user.first_name}} {{request.sent.user.last_name}}</p>
-<!--            <h2>{{request.sent_date}}</h2>-->
+            <h2>{{request.sent_date}}</h2>
             <button type="button" style="width: 35%; display: inline;" class="btn btn-danger" onclick="window.location.href = '/deny_friend/{{request.id}}'">Deny</button>
             <button type="button" style="width: 35%; display: inline;" class="btn btn-success" onclick="window.location.href = '/accept_friend/{{request.id}}'">Accept</button>
         </div>
@@ -110,7 +117,7 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-danger" onclick="delete_account()">Delete</button>
+                    <button type="button" class="btn btn-danger" onclick="window.location.href = '/delete_account/{{curr_acc.account_id}}'">Delete</button>
 <!--                    {% if user.accounts.all|length > 1%}-->
 
 <!--                        <button type="button" class="btn btn-danger" onclick="delete_account()">Delete</button>-->

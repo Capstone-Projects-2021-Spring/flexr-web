@@ -1,12 +1,18 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.views import View
 
-import pytz
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 
+import pytz
+import json
 from ..models import *
 from ..forms import *
+from ..serializers import TabSerializer
+
 
 class TabsView(LoginRequiredMixin, View):
     """
@@ -112,3 +118,115 @@ class TabsView(LoginRequiredMixin, View):
             request.session['err_message'] = "Tab could not be opened"
             
         return redirect('/')
+
+@method_decorator(csrf_exempt, name='dispatch')
+class TabAPIView(View):
+
+    def get(self, request, *args, **kwargs):
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+
+        url = request.path.split('/')
+
+        if not url[-1]:
+            url = url[:-1]
+
+        if url[-1] == 'tabs':
+            return self.get_all_tabs(request, *args, **kwargs)
+        else:
+            return self.get_tab(request, *args, **kwargs)
+
+
+    def get_tab(self, request, *args, **kwargs):
+        curr_user = request.user
+        current_account = curr_user.accounts.get(account_id = request.session['account_id'])
+
+        tab = current_account.tabs.get(id = kwargs['id'])
+
+        data = TabSerializer(tab)
+        return JsonResponse(data.data, safe=False)
+
+    def get_all_tabs(self, request, *args, **kwargs):
+        curr_user = request.user
+        current_account = curr_user.accounts.get(account_id = request.session['account_id'])
+
+        tabs = current_account.tabs.all()
+
+        data = TabSerializer(tabs, many = True)
+        return JsonResponse(data.data, safe=False)
+
+    @method_decorator(csrf_exempt)
+    def post(self, request, *args, **kwargs):
+        """
+        Add a tab to the current account
+        """
+
+        # get the current user and current account
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
+
+        # get site url
+        data = json.loads(request.body)
+        site_url = data["url"]
+
+        try:
+            tab = Tab.open_tab(site_url=site_url, curr_account=curr_account)
+            data = TabSerializer(tab)
+            return JsonResponse(data.data, safe=False)
+
+        except:
+            return JsonResponse({"error": "Could not open tab"})
+
+    @method_decorator(csrf_exempt)
+    def delete(self, request, *args, **kwargs):
+        """
+        Close a tab for the current account
+        """
+
+        # get the current user and current account
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
+
+        # try:
+            # try to close requested tab
+        print(kwargs['id'])
+        tab = curr_account.tabs.get(id=kwargs['id'])
+        print("TabAPI: Delete: tab object", tab)
+        tab = Tab.close_tab(tabID=kwargs['id'], curr_account=curr_account)
+        print("TabAPI: Delete: close tab return", tab)
+        return JsonResponse({"success": "tab closed"})
+        # except:
+        #     return JsonResponse({"error": "Could not close tab"}, status = 400)
+
+    # @method_decorator(csrf_exempt)
+    # def edit_tab(self, request, *args, **kwargs):
+    #     # get the current user and current account
+    #     curr_user = request.user
+    #     curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
+    #
+    #     data = json.loads(request.body)
+    #
+    #     if 'url' in data:
+    #         site = Site.objects.get_or_create(account = curr_account, url = data['url'])[0]
+    #         data['site_id'] = site.id
+    #
+    #     result = Tab.objects.filter(pk = kwargs["id"]).update(**data)
+    #
+    #     return JsonResponse({"success": "tab edited"})
+
+    @method_decorator(csrf_exempt)
+    def visit_tab(self, request, *args, **kwargs):
+        """
+        Gerald: This seems to do the same thing as self.add_tab
+        but I keep it just incase
+        """
+
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
+
+        try:
+            tab = Tab.visit_tab(tabID=kwargs['id'], curr_account=curr_account)
+            data = TabSerializer(tab)
+            return JsonResponse(data.data, safe=False)
+        except:
+            return JsonResponse({"error": "Could not open tab"})

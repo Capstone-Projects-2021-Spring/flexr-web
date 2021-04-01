@@ -50,10 +50,12 @@ class Account(models.Model):
     account_id = models.AutoField(primary_key=True)
 
     def save(self,  *args, **kwargs):
-
-        if self.pk is None: #new users
-            self.account_preferences = Account_Preferences.objects.create()
         super().save(*args, **kwargs)  # Call the "real" save() method.
+
+        if self.account_preferences is None: #new users
+            site = Site.objects.create(account=self, url="https://google.com")
+            site.save()
+            self.account_preferences = Account_Preferences.objects.create(home_page = site)
 
     def __str__(self):
         return str(self.username)+str(self.account_id) + " " + str(self.type_of_account)
@@ -122,16 +124,19 @@ class Team(models.Model):
 class History(models.Model):
     site = models.ForeignKey("Site", on_delete=models.CASCADE, related_name="site_history")
     account = models.ForeignKey("Account", on_delete=models.CASCADE, related_name="history") # don't do foreignkey here make it so that there is a method that gets the account from the site
+    url = models.CharField(max_length=2500)
     visit_datetime = models.DateTimeField(default=timezone.now)
 
     class Meta:
         verbose_name_plural = "histories"
+        ordering = ('-visit_datetime',)
 
     def __str__(self):
         return "User " + str(self.account.account_id)+ ": " + str(self.visit_datetime) + " " + str(self.site.url)
 
     def save(self, *args, **kwargs):
         self.site.visited()
+        self.url = self.site.url
         super().save(*args, **kwargs)
 
 class Site(models.Model):
@@ -186,7 +191,7 @@ class Site(models.Model):
         # print("URL: ", )
         url1 = str(self.url).split('?')[0]
         url2 = url1.split('/')
-        # print("URL: ", url1 )
+        #print("URL: ", url1 )
         try:
             self.name = url2[2] + "/" + url2[3]
         except:
@@ -209,6 +214,7 @@ class Tab(models.Model):
 
     # TODO we should implement a setting to have tabs automatically deleted after a certain amount of time
     last_visited = models.DateTimeField(default=timezone.now) #maybe add auto now to this
+    url = models.CharField(max_length=2500)
 
     # TODO Have this be a choice field
     # TODO make the status of a tab calculated using a method
@@ -238,7 +244,7 @@ class Tab(models.Model):
             history.save()
 
         if toSave:
-            super(Tab, tab).save()
+            tab.save()
             
         return tab
 
@@ -247,7 +253,6 @@ class Tab(models.Model):
         try:
             # print("Models", tabID)
             tab = Tab.objects.filter(account = curr_account).get(id = tabID)
-
             tab.delete()
             return "successful"
         except:
@@ -260,11 +265,15 @@ class Tab(models.Model):
             tab.last_visited = datetime.now()
             status = "active"
             tab.save()
+            site = Site.objects.filter(account=curr_account).get(url=tab.url)
+            site.visited()
+            history = History.objects.create(account=curr_account, site=site, visit_datetime=last_visit)
+            history.save()
             try:
                 site = Site.objects.filter(account = curr_account).get(url = tab.url)[0]
             except:
                 return "Site instance doesn't exist for the current user"
-            return "successful"
+            return tab
         except:
             return "Tab instance doesn't exist for the current user"
 
@@ -276,19 +285,21 @@ class Tab(models.Model):
         # call super method to create Tab entry
         account = Account.objects.filter(pk = self.account_id)[0]
         site =  Site.objects.filter(pk = self.site_id)[0]
+        self.url = self.site.url
+        print("self.url", self.url)
         tab = Tab.open_tab(site.url, account, self.created_date, self.last_visited, toSave=False)
         super(Tab, self).save(*args, **kwargs)
-
         # create corresponding site object
 
 class Bookmark(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="bookmarks")
     bookmark_name = models.CharField(verbose_name= "Bookmark name", max_length=50)
     created_date = models.DateTimeField(default=timezone.now) #keeps track of creation date
-    site = models.OneToOneField(Site, on_delete=models.CASCADE) #if the site gets deleted the bookmark gets deleted
+    site = models.ForeignKey(Site, on_delete=models.CASCADE) #if the site gets deleted the bookmark gets deleted
     last_visited = models.DateTimeField(default=timezone.now) #keeps track of last visited date
     recent_frequency = models.IntegerField(default=1) # number of visits in the last week
     number_of_visits = models.IntegerField(default=1)# keeps track of number of visits
+    url = models.CharField(max_length=2500)
 
     # TODO create a visited method
     #TODO create a method to calculate frequency
@@ -308,8 +319,10 @@ class Bookmark(models.Model):
         bookmark = Bookmark.objects.filter(pk=id).delete()
         print('bookmark deleted')
 
-
-    
+    def save(self, *args, **kwargs):
+        # call super method to create Tab entry
+        self.url =  self.site.url
+        super().save(*args, **kwargs)
 
 # TODO change bookmark status in the Site model on save
 # Gerald: What is bookmark status?
@@ -318,8 +331,8 @@ class Bookmark(models.Model):
 # TODO need to finalize the fields here
 class Account_Preferences(models.Model):
     name = models.CharField(default="Account Preferences", max_length=10)
-    home_page = models.OneToOneField(Site, on_delete=models.CASCADE, null= True)
-
+    home_page = models.ForeignKey(Site, on_delete=models.CASCADE, null= True)
+    home_page_url = models.URLField()
     # sync
     sync_enabled = models.BooleanField(default=True) # not sure if this is possible or useful
     # sharing
@@ -327,26 +340,16 @@ class Account_Preferences(models.Model):
     # security
     cookies_enabled = models.BooleanField(default=True)
     popups_enabled = models.BooleanField(default=True)
-    # maybe split into device preferences too?
-    # Misc
-    #   home page
 
-    # Display?
-    #     Dark mode
     is_dark_mode = models.BooleanField(default=False)
-    #     font-size
 
-    # syncing
-    #   sync_on?
-
-    # sharing
-    #   searchable profile?
-    # security
-        # Cookies
-        # Popups
     def __str__(self):
        return str(self.name) + " " +str(self.id)
 
+    def save(self, *args, **kwargs):
+        # call super method to create Tab entry
+        self.home_page_url =  self.home_page.url
+        super().save(*args, **kwargs)
 
 class Note(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="notes")
@@ -389,7 +392,6 @@ class bookmarkFolder(models.Model):
     created_date = models.DateTimeField(default= timezone.now)
     owner = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="bookmark_folders")
     bookmarks = models.ManyToManyField(Bookmark, blank=True)
-
 
 class Friendship(models.Model):
     sent = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="from_friend")

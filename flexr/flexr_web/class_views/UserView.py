@@ -6,6 +6,9 @@ from django.shortcuts import redirect, render
 from django.views import View
 from django.views.generic import DetailView
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+
 import json
 import pytz
 
@@ -16,6 +19,7 @@ from ..serializers import *
 
 class UserAPIView(View):
 
+    @method_decorator(csrf_exempt)
     def sign_up(self, request, *args, **kwargs):
         """
         Creates the User in the database, allowing them to sign in
@@ -36,11 +40,13 @@ class UserAPIView(View):
             new_account = Account.objects.create(user=user, email=user.email, username = user.username)
             request.session['account_id'] = new_account.account_id
 
-            return HttpResponse(f'User {username} created', status=200)
+            return JsonResponse({"success": f"User {username} created"})
+
+            
+        return JsonResponse({"error": f"Error creating user"})
         
-        return HttpResponse(f'Error creating user', status=404)
 
-
+    @method_decorator(csrf_exempt)
     def login(self, request, *args, **kwargs): 
         """
         Takes in a form and checks the database against the provided username and password to provide access to the app
@@ -61,8 +67,10 @@ class UserAPIView(View):
                 data = UserSerializer(user)
                 return JsonResponse(data.data, safe=False)
 
-        return HttpResponse('Error logging in', status=404)
+        return JsonResponse({"error": "Error logging in"})
+        
 
+    @method_decorator(csrf_exempt)
     def logout(self, request, *args, **kwargs):
         """
         Logs the user out of flexr. Erases session data and does not allow access
@@ -72,17 +80,15 @@ class UserAPIView(View):
                 JSONRequest with success or error message
         """
 
-        #print(request.__dict__)
-        #print(request.user)
         try:
             user = request.user
             logout(request)
-            return HttpResponse(f'User {user} logged out', status=200)
+            return JsonResponse({"success": f"User {user} logged out"})
 
         except:
-            return HttpResponse(f'Error logging out', status=404)
+            return JsonResponse({"error": "Error logging out"})
 
-
+    @method_decorator(csrf_exempt)
     def check_status(self, request, *args, **kwargs):
         """
         Checks whether a user is logged in or not
@@ -98,4 +104,4 @@ class UserAPIView(View):
 
             return JsonResponse(status, safe=False)
 
-        return HttpResponse('Error checking status', status=404)
+        return JsonResponse({"error": "error checking status"})
