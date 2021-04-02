@@ -95,8 +95,8 @@ class BookmarkFolderView(LoginRequiredMixin, View):
         current_acc = self.request.user.accounts.get(account_id = self.request.session['account_id'])
         bookmark_folder = current_acc.bookmark_folders.get(id = kwargs['pk'])
         form = FilterBookmarkForm
-        formb = EditBookmarkForm
-
+        formb = EditBookmarkForm()
+        formb.fields['bookmarks'].queryset = current_acc.bookmarks.all()
         # grab attributes for the shared folder
         owner = bookmark_folder.owner
         #CHANGE THIS TO NOT USE THE SHARED FOLDERS COLLABORATORS, this was written this way for testing the view method
@@ -124,7 +124,7 @@ class BookmarkFolderView(LoginRequiredMixin, View):
         # get form object on the page
         form = EditBookmarkForm(request.POST)
         #print("Note edited")
-
+        form.fields['bookmarks'].queryset = curr_account.bookmarks.all()
         # check if form is valid
         if form.is_valid():
 

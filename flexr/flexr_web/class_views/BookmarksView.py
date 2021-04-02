@@ -105,7 +105,8 @@ class BookmarksView(LoginRequiredMixin, View):
         # get all bookmarks for current user
         bookmarks = curr_account.bookmarks.all()
         form = FilterBookmarkForm
-        formb = BookmarkFolderForm
+        formb = BookmarkFolderForm()
+        formb.fields['bookmarks'].queryset = curr_account.bookmarks.all()
         folders = curr_account.bookmark_folders.all()
         formf = BookmarkOnFile
         # request messages for debugging
