@@ -255,7 +255,7 @@ class Tab(models.Model):
             tab = Tab.objects.filter(account = curr_account).get(id = tabID)
             tab.delete()
             return "successful"
-        except Exception, e:
+        except Exception as e:
             return e
 
     @classmethod
@@ -271,7 +271,7 @@ class Tab(models.Model):
             history.save()
             site = Site.objects.filter(account = curr_account).get(url = tab.url)
             return tab
-        except Exception, e:
+        except Exception as e:
             return e
 
     def __str__(self):
