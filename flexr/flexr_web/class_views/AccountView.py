@@ -61,7 +61,7 @@ class AccountViewWeb(LoginRequiredMixin, DetailView):
             request.session['message'] = "Account Created"
 
             # return to index page
-            return redirect('/')
+            return redirect(request.session['prev_url'])
 
     # Gerald: is this decorator stil required?
     @csrf_exempt
@@ -86,7 +86,7 @@ class AccountViewWeb(LoginRequiredMixin, DetailView):
             request.session['err_message'] = "Error switching account"
 
         # return to index page
-        return redirect('/')
+        return redirect(request.session['prev_url'])
 
     def delete(self, request, pk):
         curr_user = request.user
@@ -100,10 +100,10 @@ class AccountViewWeb(LoginRequiredMixin, DetailView):
                 del_account = curr_user.accounts.get(account_id=pk)
                 del_account.delete()
             request.session['message'] = "Account deleted"
-            return redirect('/')
+            return redirect(request.session['prev_url'])
         else:
             request.session['err_message'] = "Can't delete your only account"
-            return redirect('/profile')
+            return redirect(request.session['prev_url'])
 
 @method_decorator(csrf_exempt, name='dispatch')
 class AccountViewAPI(LoginRequiredMixin, DetailView):

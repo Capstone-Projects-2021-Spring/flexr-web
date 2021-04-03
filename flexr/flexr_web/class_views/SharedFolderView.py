@@ -16,7 +16,7 @@ class SharedFolderView(LoginRequiredMixin, View):
     View class for a single shared folder
     """
 
-    def get(self, *args, **kwargs):
+    def get(self,request, *args, **kwargs):
         """
         Display a single shared folder
         """
@@ -48,6 +48,7 @@ class SharedFolderView(LoginRequiredMixin, View):
 
         # return render(request, "flexr_web/shared_folder.html", {"SharedFolder": shared_folder, "Collaborators": collaborators, "Tabs": tabs, "Bookmarks": bookmarks, "Notes": notes})
 
+        request.session['prev_url'] = '/shared_folder/'+str(kwargs['pk'])+'/'
         # display the page
         return render(self.request, "flexr_web/shared_folder.html",
          {"shared_folder": shared_folder,
@@ -77,7 +78,7 @@ class SharedFolderView(LoginRequiredMixin, View):
         shared_folder.save()
         context = {'form': form}
         # return render('shared_folder/' + str(shared_folder.pk))
-        return redirect('/shared_folder/' + str(shared_folder.id))
+        return redirect(request.session['prev_url'])
         # return render(request, "flexr_web/shared_folder.html",
         #  {"shared_folder": obj,
         #   "Collaborators": collaborators,

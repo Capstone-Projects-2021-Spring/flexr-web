@@ -64,10 +64,11 @@ class IndexView(LoginRequiredMixin, View):
         # get account form object
         form = AccountForm
 
+        request.session['prev_url'] = "/"
         # display the page
         return render(request, "flexr_web/index.html",
-                      {"curr_acc": curr_account, 
-                       "Accounts": accounts, 
+                      {
+                       # "Accounts": accounts,
                        "Sites": sites,
                        "Suggested_Sites": suggested_sites,
                        "Tabs": tabs, 

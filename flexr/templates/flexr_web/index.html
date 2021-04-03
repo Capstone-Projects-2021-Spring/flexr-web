@@ -33,11 +33,12 @@
             return cookieValue;
         }
     </script>
-    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+    
 </head>
 
 <body>
     {% include "flexr_web/navbar.html" %}
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
         
 
 
@@ -65,10 +66,9 @@
         </div>
         </div>
 
-        <div class=" bm-tabs row justify-content-center">
-            
-            <div id = "tabs" class="col-lg-4">
-                <div class = "header">
+        <div class="bm-tabs row justify-content-center">
+            <div id = "tabs" class="card col-lg-4">
+                <div class = "card-header sticky-top">
                     <h2 style="display:inline">Open tabs</h2><img id="plus-icon" class="plus-icon" width = 20px; data-toggle="modal" data-target="#add_tab" src="{% static 'icons/plus.png' %}">
                 </div>
                 <script>
@@ -81,7 +81,7 @@
                     });
                 </script>
                 
-                <div class = "row  justify-content-center">
+                <div class = "card-body row justify-content-center">
                     
                     {%for tab in Tabs%}
 
@@ -106,10 +106,10 @@
                 </div>
             </div>
             <div id = "bookmarks" class="col-lg-4">
-                <div class = "header">
+                <div class = "card-header sticky-top">
                     <h2>Bookmarks</h2>
                 </div>
-                <div class = "row justify-content-center">
+                <div class = "card-body row justify-content-center">
                     {%for bm in Bookmarks%}
                         <div id = "bookmark" class = "tab card col-lg-5"  onclick="window.open('{{bm.site.url}}')">
                             <p >{{bm.site}}</p>
@@ -119,16 +119,33 @@
             </div>
         </div>
 
-        <div class = "notes">
-            <h2>Recent Notes</h2>
-            <div class = "row">
-                {%for note in Notes%}
-                    <div id = "note" class = "card col-lg-3"  onclick="window.location.href = '/opennote/{{note.id}}'">
-                            <p >{{note}}</p>
-                    </div>
-                {%endfor%}
+        <div class="bm-tabs row justify-content-center">
+            <div id = "notes" class="card col-lg-4">
+                <div class="card-header sticky-top">
+                    <h2>Recent Notes</h2>
+                </div>
+                <div class = "card-body row justify-content-center">
+                    {%for note in Notes%}
+                        <div id = "note" class = "card col-lg-3"  onclick="window.location.href = '/opennote/{{note.id}}'">
+                                <p >{{note}}</p>
+                        </div>
+                    {%endfor%}
+                </div>
+            </div>
+            <div id = "shared_folders" class="card col-lg-4">
+                <div class="card-header sticky-top">
+                    <h2>Shared folders</h2>
+                </div>
+                <div class = "card-body row justify-content-center">
+                    {%for sf in Folders%}
+                        <div id = "sf" class = "card col-lg-3"  onclick="window.location.href = '/shared_folder/{{sf.id}}'">
+                                <p>{{sf}}</p>
+                        </div>
+                    {%endfor%}
+                </div>
             </div>
         </div>
+
     <!--    <div class = "history">-->
     <!--        <h2>Recent Site history:</h2>-->
     <!--        {%for hist in History%}-->
@@ -137,26 +154,8 @@
     <!--                </div>-->
     <!--        {%endfor%}-->
     <!--    </div>-->
-        <div class = "suggested sidenav">
-            <a class="navbar-brand" href="/"><img src="{% static 'flexr_logo_2.png' %}" width="200px"></a>
-            <h2 id = "sites-head">Suggested Sites</h2>
-            {%for site in Suggested_Sites%}
-                    <div id = "site" class = "site card col-lg-12" onclick="window.open('{{site.url}}'); ">
-                            <p>{{site.name}}</p>
-                    </div>
-            {%endfor%}
-        </div>
 
-        <div class = "shared_folders">
-            <h2>Shared folders</h2>
-            <div class = "row">
-            {%for sf in Folders%}
-                    <div id = "sf" class = "card col-lg-3"  onclick="window.location.href = '/shared_folder/{{sf.id}}'">
-                            <p>{{sf}}</p>
-                    </div>
-                {%endfor%}
-                </div>
-        </div>
+        
 
 </body>
 </html>

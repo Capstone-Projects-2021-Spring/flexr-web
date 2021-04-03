@@ -20,7 +20,7 @@ class TabsView(LoginRequiredMixin, View):
     View class for the tabs page
     """
 
-    def get(self, *args, **kwargs):
+    def get(self,request, *args, **kwargs):
         """
         Display the tabs page
         """
@@ -44,7 +44,7 @@ class TabsView(LoginRequiredMixin, View):
             message = self.request.session['err_message']
             del self.request.session['err_message']
             messages.error(self.request, message)
-
+        request.session['prev_url'] = '/open_tabs/'
         # display the page
         return render(self.request, "flexr_web/open_tabs.html", 
         {"Tabs":tabs, 
@@ -70,7 +70,7 @@ class TabsView(LoginRequiredMixin, View):
         request.session['message'] = "Tab added"
 
         # return to index page
-        return redirect('/')
+        return redirect(request.session['prev_url'])
 
     
 
@@ -95,7 +95,7 @@ class TabsView(LoginRequiredMixin, View):
             request.session['err_message'] = "Tab could not be closed"
 
         # TODO we should set up django sesions to know where to redirect a user based on previous page
-        return redirect('/open_tabs')
+        return redirect(request.session['prev_url'])
 
 
 
@@ -118,7 +118,7 @@ class TabsView(LoginRequiredMixin, View):
         except:
             request.session['err_message'] = "Tab could not be opened"
             
-        return redirect('/')
+        return redirect(request.session['prev_url'])
 
 @method_decorator(csrf_exempt, name='dispatch')
 class TabAPIView(View):

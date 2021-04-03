@@ -20,7 +20,7 @@ class ProfileView(LoginRequiredMixin, View):
     """
     
     
-    def get(self, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         """
         Display the profile page
         """
@@ -101,7 +101,8 @@ class ProfileView(LoginRequiredMixin, View):
                                                                  accounts]))  # this needs to be filter on account preferences searchable
         # all_accounts = accounts
         print(all_accounts)
-        return render(self.request, "flexr_web/profile.html", {"curr_acc": curr_account, "Accounts": accounts,
+        request.session['prev_url'] = '/profile/'
+        return render(self.request, "flexr_web/profile.html", {"Accounts": accounts,
                                                                "Preferences": acc_pref, "pref_form": pref_form,
                                                                "account_form": account_form, "Friends": friends,
                                                                "AllAccounts": all_accounts,
@@ -141,7 +142,7 @@ class ProfileView(LoginRequiredMixin, View):
             request.session['message'] = "Account Edited"
 
             # return to profile page
-            return redirect('/profile')
+            return redirect(request.session['prev_url'])
 
 
 
@@ -184,4 +185,4 @@ class ProfileView(LoginRequiredMixin, View):
         request.session['message'] = "Account Preferences Saved"
 
         # return to profile page
-        return redirect('/profile')
+        return redirect(request.session['prev_url'])
