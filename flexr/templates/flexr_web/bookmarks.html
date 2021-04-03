@@ -39,10 +39,12 @@
    </div>
 </div>
 </div>
-    <hr>
+<hr>
+  <div style="float:right; width:50%;" >
+    <h3>Bookmark Folders:</h3>
     <p style="display: inline;">Create a Bookmark Folder</p> <img style="display:inline;" id="plus-icon" data-toggle="modal" data-target="#add_bookmark_folder" src="{% static 'icons/plus-square.svg' %}">
 
-</hr>
+<!-- </hr> -->
 <div class="modal fade" id="add_bookmark_folder" tabindex="-1" role="dialog" aria-labelledby="add_bookmark_folder_Label" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -76,19 +78,20 @@
       </div>
     </div>
   </div>
-  <div class = "row">
     {%for folder in Folders%}
-        <div class = "card col-lg-3">
+        <div class = "card col-lg-5">
             <p>title:  <a href="{% url 'bookmark-folder-detail' folder.pk%}">
                 {{folder.title}}</a></p>
             <p>Created Date: {{folder.created_date}}</p>
-            <p><a href="{% url 'delete-bookmark-folder' folder.pk%}">Delete Folder</a></p>
+            <!-- <p><a href="{% url 'delete-bookmark-folder' folder.pk%}">Delete Folder</a></p> -->
+            <button onclick="window.location.href = '/delete_bookmark_folder/{{folder.pk}}/'">Delete Bookmark Folder</button>
             <br>
         </div>
     {%endfor%}
 </div>
-  <hr>
-    <h3>Bookmarks:</h3>
+<div style="float:left; width:50%;" >
+    <!-- <hr> -->
+    <h3>All Bookmarks:</h3>
     {%for bookmark in Bookmarks%}
     <p>Bookmark: <a href="{{bookmark.site.url}}">{{bookmark.site.url}}</a></p>
     <p>Created Date: {{bookmark.created_date}}</p>
@@ -97,7 +100,7 @@
 
     <br>
     {%endfor%}
- 
+ </div>
       
 </body>
 </html>
