@@ -95,8 +95,8 @@ class BookmarkFolderView(LoginRequiredMixin, View):
         current_acc = self.request.user.accounts.get(account_id = self.request.session['account_id'])
         bookmark_folder = current_acc.bookmark_folders.get(id = kwargs['pk'])
         form = FilterBookmarkForm
-        formb = EditBookmarkForm
-
+        formb = EditBookmarkForm()
+        formb.fields['bookmarks'].queryset = current_acc.bookmarks.all()
         # grab attributes for the shared folder
         owner = bookmark_folder.owner
         #CHANGE THIS TO NOT USE THE SHARED FOLDERS COLLABORATORS, this was written this way for testing the view method
@@ -117,34 +117,25 @@ class BookmarkFolderView(LoginRequiredMixin, View):
           "Bookmarks": bookmarks})
           
     def edit_bookmark_folder(self, request, *args, **kwargs):
+        current_acc = request.user.accounts.get(account_id=request.session['account_id'])
+        bookmark_folder = current_acc.bookmark_folders.get(id=kwargs['pk'])
         """
-        Edit a note
         """
 
-        # get form object on the page
         form = EditBookmarkForm(request.POST)
-        #print("Note edited")
-
+        form.fields['bookmarks'].queryset = current_acc.bookmarks.all()
         # check if form is valid
         if form.is_valid():
 
-            # get current account
-            curr_acc = Account.objects.get(account_id = request.session['account_id'])
             
-            # get information from form
             title = request.POST.get('title')
-            # bookmarks.set(request.POST.get('bookmarks'))
-            
-            # get requested note and update with requested data
-            obj = curr_acc.bookmark_folders.get(pk=kwargs['pk'])
-            obj.title = title
-            if (request.POST.get('bookmarks')):
-                obj.bookmarks.set(request.POST.get('bookmarks'))
-            obj.save()
 
-        # request messages for debugging
+            bookmarkos = form.cleaned_data['bookmarks']
+
+            bookmark_folder.title = title
+            bookmark_folder.bookmarks.set(bookmarkos)
+
+
             request.session['message'] = "Bookmark edited"
-        # request.session['err_message'] = "Bookmark could not be edited"
 
-        # display requested note after editing 
-        return redirect('/bookmark_folder/'+str(obj.id))
+        return redirect('/bookmark_folder/'+str(bookmark_folder.id))
