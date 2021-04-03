@@ -22,6 +22,7 @@ from .class_views.UserView import UserAPIView
 from .class_views.FriendView import FriendView, FriendAPIView
 from .class_views.SiteView import SiteAPIView
 from .class_views.NoteView import NoteViewAPI
+from .class_views.SharedFolderView import FoldersViewAPI
 
 urlpatterns = [
     path('register', views.register_web, name='register'),
@@ -115,8 +116,8 @@ urlpatterns = [
 
     path('api/opennote/<id>/', NoteViewAPI.as_view()),
 
-    path('api/shared_folder/', FoldersViewAPI.as_view()),
-    path('api/shared_folder/<id>/', FoldersViewAPI.as_view()),
+    path('api/shared_folders/', FoldersViewAPI.as_view()),
+    path('api/shared_folders/<id>/', FoldersViewAPI.as_view()),
 ]
 
 # old patterns

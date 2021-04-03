@@ -4,6 +4,8 @@ from django.shortcuts import redirect, render
 from django.views import View
 from django.views.generic import DetailView
 from django.http import HttpResponse, JsonResponse
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 
 import json
 import pytz
@@ -88,7 +90,7 @@ class SharedFolderView(LoginRequiredMixin, View):
         # return render('shared_folder/' + str(shared_folder.pk))
         return redirect('/shared_folder/' + str(shared_folder.id))
 
-# @method_decorator(csrf_exempt, name='dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
 class FoldersViewAPI(LoginRequiredMixin, DetailView):
 
     def put(self, request, *args, **kwargs):
