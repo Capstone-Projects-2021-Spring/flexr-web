@@ -10,6 +10,7 @@ import pytz
 
 from ..models import *
 from ..forms import *
+from ..serializers import SharedFolderSerializer
 
 # TODO: Gerald add request messages
 # TODO: Gerald add comments
@@ -70,7 +71,6 @@ class SharedFolderView(LoginRequiredMixin, View):
         if form.is_valid():
             shared_folder.title = request.POST.get("new_title")
             shared_folder.title = request.POST.get("new_description")
-            print("\n\n\n\nit'svalid")
             shared_folder.title = request.POST.get('title')
             shared_folder.description = request.POST.get('description')
             tileo = form.cleaned_data['title']
@@ -88,33 +88,40 @@ class SharedFolderView(LoginRequiredMixin, View):
         # return render('shared_folder/' + str(shared_folder.pk))
         return redirect('/shared_folder/' + str(shared_folder.id))
 
+# @method_decorator(csrf_exempt, name='dispatch')
 class FoldersViewAPI(LoginRequiredMixin, DetailView):
 
     def put(self, request, *args, **kwargs):
         """
             Edit
         """
-        
-        return HttpResponse()
+        usero = request.user
+        accounto = usero.accounts.get(account_id = request.session['account_id'])
+        data = json.loads(request.body)
+        sharedFolder.objects.filter(pk = kwargs["id"]).update(**data)
+        data = SharedFolderSerializer(shared_folder)
+        return JsonResponse(data.data, safe=False)
 
     def post(self, request, *args, **kwargs):
         """
             Create
         """
-        current_acc = request.user
-        current_acc = current_acc.accounts.get(account_id = request.session['account_id'])
+        usero = request.user
+        accounto = usero.accounts.get(account_id = request.session['account_id'])
         data = json.loads(request.body)
         # data = folderSerializer(to be written and finalized)
-        return HttpResponse()
+        foldo = sharedFolder.objects.create(**data, owner=accounto)
+        return JsonResponse(data.data, safe=False)
 
     def get(self, request, *args, **kwargs):
-        current_acc = request.user.accounts.get(account_id=request.session['account_id'])
-        shared_folder = current_acc.shared_folders.get(id=kwargs['pk'])
-        shared_folder = sharedFolder.objects.filter(owner = current_acc, description=shared_folder.description)
-        return HttpResponse()
+        usero = request.user
+        accounto = usero.accounts.get(account_id = request.session['account_id'])
+        foldos = sharedFolder.objects.filter(owner=accounto)
+        data = SharedFolderSerializer(foldos, many=True)
+        return JsonResponse(data.data, safe=False)
 
     def delete(self, request, *args, **kwargs):
-        current_acc = request.user.accounts.get(account_id=request.session['account_id'])
-        shared_folder = current_acc.shared_folders.get(id=kwargs['pk'])
-        shared_folder = sharedFolder.objects.filter(owner = current_acc, description=shared_folder.description)
+        usero = request.user
+        accounto = usero.accounts.get(account_id = request.session['account_id'])
+        foldo = sharedFolder.objects.filter(pk = kwargs["id"]).delete()
         return JsonResponse({"successful": "folder deleted"})
