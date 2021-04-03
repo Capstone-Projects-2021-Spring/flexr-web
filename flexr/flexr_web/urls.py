@@ -97,7 +97,7 @@ urlpatterns = [
 
     path('api/friendships/', FriendAPIView.as_view()),
     path('api/friendships/<id>', FriendAPIView.as_view()),
-    path('api/friendships/', FriendAPIView().add_friend),
+    path('api/friendships/', FriendAPIView.as_view()),
     path('api/friendships/<id>/accept/', FriendAPIView().accept),
     path('api/friendships/<id>/deny', FriendAPIView().deny),
 
