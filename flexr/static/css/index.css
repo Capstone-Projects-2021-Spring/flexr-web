@@ -49,7 +49,7 @@ body {
     width: 45%;
 }
 .bm-tabs{
-    height: 70rem;
+    max-height: 70rem;
 }
 #tabs{
     margin-right: 2%;

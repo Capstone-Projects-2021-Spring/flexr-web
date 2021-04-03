@@ -2,6 +2,7 @@ from django.urls import path
 
 from . import views
 from .class_views.AccountPreferencesView import AccountPreferencesAPIView
+from .class_views.SuggestedSitesView import SuggestedSiteAPIView
 from .views import *
 
 # Gerald: probably a better way to do this, but I'm dumb
@@ -84,6 +85,7 @@ urlpatterns = [
     path('api/status/', UserAPIView().check_status),
 
     path('api/site/', SiteAPIView.as_view()),
+    path('api/suggested_sites/', SuggestedSiteAPIView.as_view()),
 
     path('api/tabs/', TabAPIView.as_view()),
     path('api/tab/<id>/', TabAPIView.as_view()),

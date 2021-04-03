@@ -87,8 +87,6 @@ class Account(models.Model):
             site.save()
             # print("Account.rank_sites: site.site_ranking: ",site, site.site_ranking)
 
-
-        # print(self.suggested_sites.all())
         for x in self.suggested_sites.all().iterator():
             self.suggested_sites.remove(x)
         #
@@ -431,9 +429,9 @@ class Friendship(models.Model):
             self.received.notifs.add(self)
             self.sent.pending_friends.add(self.received)
             self.received.pending_friends.add(self.sent)
-
             self.sent.save()
             self.received.save()
+
         else:
             super().save(*args, **kwargs)
             self.received.notifs.remove(self)
