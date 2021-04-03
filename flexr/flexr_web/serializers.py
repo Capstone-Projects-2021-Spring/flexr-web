@@ -55,3 +55,10 @@ class Device(serializers.ModelSerializer):
 class SharedFolderSerializer(serializers.ModelSerializer):
     class Meta:
         pass
+
+class FriendshipSerializer(serializers.ModelSerializer):
+    sent = AccountSerializer(many=False, read_only=True)
+    received = AccountSerializer(many=False, read_only=True)
+    class Meta:
+        model = Friendship
+        fields = ['sent', 'received', 'status', 'sent_date', 'accepted_date']
