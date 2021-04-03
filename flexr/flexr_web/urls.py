@@ -2,6 +2,7 @@ from django.urls import path
 
 from . import views
 from .class_views.AccountPreferencesView import AccountPreferencesAPIView
+from .class_views.SuggestedSitesView import SuggestedSiteAPIView
 from .views import *
 
 # Gerald: probably a better way to do this, but I'm dumb
@@ -18,7 +19,7 @@ from .class_views.BookmarkFolderView import BookmarkFolderView
 from .class_views.SharedFoldersView import SharedFoldersView
 from .class_views.TabsView import TabsView, TabAPIView
 from .class_views.UserView import UserAPIView
-from .class_views.FriendView import FriendView
+from .class_views.FriendView import FriendView, FriendAPIView
 from .class_views.SiteView import SiteAPIView
 from .class_views.NoteView import NoteViewAPI
 
@@ -84,6 +85,7 @@ urlpatterns = [
     path('api/status/', UserAPIView().check_status),
 
     path('api/site/', SiteAPIView.as_view()),
+    path('api/suggested_sites/', SuggestedSiteAPIView.as_view()),
 
     path('api/tabs/', TabAPIView.as_view()),
     path('api/tab/<id>/', TabAPIView.as_view()),
@@ -92,6 +94,13 @@ urlpatterns = [
     path('api/account/<id>/', AccountViewAPI.as_view()),
     path('api/accounts/', AccountViewAPI.as_view()),
     path('api/account/<id>/switch/', AccountViewAPI().switch_account, name = "switch account"),
+
+    path('api/friendships/', FriendAPIView.as_view()),
+    path('api/friendships/<id>', FriendAPIView.as_view()),
+    path('api/friendships/', FriendAPIView.as_view()),
+    path('api/friendships/<id>/accept/', FriendAPIView().accept),
+    path('api/friendships/<id>/deny', FriendAPIView().deny),
+
 
     path('api/history/', HistoryViewAPI.as_view()),
     path('api/history/filter/', HistoryViewAPI.as_view()),

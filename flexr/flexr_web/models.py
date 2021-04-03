@@ -87,8 +87,6 @@ class Account(models.Model):
             site.save()
             # print("Account.rank_sites: site.site_ranking: ",site, site.site_ranking)
 
-
-        # print(self.suggested_sites.all())
         for x in self.suggested_sites.all().iterator():
             self.suggested_sites.remove(x)
         #
@@ -255,27 +253,24 @@ class Tab(models.Model):
             tab = Tab.objects.filter(account = curr_account).get(id = tabID)
             tab.delete()
             return "successful"
-        except:
-            return "Tab doesn't exist for the current user"
+        except Exception as e:
+            return e
 
     @classmethod
     def visit_tab(cls, tabID, curr_account):
         try:
-            tab = Tab.objects.filter(account = curr_account).get(pk = tabID)[0]
+            tab = Tab.objects.filter(account = curr_account).get(pk = tabID)
             tab.last_visited = datetime.now()
             status = "active"
             tab.save()
             site = Site.objects.filter(account=curr_account).get(url=tab.url)
             site.visited()
-            history = History.objects.create(account=curr_account, site=site, visit_datetime=last_visit)
+            history = History.objects.create(account=curr_account, site=site, visit_datetime=tab.last_visited)
             history.save()
-            try:
-                site = Site.objects.filter(account = curr_account).get(url = tab.url)[0]
-            except:
-                return "Site instance doesn't exist for the current user"
+            site = Site.objects.filter(account = curr_account).get(url = tab.url)
             return tab
-        except:
-            return "Tab instance doesn't exist for the current user"
+        except Exception as e:
+            return e
 
     def __str__(self):
         return str(self.site.url)
@@ -431,9 +426,9 @@ class Friendship(models.Model):
             self.received.notifs.add(self)
             self.sent.pending_friends.add(self.received)
             self.received.pending_friends.add(self.sent)
-
             self.sent.save()
             self.received.save()
+
         else:
             super().save(*args, **kwargs)
             self.received.notifs.remove(self)

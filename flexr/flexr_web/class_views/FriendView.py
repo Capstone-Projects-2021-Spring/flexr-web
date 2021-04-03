@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
@@ -9,6 +10,8 @@ import pytz
 
 from ..models import *
 from ..forms import *
+from ..serializers import AccountSerializer, FriendshipSerializer
+
 
 class FriendView(LoginRequiredMixin, DetailView):
 
@@ -65,3 +68,62 @@ class FriendView(LoginRequiredMixin, DetailView):
         friend_account.save()
         request.session['message'] = "Friend deleted"
         return redirect('/profile')
+
+class FriendAPIView(LoginRequiredMixin, DetailView):
+
+    def get(self, request):
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+        # friends = curr_account.friends.all()
+        friendships_sent = curr_account.from_friend.all()
+        friendships_recieved = curr_account.to_friend.all()
+        # this merges two sets
+        friendships = friendships_sent | friendships_recieved
+
+        data = FriendshipSerializer(friendships, many=True)
+        return JsonResponse(data.data, safe=False)
+
+    def delete(self, request, *args, **kwargs):
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+
+        friendships_sent = curr_account.from_friend.all()
+        friendships_recieved = curr_account.to_friend.all()
+        friendships = friendships_sent | friendships_recieved
+        friendship = friendships.get(id = kwargs['id'])
+        friendship.status = "Declined"
+        friendship.save()
+        data = FriendshipSerializer(friendships, many=True)
+        return JsonResponse(data.data, safe=False)
+
+    def accept(self, request, *args, **kwargs):
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+        friendships_sent = curr_account.from_friend.all()
+        friendships_recieved = curr_account.to_friend.all()
+        friendships = friendships_sent | friendships_recieved
+        friendship = friendships.get(id = kwargs['id'])
+        friendship.status = "Accepted"
+        friendship.save()
+        data = FriendshipSerializer(friendships, many=True)
+        return JsonResponse(data.data, safe=False)
+
+    def deny(self, request, *args, **kwargs):
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+        friendships_sent = curr_account.from_friend.all()
+        friendships_recieved = curr_account.to_friend.all()
+        friendships = friendships_sent | friendships_recieved
+        friendship = friendships.get(id = kwargs['id'])
+        friendship.status = "Declined"
+        friendship.save()
+        data = FriendshipSerializer(friendships, many=True)
+        return JsonResponse(data.data, safe=False)
+
+    def post(self, request):
+        friend_acc_id = request.POST.get('accountId')
+        friend_account = Account.objects.get(account_id=friend_acc_id)
+        user_account = request.user.accounts.get(account_id=request.session['account_id'])
+        friend_request = Friendship.objects.get_or_create(sent=user_account, received=friend_account)
+        data = FriendshipSerializer(friend_request, many=True)
+        return JsonResponse(data.data, safe=False)
