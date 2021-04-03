@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
+from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView
@@ -72,7 +73,7 @@ class FriendView(LoginRequiredMixin, DetailView):
         return redirect(request.session['prev_url'])
 
 class FriendAPIView(LoginRequiredMixin, DetailView):
-
+    @method_decorator(csrf_exempt)
     def get(self, request):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
@@ -85,6 +86,7 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
         data = FriendshipSerializer(friendships, many=True)
         return JsonResponse(data.data, safe=False)
 
+    @method_decorator(csrf_exempt)
     def delete(self, request, *args, **kwargs):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
@@ -98,6 +100,7 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
         data = FriendshipSerializer(friendships, many=True)
         return JsonResponse(data.data, safe=False)
 
+    @method_decorator(csrf_exempt)
     def accept(self, request, *args, **kwargs):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
@@ -110,6 +113,7 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
         data = FriendshipSerializer(friendships, many=True)
         return JsonResponse(data.data, safe=False)
 
+    @method_decorator(csrf_exempt)
     def deny(self, request, *args, **kwargs):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
@@ -122,6 +126,7 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
         data = FriendshipSerializer(friendships, many=True)
         return JsonResponse(data.data, safe=False)
 
+    @method_decorator(csrf_exempt)
     def post(self, request):
         friend_acc_id = request.POST.get('accountId')
         friend_account = Account.objects.get(account_id=friend_acc_id)
