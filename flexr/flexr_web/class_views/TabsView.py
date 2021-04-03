@@ -7,6 +7,7 @@ from django.views import View
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 
+import traceback
 import pytz
 import json
 from ..models import *
@@ -171,11 +172,15 @@ class TabAPIView(View):
 
         try:
             tab = Tab.open_tab(site_url=site_url, curr_account=curr_account)
+
+            if isinstance(tab, Exception):
+                return JsonResponse({ "error": str(tab), "traceback": traceback.extract_tb(tab.__traceback__).format() }, status=500)
+
             data = TabSerializer(tab)
             return JsonResponse(data.data, safe=False)
 
-        except:
-            return JsonResponse({"error": "Could not open tab"})
+        except Exception as e:
+            return JsonResponse({ "error": str(e), "traceback": traceback.extract_tb(e.__traceback__).format() }, status=500)
 
     @method_decorator(csrf_exempt)
     def delete(self, request, *args, **kwargs):
@@ -190,9 +195,11 @@ class TabAPIView(View):
         # try:
             # try to close requested tab
         print(kwargs['id'])
-        tab = curr_account.tabs.get(id=kwargs['id'])
-        print("TabAPI: Delete: tab object", tab)
         tab = Tab.close_tab(tabID=kwargs['id'], curr_account=curr_account)
+
+        if isinstance(tab, Exception):
+            return JsonResponse({ "error": str(tab), "traceback": traceback.extract_tb(tab.__traceback__).format() }, status=500)
+        
         print("TabAPI: Delete: close tab return", tab)
         return JsonResponse({"success": "tab closed"})
         # except:
@@ -224,9 +231,10 @@ class TabAPIView(View):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
 
-        try:
-            tab = Tab.visit_tab(tabID=kwargs['id'], curr_account=curr_account)
-            data = TabSerializer(tab)
-            return JsonResponse(data.data, safe=False)
-        except:
-            return JsonResponse({"error": "Could not open tab"})
+        tab = Tab.visit_tab(tabID=kwargs['id'], curr_account=curr_account)
+
+        if isinstance(tab, Exception):
+            return JsonResponse({ "error": str(tab), "traceback": traceback.extract_tb(tab.__traceback__).format() }, status=500)
+            
+        data = TabSerializer(tab)
+        return JsonResponse(data.data, safe=False)
