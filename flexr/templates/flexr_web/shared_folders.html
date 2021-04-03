@@ -26,7 +26,7 @@
 <h1 style="display: inline;">Shared Folders: </h1><img id = "add_folder_icon" src="{% static 'icons/plus-square.svg'%}" data-toggle="modal" data-target="#folder">
         <div class = "row">
         {% for folder in Folders %}
-            <div class = "folder card col-md-3" onclick="window.location.href = '/shared_folder/{{folder.id}}'">
+            <div class = "folder card col-md-3" style="height: auto;" onclick="window.location.href = '/shared_folder/{{folder.id}}'">
                 <h2>{{folder.title}}</h2>
                 <p>{{folder.description}}</p>
                 <a href="{% url 'delete_shared_folder' folder.pk%}"><p>Delete Folder</p> </a>
