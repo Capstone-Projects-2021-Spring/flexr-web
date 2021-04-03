@@ -1,5 +1,6 @@
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django.forms import ModelForm
 
 from .models import *
 
@@ -29,3 +30,74 @@ class registrationform(UserCreationForm):
             raise  ValidationError("Email already exists")
         return email
 
+
+choices=(("Business", "Business"),
+        ("Personal", "Personal"),
+        ("School", "School"),
+        ("Private", "Private"),
+        ("Kids", "Kids"),
+        ("Other", "Other"))
+
+class AccountForm(forms.Form):
+    username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
+    email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}))
+    phone_number = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}), error_messages={'incomplete': 'Enter a phone number.'},
+                validators=[RegexValidator(r'^[0-9]+$', 'Enter a valid phone number.')])
+    type_of_account = forms.ChoiceField(widget=forms.Select(attrs={'class': 'form-control'}), choices = choices)
+
+    class Meta:
+        model = Account
+        fields = ('username', 'email', 'phone_number', 'type_of_account')
+
+
+class PreferencesForm(ModelForm):
+    class Meta:
+        model = Account_Preferences
+        # Make homepage a url field? may need to apppend https://www.
+        fields = ('home_page', 'sync_enabled', 'searchable_profile', 'cookies_enabled', 'popups_enabled', 'is_dark_mode')
+
+class FilterHistoryForm(forms.Form):
+    site = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}), required=False)
+    start_date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), required=False)
+    start_time = forms.DateField(widget=forms.widgets.TimeInput(attrs={'type': 'time'}), required=False)
+    end_date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), required=False)
+    end_time = forms.DateField(widget=forms.widgets.TimeInput(attrs={'type': 'time'}), required=False)
+
+    class Meta:
+        pass
+
+class EditNoteForm(ModelForm):
+    class Meta:
+        model = Note
+        # Make homepage a url field? may need to apppend https://www.
+        fields = ('title', 'content')
+
+class EditSharedFolder(ModelForm):
+    class Meta:
+        model = sharedFolder
+        fields = ('title', 'description', 'collaborators', 'bookmarks', 'tabs', 'notes')
+
+class BookmarkFolderForm(ModelForm):
+    class Meta:
+        model = bookmarkFolder
+        fields = ('title', 'bookmarks')
+
+class FilterBookmarkForm(forms.Form):
+    start_date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), required=False)
+    start_time = forms.DateField(widget=forms.widgets.TimeInput(attrs={'type': 'time'}), required=False)
+    end_date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), required=False)
+    end_time = forms.DateField(widget=forms.widgets.TimeInput(attrs={'type': 'time'}), required=False)
+
+    class Meta:
+        pass
+
+class BookmarkOnFile(forms.Form):
+    class Meta:
+        model = bookmarkFolder
+        fields = ('bookmarks')
+
+class EditBookmarkForm(ModelForm):
+    class Meta:
+        model = bookmarkFolder
+        # Make homepage a url field? may need to apppend https://www.
+        fields = ('title', 'bookmarks')

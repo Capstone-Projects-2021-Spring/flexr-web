@@ -1,33 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <title>Flexr | Home</title>
+
+    <script>
+        async function switch_account(id){
+            let csrftoken = getCookie('csrftoken');
+            const resp = await fetch('http://127.0.0.1:8000/switch_account/'+id, {
+                method : "POST",
+                body: "hello",
+                headers : {"X-CSRFToken" : csrftoken},
+            });
+            window.location.reload();
+        }
+        // The following function are copying from
+        // https://docs.djangoproject.com/en/dev/ref/csrf/#ajax
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
 </head>
+
 <body>
     {% include "flexr_web/navbar.html" %}
+        
 
-    <h1>Hello {{user}}, I am flexr</h1>
-     <h2>Accounts:</h2>
-    {%for acc in Accounts%}
-        <h3>{{acc}}</h3>
-    {%endfor%}
-    <h2>Devices:</h2>
-        {%for dev in Devices%}
-            <h3>{{dev}}</h3>
-        {%endfor%}
-    <h2>Sites:</h2>
-    {%for site in Sites%}
-        <h3>{{site}}</h3>
-    {%endfor%}
-    <h2>Open tabs:</h2>
-    {%for tab in Tabs%}
-        <h3>{{tab}}</h3>
-    {%endfor%}
-    <h2>Site history:</h2>
-    {%for hist in History%}
-        <h3>{{hist}}</h3>
-    {%endfor%}
-    <p><a href='accounts/logout'>Logout</a></p>
+
+        <div class="modal fade" id="add_tab" tabindex="-1" role="dialog" aria-labelledby="add_tabLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="add_tabLabel">Add a tab!</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method = "post" action="{% url 'add tab' %}">
+                    {% csrf_token %}
+                    <label for = "url">URL</label>
+                    <input type="url" id = "url" name = "url">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Add tab</button>
+                    </div>
+                </form>
+            </div>
+            </div>
+        </div>
+        </div>
+
+        <div class=" bm-tabs row justify-content-center">
+            
+            <div id = "tabs" class="col-lg-4">
+                <div class = "header">
+                    <h2 style="display:inline">Open tabs</h2><img id="plus-icon" class="plus-icon" width = 20px; data-toggle="modal" data-target="#add_tab" src="{% static 'icons/plus.png' %}">
+                </div>
+                <script>
+                    $(document).ready(function(){
+                        $('.plus-icon').hover(function() {
+                        $(this).attr('src', "{% static 'icons/plus-circle.png' %}");
+                        }, function() {
+                        $(this).attr('src', "{% static 'icons/plus.png' %}");
+                        });
+                    });
+                </script>
+                
+                <div class = "row  justify-content-center">
+                    
+                    {%for tab in Tabs%}
+
+                        <div id = "tab" class = "tab card col-lg-5 "  >
+                            <img class="close" onclick=" var conf = confirm('Do you want to close this tab?'); if(conf){ window.location.href = 'close_tab/{{tab.id}}'}" src="{% static 'icons/cancel.png' %}" width= 15px>
+                            <script>
+                                $(document).ready(function(){
+                                    $('.close').hover(function() {
+                                    $(this).attr('src', "{% static 'icons/cancel-circle.png' %}");
+                                    }, function() {
+                                    $(this).attr('src', "{% static 'icons/cancel.png' %}");
+                                    });
+                                });
+                            </script>
+                            <div class="card-body"  style="">
+
+                                <p onclick="window.open('{{tab.site.url}}')" style="display: inline;">{{tab.site}}</p>
+                            </div>
+
+                        </div>
+                    {%endfor%}
+                </div>
+            </div>
+            <div id = "bookmarks" class="col-lg-4">
+                <div class = "header">
+                    <h2>Bookmarks</h2>
+                </div>
+                <div class = "row justify-content-center">
+                    {%for bm in Bookmarks%}
+                        <div id = "bookmark" class = "tab card col-lg-5"  onclick="window.open('{{bm.site.url}}')">
+                            <p >{{bm.site}}</p>
+                        </div>
+                    {%endfor%}
+                </div>
+            </div>
+        </div>
+
+        <div class = "notes">
+            <h2>Recent Notes</h2>
+            <div class = "row">
+                {%for note in Notes%}
+                    <div id = "note" class = "card col-lg-3"  onclick="window.location.href = '/opennote/{{note.id}}'">
+                            <p >{{note}}</p>
+                    </div>
+                {%endfor%}
+            </div>
+        </div>
+    <!--    <div class = "history">-->
+    <!--        <h2>Recent Site history:</h2>-->
+    <!--        {%for hist in History%}-->
+    <!--                <div id = "history" class = "tab card col-lg-4"  onclick="window.open('{{hist.site.url}}')">-->
+    <!--                        <h3 >{{hist.site.url}}</h3>-->
+    <!--                </div>-->
+    <!--        {%endfor%}-->
+    <!--    </div>-->
+        <div class = "suggested sidenav">
+            <a class="navbar-brand" href="/"><img src="{% static 'flexr_logo_2.png' %}" width="200px"></a>
+            <h2 id = "sites-head">Suggested Sites</h2>
+            {%for site in Suggested_Sites%}
+                    <div id = "site" class = "site card col-lg-12" onclick="window.open('{{site.url}}'); ">
+                            <p>{{site.name}}</p>
+                    </div>
+            {%endfor%}
+        </div>
+
+        <div class = "shared_folders">
+            <h2>Shared folders</h2>
+            <div class = "row">
+            {%for sf in Folders%}
+                    <div id = "sf" class = "card col-lg-3"  onclick="window.location.href = '/shared_folder/{{sf.id}}'">
+                            <p>{{sf}}</p>
+                    </div>
+                {%endfor%}
+                </div>
+        </div>
+
 </body>
 </html>

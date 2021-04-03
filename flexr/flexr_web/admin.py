@@ -11,19 +11,32 @@ class HistoryInLine(admin.TabularInline):
 
 class SiteInLine(admin.TabularInline):
     model = Site
+    fk_name = "account"
+
+class SiteInLine2(admin.TabularInline):
+    model = Site
+    fk_name = "suggested_sites"
 
 class BookmarkInLine(admin.TabularInline):
     model = Bookmark
 
-class DeviceInLine(admin.TabularInline):
-    model = Device
-
 class NoteInLine(admin.TabularInline):
     model = Note
 
+class SharedFolderInLine(admin.TabularInline):
+    model = sharedFolder
+
+class FriendshipInline1(admin.TabularInline):
+    model = Friendship
+    fk_name = "sent"
+
+class FriendshipInline2(admin.TabularInline):
+    model = Friendship
+    fk_name = "received"
+
 class AccountAdmin(admin.ModelAdmin):
     inlines = [
-        TabInLine, HistoryInLine, SiteInLine, BookmarkInLine, DeviceInLine, NoteInLine,
+        TabInLine, HistoryInLine, SiteInLine, SiteInLine2 , BookmarkInLine, NoteInLine, SharedFolderInLine, FriendshipInline1, FriendshipInline2
     ]
 
 class TabAdmin(admin.ModelAdmin):
@@ -31,11 +44,12 @@ class TabAdmin(admin.ModelAdmin):
 
 # Register your models here.
 admin.site.register(Account, AccountAdmin)
-admin.site.register(Team)
+admin.site.register(sharedFolder)
+admin.site.register(Friendship)
 admin.site.register(History)
 admin.site.register(Site)
 admin.site.register(Tab, TabAdmin)
 admin.site.register(Bookmark)
-admin.site.register(Device)
 admin.site.register(Account_Preferences)
 admin.site.register(Note)
+admin.site.register(bookmarkFolder)

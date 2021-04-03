@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flexr | Shared Folders</title>
+    {% load static %}
+    <style>
+        #plus-icon:hover{
+            cursor: pointer;
+        }
+        .folder:hover{
+            cursor: pointer;
+        }
+        #add_folder_icon:hover{
+            cursor: pointer;
+
+        }
+        #add_folder_icon{
+            cursor: pointer;
+            display: inline;
+        }
+    </style>
+</head>
+<body>
+    {% include "flexr_web/navbar.html" %}
+<h1 style="display: inline;">Shared Folders: </h1><img id = "add_folder_icon" src="{% static 'icons/plus-square.svg'%}" data-toggle="modal" data-target="#folder">
+        <div class = "row">
+        {% for folder in Folders %}
+            <div class = "folder card col-md-3" style="height: auto;" onclick="window.location.href = '/shared_folder/{{folder.id}}'">
+                <h2>{{folder.title}}</h2>
+                <p>{{folder.description}}</p>
+                <a href="{% url 'delete_shared_folder' folder.pk%}"><p>Delete Folder</p> </a>
+                {% for collaborator in folder.collaborators.all %}
+                    <p>{{collaborator}}</p>
+                {% endfor %}
+            </div>
+        {% endfor %}
+        </div>
+    <div class="modal fade" id="folder" tabindex="-1" role="dialog" aria-labelledby="folderLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="folderLabel">Create a shared folder</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <form method="post" action="/add_shared_folder/">
+                   {% csrf_token %}
+                      {% for field in folder_form %}
+                        <p>
+                            {{ field.label_tag }}<br>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <small style="color: grey">{{ field.help_text }}</small>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <p style="color: red">{{ error }}</p>
+                            {% endfor %}
+                        </p>
+                    {% endfor %}
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+<!--                    {% if user.accounts.all|length > 1%}-->
+
+<!--                        <button type="button" class="btn btn-danger" onclick="delete_account()">Delete</button>-->
+<!--                    {%endif%}-->
+                    <button type="submit" class="btn btn-primary">Create folder</button>
+                </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+</body>
+</html>
