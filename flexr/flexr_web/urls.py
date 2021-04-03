@@ -113,7 +113,10 @@ urlpatterns = [
 
     path('api/account_preferences/', AccountPreferencesAPIView.as_view()),
 
-    path('api/opennote/<id>/', NoteViewAPI.as_view())
+    path('api/opennote/<id>/', NoteViewAPI.as_view()),
+
+    path('api/shared_folder/', FoldersViewAPI.as_view()),
+    path('api/shared_folder/<id>/', FoldersViewAPI.as_view()),
 ]
 
 # old patterns
