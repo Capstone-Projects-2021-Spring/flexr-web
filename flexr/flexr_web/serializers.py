@@ -36,6 +36,11 @@ class BookmarkSerializer(serializers.ModelSerializer):
         fields = ['id', 'account','url', 'bookmark_name', 'created_date', 'site', 'last_visited',
         'recent_frequency', 'number_of_visits']
 
+class BookmarkFolderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = bookmarkFolder
+        fields = ['id', 'owner', 'title', 'created_date', 'bookmarks']
+
 class AccountPreferencesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account_Preferences

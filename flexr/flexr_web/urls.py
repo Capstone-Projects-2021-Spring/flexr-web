@@ -15,7 +15,7 @@ from .class_views.NoteView import NoteView
 from .class_views.NotesView import NotesView
 from .class_views.ProfileView import ProfileView
 from .class_views.SharedFolderView import SharedFolderView
-from .class_views.BookmarkFolderView import BookmarkFolderView
+from .class_views.BookmarkFolderView import BookmarkFolderView, BookmarkFoldersViewAPI
 from .class_views.SharedFoldersView import SharedFoldersView
 from .class_views.TabsView import TabsView, TabAPIView
 from .class_views.UserView import UserAPIView
@@ -53,9 +53,9 @@ urlpatterns = [
     path('add_bookmark/<id>/', BookmarksView().add_bookmark, name = "add bookmark"),
     path('delete_bookmark/<id>/', BookmarksView().delete_bookmark, name = "delete bookmark"),
 
-    path('create_bookmark_folder/', views.create_bookmark_folder_web, name='create_bookmark_folder'),
+    path('create_bookmark_folder/', BookmarkFolderView().create_bookmark_folder_web, name='create_bookmark_folder'),
     path('bookmark_folder/<int:pk>/', BookmarkFolderView.as_view(), name='bookmark-folder-detail'),
-    path('delete-bookmark_folder/<int:pk>/', views.delete_bookmark_folder_web, name='delete-bookmark-folder'),
+    path('delete_bookmark_folder/<int:pk>/', BookmarkFolderView().delete_bookmark_folder_web, name='delete-bookmark-folder'),
     path('edit_bookmark_folder/<int:pk>', BookmarkFolderView().edit_bookmark_folder, name='edit_bookmark_folder'),
 
     path('shared_folders/', SharedFoldersView.as_view(), name = "shared folders"),
@@ -110,6 +110,9 @@ urlpatterns = [
     path('api/bookmarks/', BookmarksViewAPI.as_view()),
     path('api/bookmarks/<id>/', BookmarksViewAPI.as_view()),
     path('api/bookmarks/all/', BookmarksViewAPI.as_view()),
+
+    path('api/bookmark_folders/', BookmarkFoldersViewAPI.as_view()),
+    path('api/bookmark_folders/<id>/', BookmarkFoldersViewAPI.as_view()),
 
     path('api/account_preferences/', AccountPreferencesAPIView.as_view()),
 
