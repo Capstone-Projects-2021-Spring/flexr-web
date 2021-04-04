@@ -303,9 +303,9 @@ class Bookmark(models.Model):
         return str(self.bookmark_name)
 
     @classmethod
-    def create_bookmark(cls, tab, curr_account, name='bookmark', last_visited=None):
+    def create_bookmark(cls, tab, curr_account, last_visited=None):
         try:
-            Bookmark.objects.create(account = curr_account, bookmark_name = name, site=tab.site)
+            Bookmark.objects.create(account = curr_account, bookmark_name = tab.url, site=tab.site)
         except:
             print('bookmark already exists')
     
