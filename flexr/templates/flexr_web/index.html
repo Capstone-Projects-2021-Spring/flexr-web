@@ -139,26 +139,52 @@
         </div>
 
         <div class="bm-tabs row justify-content-center">
-            <div id = "notes" class="card col-lg-4">
-                <div class="card-header sticky-top">
-                    <h2>Recent Notes</h2>
+            <div id = "tabs" class="card col-lg-4">
+                <div class = "card-header sticky-top">
+                    <h2 style="display:inline">Notes</h2><img id="plus-icon" class="plus-icon" width = 20px; data-toggle="modal" data-target="#add_tab" src="{% static 'icons/plus.png' %}">
                 </div>
+                <script>
+                    $(document).ready(function(){
+                        $('.plus-icon').hover(function() {
+                        $(this).attr('src', "{% static 'icons/plus-circle.png' %}");
+                        }, function() {
+                        $(this).attr('src', "{% static 'icons/plus.png' %}");
+                        });
+                    });
+                </script>
+                
                 <div class = "card-body row justify-content-center">
+                    
                     {%for note in Notes%}
-                        <div id = "note" class = "card col-lg-3"  onclick="window.location.href = '/opennote/{{note.id}}'">
-                                <p >{{note}}</p>
+
+                        <div id = "note" class = "note card col-lg-5 "  >
+                            <img class="close" onclick=" var conf = confirm('Do you want to delete this note?'); if(conf){ window.location.href = 'delete-note/{{note.id}}'}" src="{% static 'icons/cancel.png' %}" width= 15px>
+                            <script>
+                                $(document).ready(function(){
+                                    $('.close').hover(function() {
+                                    $(this).attr('src', "{% static 'icons/cancel-circle.png' %}");
+                                    }, function() {
+                                    $(this).attr('src', "{% static 'icons/cancel.png' %}");
+                                    });
+                                });
+                            </script>
+                            <div class="card-body" onclick="window.location.href = '/opennote/{{note.id}}'" style="">
+
+                                <p style="display: inline;">{{note}}</p>
+                            </div>
+
                         </div>
                     {%endfor%}
                 </div>
             </div>
-            <div id = "shared_folders" class="card col-lg-4">
-                <div class="card-header sticky-top">
-                    <h2>Shared folders</h2>
+            <div id = "bookmarks" class="col-lg-4">
+                <div class = "card-header sticky-top">
+                    <h2>Shared Folders</h2>
                 </div>
                 <div class = "card-body row justify-content-center">
                     {%for sf in Folders%}
-                        <div id = "sf" class = "card col-lg-3"  onclick="window.location.href = '/shared_folder/{{sf.id}}'">
-                                <p>{{sf}}</p>
+                        <div id = "bookmark" class = "tab card col-lg-5"  onclick="window.location.href = 'shared_folder/{{sf.id}}/'">
+                            <p >{{sf}}</p>
                         </div>
                     {%endfor%}
                 </div>

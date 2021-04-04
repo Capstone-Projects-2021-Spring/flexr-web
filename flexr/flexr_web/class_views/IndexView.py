@@ -67,6 +67,7 @@ class IndexView(LoginRequiredMixin, View):
         request.session['prev_url'] = "/"
         # display the page
         filtered = False
+        print(notes)
         return render(request, "flexr_web/index.html",
                       {
                        # "Accounts": accounts,
