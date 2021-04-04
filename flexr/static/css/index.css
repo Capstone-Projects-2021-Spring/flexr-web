@@ -21,20 +21,16 @@ body {
     height: 3rem;
 }
 
-#site{
-    height: 3rem;
-    font-size: larger;
-    padding: 2%;
-    margin-top: 2%;
-}
 
-#accounts, #tabs, #bookmarks{
+#accounts, #tabs, #bookmarks, #notes, #shared_folders{
     background-color: #f7fdff !important;
     box-shadow: 1px 5px 15px 1px #e5e8f3;
     border-radius: 7px;
     margin-bottom: 2%;
-    overflow-y: scroll !important;
     transition: all 1s ease;
+    padding: inherit !important;
+    border-bottom: 10px solid #f7fdff;
+
 }
 
 #accounts:hover{
@@ -45,49 +41,52 @@ body {
 	-ms-transform: all 1s ease;
 }
 
-#tabs, #bookmarks, .header{
+#tabs, #bookmarks, .header, #notes, #shared_folders{
     width: 45%;
 }
-.bm-tabs{
-    max-height: 70rem;
-}
-#tabs{
+
+#tabs, #notes{
     margin-right: 2%;
+    max-height: 25rem;
+    overflow: scroll;
+}
+#bookmarks, #shared_folders{
+    max-height: 25rem;
+    overflow: scroll;
 }
 
-.header{
-    position: sticky;
+
+.card-header{
+    /* position: sticky; */
     background-color: #f7fdff !important;
     z-index: 1;
-    top: 5px;
+    /* top: -.5px; */
     width: 100%;
     margin-bottom: 10px;
+    height: 100%;
+    margin-top: -1%;
 }
 
 h2{
     color: #001872;
 }
-#sites-head{
-    color: white;
-}
 
-#account, #tab, #note, #site, #history, #bookmark, #sf {
+
+#account, #tab, #note,  #history, #bookmark, #sf {
     border-radius: 7px; 
     text-align:center;
     margin: 1%;
-    max-height: 8rem;
 }
 
-#account:hover, #tab:hover, #note:hover, #site:hover, #history:hover, #bookmark:hover, #sf:hover{
+#account:hover, #tab:hover, #note:hover, #history:hover, #bookmark:hover, #sf:hover{
     text-align:center;
     box-shadow: 1px 2px 15px 1px #ccd3eb;
     cursor: pointer;
     position: relative; 
     top: -2px;
-
 }
 .close{
-    margin-top: 3%;
+    margin-top: -1%;
 }
 
 #plus-icon{
@@ -106,37 +105,11 @@ h2{
 .card{
     /* box-shadow: 1px 1px 10px 1px #ccd3eb; */
     border: 1px solid #e5f7fc ;
-    padding: .5%;
-    height: 5rem;
+    padding: 1%;
+    height: 6rem;
     overflow: hidden;
     word-wrap: break-word;
     text-overflow: ellipsis;
-}
-.site{
-    max-height: 5rem;
-    padding: 2%;
-    color: black;
-    overflow: hidden;
-    word-wrap: break-word;
-}
-
-/* The sidebar menu */
-.sidenav {
-    color: white;
-    font-size: .7rem;
-    text-align:center;
-    height: 100%; /* Full-height: remove this if you want "auto" height */
-    width: 13%; /* Set the width of the sidebar */
-    padding: 1%;
-    position: fixed; /* Fixed Sidebar (stay in place on scroll) */
-    z-index: 1; /* Stay on top */
-    top: 0; /* Stay at the top */
-    left: 0;
-    background-image: linear-gradient( #00C4EE,#0087C2, #00559F
-    , #001872);
-    overflow-x: hidden; /* Disable horizontal scroll */
-    padding-top: 20px;
-    box-shadow: inset  0 0 10px #001872;
 }
 
               

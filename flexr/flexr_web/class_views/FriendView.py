@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
+from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView
@@ -19,6 +20,7 @@ class FriendView(LoginRequiredMixin, DetailView):
         curr_account = request.user.accounts.get(account_id=request.session['account_id'])
         friends = curr_account.friends.all()
         print(friends)
+        request.session['prev_url'] = '/friends/'
         return render(request, "flexr_web/friends.html", {"Friends": friends})
 
     def add_friend(self, request):
@@ -26,28 +28,29 @@ class FriendView(LoginRequiredMixin, DetailView):
         friend_account = Account.objects.get(account_id=friend_acc_id)
         user_account = request.user.accounts.get(account_id=request.session['account_id'])
         friend_request = Friendship.objects.get_or_create(sent=user_account, received=friend_account)
-        return redirect('/friends')
+        request.session['message'] = "Friend request sent"
+        return redirect(request.session['prev_url'])
 
     def deny_friend(self, request, pk):
         friend_request = Friendship.objects.get(id=pk)
         friend_request.status = "Declined"
         friend_request.save()
-        request.session['message'] = "Friend request DENIED"
-        return redirect('/profile')
+        request.session['message'] = "Friend request denied"
+        return redirect(request.session['prev_url'])
 
     def accept_friend(self, request, pk):
         friend_request = Friendship.objects.get(id=pk)
         friend_request.status = "Accepted"
         friend_request.save()
-        request.session['message'] = "Friend request ACCEPTED"
-        return redirect('/profile')
+        request.session['message'] = "Friend request accepted"
+        return redirect(request.session['prev_url'])
 
     def remove_notif(self, request, pk):
         curr_account = request.user.accounts.get(account_id=request.session['account_id'])
         notif = curr_account.notifs.get(id=pk)
         curr_account.notifs.remove(notif)
         curr_account.save()
-        return redirect('/')
+        return redirect(request.session['prev_url'])
 
     def remove_friend(self, request, pk):
         current_account = request.user.accounts.get(account_id=request.session['account_id'])
@@ -60,17 +63,17 @@ class FriendView(LoginRequiredMixin, DetailView):
             friendship = Friendship.objects.filter(sent=friend_account, received=current_account)
             if (friendship.count() == 0):
                 request.session['errmessage'] = "Trouble finding friendship"
-                return redirect('/profile')
+                return redirect(request.session['prev_url'])
         friendship = friendship[0]
         friendship.status = "Declined"
         friendship.save()
         current_account.save()
         friend_account.save()
         request.session['message'] = "Friend deleted"
-        return redirect('/profile')
+        return redirect(request.session['prev_url'])
 
 class FriendAPIView(LoginRequiredMixin, DetailView):
-
+    @method_decorator(csrf_exempt)
     def get(self, request):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
@@ -83,6 +86,7 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
         data = FriendshipSerializer(friendships, many=True)
         return JsonResponse(data.data, safe=False)
 
+    @method_decorator(csrf_exempt)
     def delete(self, request, *args, **kwargs):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
@@ -96,6 +100,7 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
         data = FriendshipSerializer(friendships, many=True)
         return JsonResponse(data.data, safe=False)
 
+    @method_decorator(csrf_exempt)
     def accept(self, request, *args, **kwargs):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
@@ -108,6 +113,7 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
         data = FriendshipSerializer(friendships, many=True)
         return JsonResponse(data.data, safe=False)
 
+    @method_decorator(csrf_exempt)
     def deny(self, request, *args, **kwargs):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
@@ -120,6 +126,7 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
         data = FriendshipSerializer(friendships, many=True)
         return JsonResponse(data.data, safe=False)
 
+    @method_decorator(csrf_exempt)
     def post(self, request):
         friend_acc_id = request.POST.get('accountId')
         friend_account = Account.objects.get(account_id=friend_acc_id)

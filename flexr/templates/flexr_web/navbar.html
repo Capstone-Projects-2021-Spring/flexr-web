@@ -135,14 +135,17 @@
       {%endfor%}
     {%endif %}
     <div class = "suggested sidenav">
-      <a class="navbar-brand" href="/"><img src="{% static 'flexr_logo_2.png' %}" width="200px"></a>
+      <a class="navbar-brand" href="/"><img src="{% static 'flexr_logo_2.png' %}" width="100%"></a>
       <h2 id = "sites-head">Suggested Sites</h2>
       {%for site in Suggested_Sites%}
               <div id = "site" class = "site card col-lg-12" onclick="window.open('{{site.url}}'); ">
                       <p>{{site.name}}</p>
               </div>
       {%endfor%}
-  </div>
+    </div>
+
+    
+  
   <div class="modal fade" id="add_account" tabindex="-1" role="dialog" aria-labelledby="add_accountLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">

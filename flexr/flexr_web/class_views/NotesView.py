@@ -18,7 +18,7 @@ class NotesView(LoginRequiredMixin, View):
     View class for the notes page
     """
 
-    def get(self, *args, **kwargs):
+    def get(self,request, *args, **kwargs):
         """
         Display the notes page
         """
@@ -42,6 +42,7 @@ class NotesView(LoginRequiredMixin, View):
             message = self.request.session['err_message']
             del self.request.session['err_message']
             messages.error(self.request, message)
+        request.session['prev_url'] = '/notes/'
 
         # display the page
         return render(self.request, "flexr_web/notes.html", 
@@ -77,7 +78,7 @@ class NotesView(LoginRequiredMixin, View):
                 if (passw not in EMPTY_VALUES):
                     print("reached",passw)
                     request.session['err_message'] = "Note not created. Please put a password on locked note"
-                    return redirect('/notes')
+                    return redirect(request.session['prev_url'])
                 lo = False
 
             newnote = Note.objects.create(account=acc, title=tit, content=cont, lock=lo, password=passw)
@@ -88,10 +89,10 @@ class NotesView(LoginRequiredMixin, View):
             request.session['err_message'] = "Note not created. Please put a password on locked note"
             #print(form.errors)
 
-        return redirect('/notes')
+        return redirect(request.session['prev_url'])
 
 
-    def delete_note(self, *args, **kwargs):
+    def delete_note(self,request, *args, **kwargs):
         """
         Delete a note
         """
@@ -103,4 +104,4 @@ class NotesView(LoginRequiredMixin, View):
         obj.delete()
 
         # return to notes page
-        return redirect('/notes')
+        return redirect(request.session['prev_url'])

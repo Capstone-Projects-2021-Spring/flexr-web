@@ -22,7 +22,7 @@ class SharedFolderView(LoginRequiredMixin, View):
     View class for a single shared folder
     """
 
-    def get(self, *args, **kwargs):
+    def get(self,request, *args, **kwargs):
         """
         Display a single shared folder
         """
@@ -54,6 +54,7 @@ class SharedFolderView(LoginRequiredMixin, View):
 
         # return render(request, "flexr_web/shared_folder.html", {"SharedFolder": shared_folder, "Collaborators": collaborators, "Tabs": tabs, "Bookmarks": bookmarks, "Notes": notes})
 
+        request.session['prev_url'] = '/shared_folder/'+str(kwargs['pk'])+'/'
         # display the page
         return render(self.request, "flexr_web/shared_folder.html",
          {"shared_folder": shared_folder,
@@ -88,7 +89,45 @@ class SharedFolderView(LoginRequiredMixin, View):
         shared_folder.save()
         context = {'form': form}
         # return render('shared_folder/' + str(shared_folder.pk))
-        return redirect('/shared_folder/' + str(shared_folder.id))
+        return redirect(request.session['prev_url'])
+        # return render(request, "flexr_web/shared_folder.html",
+        #  {"shared_folder": obj,
+        #   "Collaborators": collaborators,
+        #   "Tabs":tabs,
+        #   "Bookmarks": bookmarks,
+        #   "Notes": notes},
+        #   "form: form")
+
+    # def edit_shared_folder(self, request, *args, **kwargs):
+    #     """
+    #     Edit a note
+    #     """
+    #
+    #     # get form object on the page
+    #     form = EditSharedFolder(request.POST)
+    #     # print("Note edited")
+    #     obj = Account.objects.get(account_id=request.session['account_id']).shared_folders.get(pk=kwargs['pk'])
+    #     # check if form is valid
+    #     if form.is_valid():
+    #         # get current account
+    #         curr_acc = Account.objects.get(account_id=request.session['account_id'])
+    #
+    #         # get information from form
+    #         title = request.POST.get('title')
+    #         # content = request.POST.get('content')
+    #
+    #         # get requested note and update with requested data
+    #         obj = curr_acc.shared_folders.get(pk=kwargs['pk'])
+    #         obj.title = title
+    #         obj.content = content
+    #         obj.save()
+    #
+    #         # request messages for debugging
+    #         request.session['message'] = "Note edited"
+    #     request.session['err_message'] = "Note could not be edited"
+    #
+    #     # display requested note after editing
+    #     return redirect('/opennote/' + str(obj.id))
 
 @method_decorator(csrf_exempt, name='dispatch')
 class FoldersViewAPI(LoginRequiredMixin, DetailView):

@@ -20,7 +20,7 @@ class TabsView(LoginRequiredMixin, View):
     View class for the tabs page
     """
 
-    def get(self, *args, **kwargs):
+    def get(self,request, *args, **kwargs):
         """
         Display the tabs page
         """
@@ -44,7 +44,7 @@ class TabsView(LoginRequiredMixin, View):
             message = self.request.session['err_message']
             del self.request.session['err_message']
             messages.error(self.request, message)
-
+        request.session['prev_url'] = '/open_tabs/'
         # display the page
         return render(self.request, "flexr_web/open_tabs.html", 
         {"Tabs":tabs, 
@@ -70,7 +70,7 @@ class TabsView(LoginRequiredMixin, View):
         request.session['message'] = "Tab added"
 
         # return to index page
-        return redirect('/')
+        return redirect(request.session['prev_url'])
 
     
 
@@ -95,9 +95,7 @@ class TabsView(LoginRequiredMixin, View):
             request.session['err_message'] = "Tab could not be closed"
 
         # TODO we should set up django sesions to know where to redirect a user based on previous page
-        return redirect('/open_tabs')
-
-
+        return redirect(request.session['prev_url'])
 
 
     def open_tab(self, request, *args, **kwargs):
@@ -118,7 +116,27 @@ class TabsView(LoginRequiredMixin, View):
         except:
             request.session['err_message'] = "Tab could not be opened"
             
-        return redirect('/')
+        return redirect(request.session['prev_url'])
+
+    def post(self, request):
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
+        search = request.POST.get('search')
+        tabs = curr_account.tabs.all()
+        tabs = tabs.filter(site__url__icontains=search)
+        print(tabs)
+        history = curr_account.history.all()
+        sites = curr_account.sites.all()
+        bookmarks = curr_account.bookmarks.all()
+        notes = curr_account.notes.all()
+        folders = curr_account.shared_folders.all()
+        suggested_sites = curr_account.suggested_sites.order_by('-site_ranking')
+        request.session['prev_url'] = "/"
+        # display the page
+        form = AccountForm
+        filtered = True
+        return render(self.request, "flexr_web/open_tabs.html",
+                      {"Tabs": tabs, "filtered": filtered})
 
 @method_decorator(csrf_exempt, name='dispatch')
 class TabAPIView(View):
