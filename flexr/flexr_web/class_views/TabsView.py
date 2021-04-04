@@ -98,8 +98,6 @@ class TabsView(LoginRequiredMixin, View):
         return redirect(request.session['prev_url'])
 
 
-
-
     def open_tab(self, request, *args, **kwargs):
         """
         Gerald: This seems to do the same thing as self.add_tab
@@ -119,6 +117,26 @@ class TabsView(LoginRequiredMixin, View):
             request.session['err_message'] = "Tab could not be opened"
             
         return redirect(request.session['prev_url'])
+
+    def post(self, request):
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
+        search = request.POST.get('search')
+        tabs = curr_account.tabs.all()
+        tabs = tabs.filter(site__url__icontains=search)
+        print(tabs)
+        history = curr_account.history.all()
+        sites = curr_account.sites.all()
+        bookmarks = curr_account.bookmarks.all()
+        notes = curr_account.notes.all()
+        folders = curr_account.shared_folders.all()
+        suggested_sites = curr_account.suggested_sites.order_by('-site_ranking')
+        request.session['prev_url'] = "/"
+        # display the page
+        form = AccountForm
+        filtered = True
+        return render(self.request, "flexr_web/open_tabs.html",
+                      {"Tabs": tabs, "filtered": filtered})
 
 @method_decorator(csrf_exempt, name='dispatch')
 class TabAPIView(View):
