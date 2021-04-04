@@ -17,7 +17,7 @@
     box-shadow: 1px 5px 15px 1px #ccd3eb;
     margin-left: 5%;
     padding-left: 15%;
-    margin-top: 3%;
+    margin-top: 2%;
 }
 
 .nav-link {
@@ -197,7 +197,7 @@ h2{
     width: 14%; /* Set the width of the sidebar */
     margin-left:2%;
     margin-right: 2%;
-    margin-top: 2.5%;
+    margin-top: 2.4%;
     border-radius: 7px;
     position: fixed; /* Fixed Sidebar (stay in place on scroll) */
     z-index: 1; /* Stay on top */
@@ -220,7 +220,7 @@ h2{
     width: 14%; /* Set the width of the sidebar */
     margin-left:2%;
     margin-right: 2%;
-    margin-top: 2.5%;
+    margin-top: 2.4%;
     border-radius: 7px;
     position: fixed; /* Fixed Sidebar (stay in place on scroll) */
     z-index: 1; /* Stay on top */
