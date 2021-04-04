@@ -303,7 +303,7 @@ class Bookmark(models.Model):
         return str(self.bookmark_name)
 
     @classmethod
-    def create_bookmark(cls, tab, curr_account, name='bookmark', last_visited=None):
+    def create_bookmark(cls, tab, curr_account, last_visited=None):
         try:
             bm = Bookmark.objects.create(account = curr_account, bookmark_name = name, site=tab.site)
             bm.save()
