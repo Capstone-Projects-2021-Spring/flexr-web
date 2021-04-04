@@ -17,7 +17,7 @@
     box-shadow: 1px 5px 15px 1px #ccd3eb;
     margin-left: 5%;
     padding-left: 15%;
-    
+    margin-top: 2%;
 }
 
 .nav-link {
@@ -48,9 +48,11 @@
 .body{
     margin-left: 2%;
     margin-right: 2%;
+    
 }
 
 body{
+    
     padding-right: 1%;
     padding-left: 15%;
     font-family: 'Ubuntu', sans-serif;
@@ -184,11 +186,11 @@ h2{
     color: white;
     font-size: .7rem;
     text-align:center;
-    height: 90%; /* Full-height: remove this if you want "auto" height */
+    height: 88.5%; /* Full-height: remove this if you want "auto" height */
     width: 14%; /* Set the width of the sidebar */
     margin-left:2%;
     margin-right: 2%;
-    margin-top: 1%;
+    margin-top: 2.5%;
     border-radius: 7px;
     position: fixed; /* Fixed Sidebar (stay in place on scroll) */
     z-index: 1; /* Stay on top */
@@ -207,11 +209,11 @@ h2{
     color: white;
     font-size: .7rem;
     text-align:center;
-    height: 90%; /* Full-height: remove this if you want "auto" height */
+    height: 88.5%; /* Full-height: remove this if you want "auto" height */
     width: 14%; /* Set the width of the sidebar */
     margin-left:2%;
     margin-right: 2%;
-    margin-top: 1%;
+    margin-top: 2.5%;
     border-radius: 7px;
     position: fixed; /* Fixed Sidebar (stay in place on scroll) */
     z-index: 1; /* Stay on top */
