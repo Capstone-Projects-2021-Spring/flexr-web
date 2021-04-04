@@ -25,9 +25,11 @@ class FriendView(LoginRequiredMixin, DetailView):
 
     def add_friend(self, request):
         friend_acc_id = request.POST.get('account_friend')
+        print(friend_acc_id)
         friend_account = Account.objects.get(account_id=friend_acc_id)
         user_account = request.user.accounts.get(account_id=request.session['account_id'])
         friend_request = Friendship.objects.get_or_create(sent=user_account, received=friend_account)
+        print(friend_request)
         request.session['message'] = "Friend request sent"
         return redirect(request.session['prev_url'])
 

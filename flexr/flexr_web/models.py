@@ -153,7 +153,7 @@ class Site(models.Model):
 
     # TODO Are these necessary?
     open_tab = models.BooleanField(verbose_name="Is this site opened in a tab?", default=True)
-    bookmarked = models.BooleanField(verbose_name="Is this site bookmarked?", default = False)
+    bookmarked = models.IntegerField(verbose_name="Is this site bookmarked?", default = 0)
 
     # TODO Add functionality once a site is visited (check the Tab class)
     def visited(self):
@@ -305,9 +305,12 @@ class Bookmark(models.Model):
     @classmethod
     def create_bookmark(cls, tab, curr_account, last_visited=None):
         try:
-            Bookmark.objects.create(account = curr_account, bookmark_name = tab.url, site=tab.site)
+            bm = Bookmark.objects.create(account = curr_account, bookmark_name = name, site=tab.site)
+            bm.save()
+            return bm.id
         except:
             print('bookmark already exists')
+        
     
     @classmethod
     def delete_bookmark(cls, id):

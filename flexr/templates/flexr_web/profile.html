@@ -58,14 +58,20 @@
             </button>
           </div>
           <div class="modal-body">
+                {% for account in AllAccounts %}
+                    <br>
+                    <form style="margin: 10%;" method="post" action = "/add_friend/"><p style="display: inline;"><input hidden name = "account_friend" value = "{{account.account_id}}"></input>{{account.username}} - {{account.user.first_name}} {{account.user.last_name}} {{account.account_id}}</p><button style="display: inline;" type="submit" class="btn btn-primary">Add Friend!</button></option>
+                    <br>
+                {% endfor %}
               <form method="post" action="/add_friend/">
                    {% csrf_token %}
 <!--                    <input type="text" id="tags" name = "account_friend">-->
-                    <select name = "account_friend">
+                    <!-- <select name = "account_friend">
                         {% for account in AllAccounts %}
                             <option value = {{account.account_id}}>{{account.username}} - {{account.user.first_name}} {{account.user.last_name}} {{account.account_id}}</option>
                         {% endfor %}
-                    </select>
+                    </select> -->
+                    
                   <script>
                   $( function() {
                         var availableTags = [
@@ -80,7 +86,7 @@
                   </script>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Send friend request!</button>
+                    <!-- <button type="submit" class="btn btn-primary">Send friend request!</button> -->
                 </div>
             </form>
           </div>
