@@ -1,12 +1,18 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.views import View
+from django.views.generic import DetailView
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+import json
 import pytz
 
 from ..models import *
 from ..forms import *
+from ..serializers import BookmarkSerializer, BookmarkFolderSerializer
 
 # TODO: Gerald add request messages
 # TODO: Gerald add comments
@@ -91,7 +97,7 @@ class BookmarkFolderView(LoginRequiredMixin, View):
         """
         Display a single shared folder
         """
-
+  
         # get the current account and requested shared folder
         current_acc = request.user.accounts.get(account_id = request.session['account_id'])
         bookmark_folder = current_acc.bookmark_folders.get(id = kwargs['pk'])
@@ -116,6 +122,35 @@ class BookmarkFolderView(LoginRequiredMixin, View):
           "formb": formb,
           "form": form,
           "Bookmarks": bookmarks})
+
+    def create_bookmark_folder_web(self, request, *args, **kwargs):
+    
+        form = BookmarkFolderForm(request.POST)
+
+        # check that the form is valid
+        if form.is_valid():
+            # form.save()
+            #print(request.POST)
+
+            # grab information from the form
+            title = form.cleaned_data['title']
+            owner = request.user.accounts.get(account_id = request.session['account_id'])
+            bookmarks = form.cleaned_data['bookmarks']
+
+            # create shared folder object and set its attributes
+            folder = bookmarkFolder.objects.create(title = title, owner = owner)
+            folder.bookmarks.set(bookmarks)
+            folder.save()
+
+        # request message for debugging
+            request.session['message'] = "Bookmark Folder created"
+
+        else:
+            request.session['err_message'] = "Bookmark Folder not created."
+            #print(form.errors)
+
+        # return to shared folders page
+        return redirect(request.session['prev_url'])
           
     def edit_bookmark_folder(self, request, *args, **kwargs):
         current_acc = request.user.accounts.get(account_id=request.session['account_id'])
@@ -138,7 +173,91 @@ class BookmarkFolderView(LoginRequiredMixin, View):
 
 
             request.session['message'] = "Bookmark edited"
-
-        # display requested note after editing 
         return redirect(request.session['prev_url'])
 
+    def delete_bookmark_folder_web(self, request, *args, **kwargs):
+        current_acc = request.user.accounts.get(account_id = request.session['account_id'])
+        obj = current_acc.bookmark_folders.get(id=kwargs['pk'])
+            # delete note object
+        obj.delete()
+
+            # return to notes page
+        return redirect('/bookmarks')
+
+@method_decorator(csrf_exempt, name='dispatch')
+class BookmarkFoldersViewAPI(LoginRequiredMixin, DetailView):
+
+    def post(self, request, *args, **kwargs):
+        """
+            Adds a bookmark to a bookmark table for the specific account
+                    Parameters:
+                        request.PUT has a form for data for a bookmark
+                    Returns:
+                        JSONRequest with success or error message
+        """
+
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+
+        data = json.loads(request.body)
+
+        # if 'url' in data:
+        #     site = Site.objects.get_or_create(account = curr_account, url = data['url'])[0]
+        #     data['site_id'] = site.id
+
+        bookmark_folder = bookmarkFolder.objects.create(owner=curr_account, **data)
+
+        data = BookmarkFolderSerializer(bookmark_folder)
+        
+        return JsonResponse(data.data, safe=False)
+
+    def get(self, request, *args, **kwargs):
+        """
+        Gets a specific bookmark from a bookmark table for the specific account
+                    Parameters:
+                        request.GET has an id for a bookmark
+                    Returns:
+                        JSONRequest with success message and a bookmark or error message
+        """
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+
+        bookmark_folder = bookmarkFolder.objects.filter(owner = curr_account)
+        data = BookmarkFolderSerializer(bookmark_folder, many=True)
+        return JsonResponse(data.data, safe=False)
+
+    def delete(self, request, *args, **kwargs):
+        user = request.user
+        account = user.accounts.get(account_id = request.session['account_id'])
+
+        folder = bookmarkFolder.objects.filter(owner = account, pk = kwargs["id"]).delete()
+
+        # folder = account.bookmark_folders.get(pk=kwargs['pk']).delete()
+        # obj = account.bookmark_folders.get(id = kwargs['pk'])
+            # delete note object
+        # obj.delete()
+        return JsonResponse({"successful": "folder deleted"})
+
+    def put(self, request, *args, **kwargs):
+        """
+            Edits a bookmark from a bookmark table for the specific account
+                    Parameters:
+                        request.PUT has a form for data for the edited bookmark
+                    Returns:
+                        JSONRequest with success or error message
+        """
+        
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+
+        data = json.loads(request.body)
+
+        # if 'url' in data:
+        #     site = Site.objects.get_or_create(account = curr_account, url = data['url'])[0]
+        #     data['site_id'] = site.id
+
+        result = bookmarkFolder.objects.filter(owner = curr_account, pk = kwargs["id"]).update(**data)
+
+        # data = BookmarkFolderSerializer(result)
+        
+        return JsonResponse({"successful": "folder updated"})
