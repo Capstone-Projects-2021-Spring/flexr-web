@@ -14,7 +14,7 @@ from ..forms import *
 from ..serializers import SiteSerializer
 
 class SuggestedSiteAPIView(LoginRequiredMixin, View):
-
+    @method_decorator(csrf_exempt)
     def get(self, request):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])

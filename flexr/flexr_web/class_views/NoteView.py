@@ -20,7 +20,7 @@ from ..forms import *
 # TODO: Gerald more comments
 class NoteView(LoginRequiredMixin, View):
 
-    def get(self, *args, **kwargs):
+    def get(self,request,  *args, **kwargs):
         """
         Display a single note
         """
@@ -58,6 +58,7 @@ class NoteView(LoginRequiredMixin, View):
                 locked = False
             del self.request.session['note_unlocked']
 
+        request.session['prev_url'] = '/opennote/'+ str(kwargs['pk'])+'/'
         # display note on the page
         return render(self.request, "flexr_web/note.html", 
         {"object": obj, 
@@ -92,10 +93,11 @@ class NoteView(LoginRequiredMixin, View):
 
         # request messages for debugging
             request.session['message'] = "Note edited"
-        request.session['err_message'] = "Note could not be edited"
+        else:
+            request.session['err_message'] = "Note could not be edited"
 
         # display requested note after editing 
-        return redirect('/opennote/'+str(obj.id))
+        return redirect(request.session['prev_url'])
 
     def unlock_note(self, request, *args, **kwargs):
         """
@@ -118,7 +120,7 @@ class NoteView(LoginRequiredMixin, View):
             request.session['err_message'] = "Wrong password"
 
         # display requested note after unlock attempt
-        return redirect('/opennote/' + str(kwargs['pk']))
+        return redirect(request.session['prev_url'])
 
 
 @method_decorator(csrf_exempt, name='dispatch')

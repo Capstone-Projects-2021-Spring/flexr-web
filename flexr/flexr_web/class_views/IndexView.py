@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
+from django.utils.decorators import method_decorator
 from django.views import View
 
 from ..models import *
@@ -63,11 +64,14 @@ class IndexView(LoginRequiredMixin, View):
 
         # get account form object
         form = AccountForm
-
+        request.session['prev_url'] = "/"
         # display the page
+        filtered = False
+        print(notes)
         return render(request, "flexr_web/index.html",
-                      {"curr_acc": curr_account, 
-                       "Accounts": accounts, 
+                      {
+                       # "Accounts": accounts,
+                      "filtered": filtered,
                        "Sites": sites,
                        "Suggested_Sites": suggested_sites,
                        "Tabs": tabs, 
@@ -76,3 +80,34 @@ class IndexView(LoginRequiredMixin, View):
                        "Bookmarks": bookmarks, 
                        "Folders":folders,
                        "form": form})
+
+    def post(self, request):
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
+        search = request.POST.get('search')
+        tabs = curr_account.tabs.all()
+        tabs = tabs.filter(site__url__icontains=search)
+        print(tabs)
+        history = curr_account.history.all()
+        sites = curr_account.sites.all()
+        bookmarks = curr_account.bookmarks.all()
+        notes = curr_account.notes.all()
+        folders = curr_account.shared_folders.all()
+        suggested_sites = curr_account.suggested_sites.order_by('-site_ranking')
+        request.session['prev_url'] = "/"
+        # display the page
+        form = AccountForm
+        filtered = True
+        return render(request, "flexr_web/index.html",
+                      {
+                          "filtered": filtered,
+                          # "Accounts": accounts,
+                          "Sites": sites,
+                          "Suggested_Sites": suggested_sites,
+                          "Tabs": tabs,
+                          "Notes": notes,
+                          "History": history,
+                          "Bookmarks": bookmarks,
+                          "Folders": folders,
+                          "form": form})
+        # return redirect('/')

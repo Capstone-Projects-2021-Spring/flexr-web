@@ -59,7 +59,8 @@ class Device(serializers.ModelSerializer):
 
 class SharedFolderSerializer(serializers.ModelSerializer):
     class Meta:
-        pass
+        model = sharedFolder
+        fields = ['id', 'title', 'description', 'collaborators', 'bookmarks', 'tabs', 'notes']
 
 class FriendshipSerializer(serializers.ModelSerializer):
     sent = AccountSerializer(many=False, read_only=True)

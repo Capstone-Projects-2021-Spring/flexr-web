@@ -84,6 +84,7 @@ class BookmarksView(LoginRequiredMixin, View):
         # request message for debugging
         request.session['message'] = "Bookmark Filtered"
 
+        request.session['prev_url'] = '/bookmarks/'
         # Gerald: using redirect doesn't work here?
         return render(request, "flexr_web/bookmarks.html",
          {"Bookmarks": bookmarks, 
@@ -93,7 +94,7 @@ class BookmarksView(LoginRequiredMixin, View):
           "form": form})
 
 
-    def get(self, *args, **kwargs):
+    def get(self,request, *args, **kwargs):
         """
         Display the bookmarks page
         """
@@ -120,6 +121,7 @@ class BookmarksView(LoginRequiredMixin, View):
             del self.request.session['err_message']
             messages.error(self.request, message)
 
+        request.session['prev_url'] = '/bookmarks/'
         # display the page
         return render(self.request, "flexr_web/bookmarks.html", 
         {"Bookmarks": bookmarks,
@@ -152,7 +154,7 @@ class BookmarksView(LoginRequiredMixin, View):
         request.session['message'] = "Bookmark Created"
 
         # go to open_tabs page
-        return redirect('/open_tabs')
+        return redirect(request.session['prev_url'])
 
 
     def delete_bookmark(self, request, *args, **kwargs):
@@ -171,7 +173,7 @@ class BookmarksView(LoginRequiredMixin, View):
         request.session['message'] = "Bookmark Deleted"
         
         # return to bookmarks page
-        return redirect('/bookmarks')
+        return redirect(request.session['prev_url'])
 
 @method_decorator(csrf_exempt, name='dispatch')
 class BookmarksViewAPI(LoginRequiredMixin, DetailView):

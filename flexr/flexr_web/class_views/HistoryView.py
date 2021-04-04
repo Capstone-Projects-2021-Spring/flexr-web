@@ -22,14 +22,14 @@ class HistoryView(LoginRequiredMixin, View):
     View class for the history page
     """
 
-    def get(self, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         """
         Display the history page
         """
         
         # get current user and current account
-        curr_user = self.request.user
-        curr_account = curr_user.accounts.get(account_id = self.request.session['account_id'])
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
 
         # get all user's accounts and history
         accounts = curr_user.accounts.all()
@@ -39,19 +39,19 @@ class HistoryView(LoginRequiredMixin, View):
         form = FilterHistoryForm
 
         # request messages for debugging
-        if ('message' in self.request.session):
-            message = self.request.session['message']
-            del self.request.session['message']
-            messages.success(self.request, message)
+        if ('message' in request.session):
+            message = request.session['message']
+            del request.session['message']
+            messages.success(request, message)
 
-        elif ('err_message' in self.request.session):
-            message = self.request.session['err_message']
-            del self.request.session['err_message']
-            messages.error(self.request, message)
+        elif ('err_message' in request.session):
+            message = request.session['err_message']
+            del request.session['err_message']
+            messages.error(request, message)
 
-
+        request.session['prev_url'] = '/browsing_history/'
         # display the page
-        return render(self.request, "flexr_web/browsing_history.html",
+        return render(request, "flexr_web/browsing_history.html",
          {"History": history, 
           "Accounts": accounts,
           "form": form})
@@ -143,7 +143,7 @@ class HistoryView(LoginRequiredMixin, View):
         request.session['message'] = "History Deleted"
 
         # return to history page
-        return redirect('/browsing_history/')
+        return redirect(request.session['prev_url'])
         
 @method_decorator(csrf_exempt, name='dispatch')
 class HistoryViewAPI(LoginRequiredMixin, DetailView):

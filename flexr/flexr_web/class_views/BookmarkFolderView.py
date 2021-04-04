@@ -85,6 +85,7 @@ class BookmarkFolderView(LoginRequiredMixin, View):
         # request message for debugging
         request.session['message'] = "Bookmark Filtered"
 
+        request.session['prev_url'] = '/bookmark_folder/'+str(kwargs['pk'])+'/'
         # Gerald: using redirect doesn't work here?
         return render(request, "flexr_web/bookmark_folder.html",
          {"Bookmarks": bookmarks, 
@@ -92,13 +93,13 @@ class BookmarkFolderView(LoginRequiredMixin, View):
           "bookmark_folder": bookmark_folder,
           "form": form})
 
-    def get(self, *args, **kwargs):
+    def get(self,request,  *args, **kwargs):
         """
         Display a single shared folder
         """
-
+  
         # get the current account and requested shared folder
-        current_acc = self.request.user.accounts.get(account_id = self.request.session['account_id'])
+        current_acc = request.user.accounts.get(account_id = request.session['account_id'])
         bookmark_folder = current_acc.bookmark_folders.get(id = kwargs['pk'])
         form = FilterBookmarkForm
         formb = EditBookmarkForm()
@@ -114,9 +115,9 @@ class BookmarkFolderView(LoginRequiredMixin, View):
         # we may want to add a field to each object that says "shared"
 
         # return render(request, "flexr_web/shared_folder.html", {"SharedFolder": shared_folder, "Collaborators": collaborators, "Tabs": tabs, "Bookmarks": bookmarks, "Notes": notes})
-
+        request.session['prev_url'] = '/bookmark_folder/' + str(kwargs['pk'])
         # display the page
-        return render(self.request, "flexr_web/bookmark_folder.html",
+        return render(request, "flexr_web/bookmark_folder.html",
          {"bookmark_folder": bookmark_folder, 
           "formb": formb,
           "form": form,
@@ -149,7 +150,7 @@ class BookmarkFolderView(LoginRequiredMixin, View):
             #print(form.errors)
 
         # return to shared folders page
-        return redirect('/bookmarks')
+        return redirect(request.session['prev_url'])
           
     def edit_bookmark_folder(self, request, *args, **kwargs):
         current_acc = request.user.accounts.get(account_id=request.session['account_id'])
@@ -172,8 +173,7 @@ class BookmarkFolderView(LoginRequiredMixin, View):
 
 
             request.session['message'] = "Bookmark edited"
-
-        return redirect('/bookmark_folder/'+str(bookmark_folder.id))
+        return redirect(request.session['prev_url'])
 
     def delete_bookmark_folder_web(self, request, *args, **kwargs):
         current_acc = request.user.accounts.get(account_id = request.session['account_id'])
