@@ -117,3 +117,9 @@ h2{
     cursor: pointer;
     color: grey;
 }
+
+.form-control{
+     width: 30%;
+     display: inline;
+     margin-left: 20%;
+}
