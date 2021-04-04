@@ -42,6 +42,10 @@ class SharedFolderView(LoginRequiredMixin, View):
         notes = shared_folder.notes.all()
 
         form = EditSharedFolder()
+        form.fields['bookmarks'].queryset = current_acc.bookmarks.all()
+        form.fields['tabs'].queryset = current_acc.tabs.all()
+        form.fields['notes'].queryset = current_acc.notes.all()
+        
         form.fields["title"].initial = shared_folder.title
         form.fields["description"].initial = shared_folder.description
         form.fields["collaborators"].initial = shared_folder.collaborators.all()

@@ -104,6 +104,8 @@ class BookmarkFolderView(LoginRequiredMixin, View):
         form = FilterBookmarkForm
         formb = EditBookmarkForm()
         formb.fields['bookmarks'].queryset = current_acc.bookmarks.all()
+        formb.fields["title"].initial = bookmark_folder.title
+        formb.fields["bookmarks"].initial = bookmark_folder.bookmarks.all()
         # grab attributes for the shared folder
         owner = bookmark_folder.owner
         #CHANGE THIS TO NOT USE THE SHARED FOLDERS COLLABORATORS, this was written this way for testing the view method
@@ -160,6 +162,8 @@ class BookmarkFolderView(LoginRequiredMixin, View):
 
         form = EditBookmarkForm(request.POST)
         form.fields['bookmarks'].queryset = current_acc.bookmarks.all()
+        form.fields["title"].initial = bookmark_folder.title
+        form.fields["bookmarks"].initial = bookmark_folder.bookmarks.all()
         # check if form is valid
         if form.is_valid():
 
