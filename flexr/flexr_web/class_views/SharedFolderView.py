@@ -139,7 +139,8 @@ class FoldersViewAPI(LoginRequiredMixin, DetailView):
         usero = request.user
         accounto = usero.accounts.get(account_id = request.session['account_id'])
         data = json.loads(request.body)
-        sharedFolder.objects.filter(pk = kwargs["id"]).update(**data)
+        shared_folder = sharedFolder.objects.filter(pk = kwargs["id"])
+        shared_folder.update(**data)
         data = SharedFolderSerializer(shared_folder)
         return JsonResponse(data.data, safe=False)
 
@@ -150,8 +151,8 @@ class FoldersViewAPI(LoginRequiredMixin, DetailView):
         usero = request.user
         accounto = usero.accounts.get(account_id = request.session['account_id'])
         data = json.loads(request.body)
-        # data = folderSerializer(to be written and finalized)
-        foldo = sharedFolder.objects.create(**data, owner=accounto)
+        shared_folder = sharedFolder.objects.create(**data, owner=accounto)
+        data = SharedFolderSerializer(shared_folder)
         return JsonResponse(data.data, safe=False)
 
     def get(self, request, *args, **kwargs):
