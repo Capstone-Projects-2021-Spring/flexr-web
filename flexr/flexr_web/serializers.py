@@ -2,41 +2,50 @@ from rest_framework import serializers
 
 from .models import *
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'email']
 
 class AccountSerializer(serializers.ModelSerializer):
-
+    # user = UserSerializer(many=False, read_only=True)
     class Meta:
         model = Account
         fields = ['account_id', 'user', 'username', 'email', 'phone_number', 'date_joined', 'type_of_account',
         'account_preferences', 'account_id']
 
 class SiteSerializer(serializers.ModelSerializer):
+    account = AccountSerializer(many=False, read_only=False)
     class Meta:
         model = Site
         fields = ['id', 'name', 'account', 'suggested_sites', 'url', 'first_visit', 'last_visit', 'recent_frequency',
                   'number_of_visits', 'site_ranking', 'open_tab', 'bookmarked']
 
 class TabSerializer(serializers.ModelSerializer):
+    # site = SiteSerializer(many=False, read_only=False)
+    # account = AccountSerializer(many=False, read_only=False)
     class Meta:
         model = Tab
         fields = ['id', 'account', 'site','url', 'created_date', 'last_visited', 'status']
 
 class HistorySerializer(serializers.ModelSerializer):
+    # site = SiteSerializer(many=False, read_only=False)
+    # account = AccountSerializer(many = False, read_only=False)
     class Meta:
         model = History
         fields = ['id', 'site','url', 'account', 'visit_datetime']
 
 class BookmarkSerializer(serializers.ModelSerializer):
+    # site = SiteSerializer(many=False)
     class Meta:
         model = Bookmark
         fields = ['id', 'account','url', 'bookmark_name', 'created_date', 'site', 'last_visited',
         'recent_frequency', 'number_of_visits']
 
 class BookmarkFolderSerializer(serializers.ModelSerializer):
+    owner = AccountSerializer(many=False, read_only=True)
+    bookmarks = BookmarkSerializer(many=True, read_only=False)
     class Meta:
         model = bookmarkFolder
         fields = ['id', 'owner', 'title', 'created_date', 'bookmarks']
