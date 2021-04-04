@@ -1,9 +1,22 @@
+.dropdown-menu{
+    width: 500%;
+    text-align: center;
+}
+
+.nav{
+    background-color: #00C4EE;
+    color: white;
+    
+}
+
 #navDiv{
     background-image: linear-gradient(90deg, #00C4EE,#0087C2);
     margin-bottom: 2%;
     border-radius: 7px;
-    width: 100%;
+    width: 90%;
     box-shadow: 1px 5px 15px 1px #ccd3eb;
+    margin-left: 5%;
+    padding-left: 15%;
     
 }
 
@@ -11,7 +24,8 @@
 	color: white;
     border-radius: 7px;
     font-size: x-large;
-	transition: all .5s ease;
+    transition: all .5s ease;
+    
 }
 
 .nav-item:hover {
@@ -31,30 +45,19 @@
     right:5%;
 }
 
+.body{
+    margin-left: 2%;
+    margin-right: 2%;
+}
+
 body{
     padding-right: 1%;
     padding-left: 15%;
     font-family: 'Ubuntu', sans-serif;
-}
-.dropdown-menu{
-    width: 500%;
-    text-align: center;
-}
-
-body {
-    padding-top: 1%;
-    padding-left: 15%;
-    padding-right: 15%;
     background-color: #e5f7fc !important;
 }
 
-.container{
-    max-width: 100%;
-}
-.nav{
-    background-color: #00C4EE;
-    color: white;
-}
+
 
 #plus-icon:hover{
     cursor: pointer;
@@ -70,7 +73,6 @@ body {
     box-shadow: 1px 5px 15px 1px #e5e8f3;
     border-radius: 7px;
     margin-bottom: 2%;
-    padding: 1%;
     transition: all 1s ease;
 }
 
@@ -138,8 +140,7 @@ h2{
 #site{
     
     height: 3rem;
-    width: 106%;
-    margin-left: -1%;
+    width: 110%;
     font-size: larger;
     padding: 2%;
     margin-top: 5% !important;
@@ -161,15 +162,16 @@ h2{
     border: none !important;
     font-size: 1.1rem !important;
     z-index: -1;
-    background-color: #0087C2;
     max-height: 5rem;
     padding: 2%;
     color: white;
     overflow: hidden;
     word-wrap: break-word;
-    box-shadow: inset 10px 0px 10px -10px #001872, inset -30px 0px 30px -30px #001872;
+    background-color: inherit;
+    /* box-shadow: inset 10px 0px 10px -10px #001872, inset -30px 0px 30px -30px #001872; */
     /* box-shadow: inset  1px 1px 5px ; */
 }
+
 .site:hover{
     color: black;
     z-index: 1;
@@ -182,19 +184,67 @@ h2{
     color: white;
     font-size: .7rem;
     text-align:center;
-    height: 100%; /* Full-height: remove this if you want "auto" height */
+    height: 90%; /* Full-height: remove this if you want "auto" height */
     width: 14%; /* Set the width of the sidebar */
+    margin-left:2%;
+    margin-right: 2%;
+    margin-top: 1%;
+    border-radius: 7px;
     position: fixed; /* Fixed Sidebar (stay in place on scroll) */
     z-index: 1; /* Stay on top */
     top: 0; /* Stay at the top */
     left: 0;
-    background-color: #0087C2;
-    /* background-image: linear-gradient( #00C4EE,#0087C2, #00559F
-    , #001872); */
+    /* background-color: #0087C2; */
+    background-image: linear-gradient( #00C4EE,#0087C2, #00559F
+    , #001872);
     overflow-x: hidden; /* Disable horizontal scroll */
     padding-top: 20px;
-    box-shadow: inset  0 0 10px #001872;
-}           
+    /* box-shadow: inset  0 0 10px #001872; */
+}   
+
+/* The sidebar menu */
+.sidenav2 {
+    color: white;
+    font-size: .7rem;
+    text-align:center;
+    height: 90%; /* Full-height: remove this if you want "auto" height */
+    width: 14%; /* Set the width of the sidebar */
+    margin-left:2%;
+    margin-right: 2%;
+    margin-top: 1%;
+    border-radius: 7px;
+    position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+    z-index: 1; /* Stay on top */
+    top: 0; /* Stay at the top */
+    right: 0;
+    /* background-color: #0087C2; */
+    background-image: linear-gradient( #00C4EE,#0087C2, #00559F
+    , #001872);
+    overflow-x: hidden; /* Disable horizontal scroll */
+    padding-top: 20px;
+    /* box-shadow: inset  0 0 10px #001872; */
+}   
+
+#acc{
+    width: 105%;
+    font-size: 1.2rem;
+}
+#acc:hover{
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: black;
+    background-color: #e5f7fc;
+    box-shadow: 1px 1px 10px 0px #001872;
+}
+
+.active_acc{
+    font-size: 1.2rem;
+    color: black;
+    background-color: #e5f7fc;
+    box-shadow: 1px 1px 10px 0px #001872;
+}
+
+
 .fa-window-close:hover{
     cursor: pointer;
     color: grey;
