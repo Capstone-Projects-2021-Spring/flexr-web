@@ -53,6 +53,10 @@ class Device(serializers.ModelSerializer):
         pass
 
 class SharedFolderSerializer(serializers.ModelSerializer):
+    collaborators = AccountSerializer(many=True, read_only=True)
+    bookmarks = BookmarkSerializer(many = True, read_only=True)
+    tabs = TabSerializer(many=True, read_only=True)
+    notes = NoteSerializer(many = True, read_only=True)
     class Meta:
         model = sharedFolder
         fields = ['id', 'title', 'description', 'collaborators', 'bookmarks', 'tabs', 'notes']

@@ -138,17 +138,22 @@
     <div class="col">
       <div class = " sidenav2">
         <!-- <a class="navbar-brand" href="/"><img src="{% static 'flexr_logo_2.png' %}" width="100%"></a> -->
-        <img src="{% static 'flexr_logo.png' %}" width="15%" style="display: inline;  padding-bottom: 5%;"><h1 style="font-size: xx-large; display: inline;">{{user.first_name}} {{user.last_name}}</h1>
+        <span onclick="window.location.href = '/profile'" style="cursor: pointer;">
+        <img src="{% static 'flexr_logo.png' %}" width="15%" style="display: inline;  padding-bottom: 5%;"><h1 style="font-size: xx-large; display: inline;" >{{user.first_name}} {{user.last_name}}</h1>
+        </span>
+        <!-- <div style="border: 10px solid white; margin-top: -1.5%; margin-bottom: 5%;"></div> -->
+      
         <h2 id = "sites-head">Accounts</h2>
           {%for acc in Accounts%}          
-              <div id = "acc" class = "col-lg-10" onclick="window.location.href = '/switch_account/{{acc.account_id}}'">
+              <div id = "acc" class = "col-lg-10" >
                   {%if acc.account_id == curr_acc.account_id%}
                       <h3 class = "active_acc" onclick="window.location.href = '/profile'">{{acc}}</h3>
                   {%else%}
-                      <p>{{acc}}</p>
+                      <p onclick="window.location.href = '/switch_account/{{acc.account_id}}'">{{acc}}</p>
                   {%endif%}
               </div>
           {%endfor%}
+          <!-- <div style="border: 10px solid white; margin-top: -1.5%; margin-bottom: 5%;"></div> -->
           <h3 id = "acc" class = "col-lg-10" onclick = "window.location.href ='/accounts/logout'">Log out</h3>
       </div>
     <div class = "suggested sidenav">
