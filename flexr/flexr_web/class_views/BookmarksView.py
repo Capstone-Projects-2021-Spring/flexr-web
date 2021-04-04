@@ -146,10 +146,14 @@ class BookmarksView(LoginRequiredMixin, View):
 
         # get requested tab object
         tab = curr_account.tabs.get(pk = kwargs['id'])
+        
 
         # create requested bookmark object
-        Bookmark.create_bookmark(tab, curr_account)
-
+        bm_id = Bookmark.create_bookmark(tab, curr_account)
+        site = tab.site
+        site.bookmarked = bm_id
+        site.save()
+        tab.save()
         # request message for debugging
         request.session['message'] = "Bookmark Created"
 
@@ -165,7 +169,10 @@ class BookmarksView(LoginRequiredMixin, View):
         # get current user and current account
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
-
+        bm = curr_account.bookmarks.get(id = kwargs['id'])
+        site = bm.site
+        site.bookmarked = 0
+        site.save()
         # delete requested bookmark
         Bookmark.delete_bookmark(kwargs['id'])
 

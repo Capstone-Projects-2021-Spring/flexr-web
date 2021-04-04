@@ -82,7 +82,8 @@
         <div class="bm-tabs row justify-content-center">
             <div id = "tabs" class="card col-lg-4">
                 <div class = "card-header sticky-top">
-                    <h2 style="display:inline">Open tabs</h2><img id="plus-icon" class="plus-icon" width = 20px; data-toggle="modal" data-target="#add_tab" src="{% static 'icons/plus.png' %}">
+                    <h2 style="display:inline">Open tabs</h2>
+                    <img id="plus-icon" class="plus-icon" width = 20px; data-toggle="modal" data-target="#add_tab" src="{% static 'icons/plus.png' %}">
                     {%if Tabs|length > 6%}
                         <form style="display: inline;" method="post" action="/">{% csrf_token %}<input type="text" name = "search" placeholder="Search for tab..." style="margin-right: 1%;"><button  style="margin-right: 1%;" type="submit" class="btn btn-primary">Search</button> </form>
                         {%if filtered%}
@@ -118,6 +119,14 @@
                             <div class="card-body"  style="">
 
                                 <p onclick="window.open('{{tab.site.url}}')" style="display: inline;">{{tab.site}}</p>
+                                <span style="display: inline;">
+                                
+                                    {%if tab.site.bookmarked > 0%}
+                                        <img class="bm" onclick="window.location.href = 'delete_bookmark/{{tab.site.bookmarked}}'" src="{% static 'icons/bookmarked.png' %}" width= 15px>
+                                    {%else%}
+                                        <img class="bm" onclick="window.location.href = 'add_bookmark/{{tab.id}}'" src="{% static 'icons/empty-bookmark.png' %}" width= 15px>
+                                    {%endif%}
+                                </span>
                             </div>
 
                         </div>
@@ -130,9 +139,14 @@
                 </div>
                 <div class = "card-body row justify-content-center">
                     {%for bm in Bookmarks%}
-                        <div id = "bookmark" class = "tab card col-lg-5"  onclick="window.open('{{bm.site.url}}')">
-                            <p >{{bm.site}}</p>
+                    
+                        <div id = "bookmark" class = "tab card col-lg-5"  >
+                            <p onclick="window.open('{{bm.site.url}}')"  style="display: inline;">{{bm.site}}</p>
+                            <span style="display: inline;">
+                                <img class="bm" onclick="window.location.href = 'delete_bookmark/{{bm.site.bookmarked}}'" src="{% static 'icons/bookmarked.png' %}" width= 15px>
+                            </span>
                         </div>
+
                     {%endfor%}
                 </div>
             </div>
