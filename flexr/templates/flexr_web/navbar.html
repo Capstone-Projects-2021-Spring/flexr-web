@@ -43,13 +43,13 @@
           <a class="nav-link" href="/">Home</a>
         </li>
 
-          <li class="nav-item">
+        <li class="nav-item">
           <a class="nav-link" href="/browsing_history">History</a>
         </li>
           <li class="nav-item">
           <a class="nav-link" href="/notes">Notes</a>
         </li>
-          <li class="nav-item">
+        <li class="nav-item">
           <a class="nav-link" href="/open_tabs">Tabs</a>
         </li>
         <li class="nav-item">
@@ -134,14 +134,26 @@
           {%endif%}
       {%endfor%}
     {%endif %}
+    
+      
     <div class = "suggested sidenav">
+     
       <a class="navbar-brand" href="/"><img src="{% static 'flexr_logo_2.png' %}" width="100%"></a>
+      <h2 id = "sites-head">Bookmarks</h2>
+      {%for site in Suggested_Sites%}
+              <div id = "site" class = "site card col-lg-12" onclick="window.open('{{site.url}}'); ">
+                      <p>{{site.name}}</p>
+              </div>
+      {%endfor%}
+      <hr style="color: white;">
       <h2 id = "sites-head">Suggested Sites</h2>
       {%for site in Suggested_Sites%}
               <div id = "site" class = "site card col-lg-12" onclick="window.open('{{site.url}}'); ">
                       <p>{{site.name}}</p>
               </div>
       {%endfor%}
+
+      
     </div>
 
     

@@ -85,10 +85,11 @@
                     <h2 style="display:inline">Open tabs</h2>
                     <img id="plus-icon" class="plus-icon" width = 20px; data-toggle="modal" data-target="#add_tab" src="{% static 'icons/plus.png' %}">
                     {%if Tabs|length > 6%}
-                        <form style="display: inline;" method="post" action="/">{% csrf_token %}<input type="text" name = "search" placeholder="Search for tab..." style="margin-right: 1%;"><button  style="margin-right: 1%;" type="submit" class="btn btn-primary">Search</button> </form>
-                        {%if filtered%}
-                            <button class="btn btn-primary" onclick="window.location.href = '/'">Reset</button>
-                        {%endif%}
+                        <form style="display: inline;" method="post" action="/">{% csrf_token %}<input class="form-control" width= 20% type="text" name = "search" placeholder="Search for tab..." style="margin-right: 1%;"><button  style="margin-right: 1%;" type="submit" class="btn btn-primary">Search</button> </form>
+                        
+                    {%endif%}
+                    {%if filtered%}
+                        <button class="btn btn-primary form-control" onclick="window.location.href = '/'">Reset</button>
                     {%endif%}
                 </div>
                 <script>

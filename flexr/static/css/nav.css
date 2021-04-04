@@ -17,7 +17,7 @@
     box-shadow: 1px 5px 15px 1px #ccd3eb;
     margin-left: 5%;
     padding-left: 15%;
-    margin-top: 2%;
+    margin-top: 3%;
 }
 
 .nav-link {
@@ -142,9 +142,9 @@ h2{
 #site{
     
     height: 3rem;
-    width: 110%;
+    width: 102%;
     font-size: larger;
-    padding: 2%;
+    padding: 1%;
     margin-top: 5% !important;
 }
 #site:hover{
@@ -165,7 +165,7 @@ h2{
     font-size: 1.1rem !important;
     z-index: -1;
     max-height: 5rem;
-    padding: 2%;
+    padding: 1%;
     color: white;
     overflow: hidden;
     word-wrap: break-word;
@@ -179,6 +179,13 @@ h2{
     z-index: 1;
     background-color: #e5f7fc;
     box-shadow: 1px 1px 10px 0px #001872;
+    transition: width 2s;
+    transition-timing-function: linear;
+    text-align: center;
+    /* -webkit-transition: all 1s ease;
+	-moz-transition: all 1s ease;
+	-o-transition: all 1s ease;
+	-ms-transform: all 1s ease; */
 }
 
 /* The sidebar menu */
