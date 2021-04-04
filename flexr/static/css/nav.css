@@ -212,7 +212,7 @@ h2{
 }   
 
 /* The sidebar menu */
-.sidenav2 {
+.sidenav4 {
     color: white;
     font-size: .7rem;
     text-align:center;
@@ -227,12 +227,32 @@ h2{
     top: 0; /* Stay at the top */
     right: 0;
     /* background-color: #0087C2; */
-    background-image: linear-gradient( #00C4EE,#0087C2, #00559F
-    , #001872);
+    background-image: linear-gradient(#00C4EE,#0087C2, #00559F);
     overflow-x: hidden; /* Disable horizontal scroll */
     padding-top: 20px;
     /* box-shadow: inset  0 0 10px #001872; */
 }   
+
+.sidenav2{
+    color: white;
+    font-size: .7rem;
+    text-align:center;
+    height: 44%; /* Full-height: remove this if you want "auto" height */
+    width: 14%; /* Set the width of the sidebar */
+    margin-left: 2%;
+    margin-right: 2%;
+    margin-top: 2.4%;
+    border-radius: 7px;
+    position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+    z-index: 1; /* Stay on top */
+    top: 0; /* Stay at the top */
+    right: 0;
+    /* background-color: #0087C2; */
+    background-image: linear-gradient(#00C4EE,#0087C2, #00559F);
+    overflow-x: hidden; /* Disable horizontal scroll */
+    padding-top: 20px;
+    /* box-shadow: inset  0 0 10px #001872; */
+}
 
 #acc{
     width: 105%;
