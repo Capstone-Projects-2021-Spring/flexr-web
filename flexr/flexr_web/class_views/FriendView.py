@@ -84,7 +84,6 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
         friendships_recieved = curr_account.to_friend.all()
         # this merges two sets
         friendships = friendships_sent | friendships_recieved
-
         data = FriendshipSerializer(friendships, many=True)
         return JsonResponse(data.data, safe=False)
 
@@ -109,7 +108,10 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
         friendships_sent = curr_account.from_friend.all()
         friendships_recieved = curr_account.to_friend.all()
         friendships = friendships_sent | friendships_recieved
-        friendship = friendships.get(id = kwargs['id'])
+        print(friendships[0].id )
+        print(friendships[1].id)
+        friendship = Friendship.objects.get(id = kwargs['id'])
+        print(friendship)
         friendship.status = "Accepted"
         friendship.save()
         data = FriendshipSerializer(friendships, many=True)
@@ -122,7 +124,7 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
         friendships_sent = curr_account.from_friend.all()
         friendships_recieved = curr_account.to_friend.all()
         friendships = friendships_sent | friendships_recieved
-        friendship = friendships.get(id = kwargs['id'])
+        friendship = Friendship.objects.get(id = kwargs['id'])
         friendship.status = "Declined"
         friendship.save()
         data = FriendshipSerializer(friendships, many=True)
