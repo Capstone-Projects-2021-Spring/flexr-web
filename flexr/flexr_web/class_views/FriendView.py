@@ -88,10 +88,9 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
         return JsonResponse(data.data, safe=False)
 
     @method_decorator(csrf_exempt)
-    def delete(self, request, *args, **kwargs):
+    def delete_friend(self, request, *args, **kwargs):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
-
         friendships_sent = curr_account.from_friend.all()
         friendships_recieved = curr_account.to_friend.all()
         friendships = friendships_sent | friendships_recieved
