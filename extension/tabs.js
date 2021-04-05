@@ -11,8 +11,9 @@ window.onload = function () {
         var request = new XMLHttpRequest();
             
         request.open("GET", "http://127.0.0.1:8000/api/tabs/");
-        request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        request.send("username=admin2&password=password");
+        //request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        //request.send("username=admin2&password=password");
+        request.send();
         request.onload = () => {
             console.log(request);
             if (request.status == 200){
