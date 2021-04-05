@@ -80,4 +80,4 @@ class FriendshipSerializer(serializers.ModelSerializer):
     received = AccountSerializer(many=False, read_only=True)
     class Meta:
         model = Friendship
-        fields = ['sent', 'received', 'status', 'sent_date', 'accepted_date']
+        fields = ['id','sent', 'received', 'status', 'sent_date', 'accepted_date']

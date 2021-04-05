@@ -84,19 +84,24 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
         friendships_recieved = curr_account.to_friend.all()
         # this merges two sets
         friendships = friendships_sent | friendships_recieved
-
         data = FriendshipSerializer(friendships, many=True)
         return JsonResponse(data.data, safe=False)
 
     @method_decorator(csrf_exempt)
-    def delete(self, request, *args, **kwargs):
+    def delete_friend(self, request, *args, **kwargs):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
-
         friendships_sent = curr_account.from_friend.all()
         friendships_recieved = curr_account.to_friend.all()
         friendships = friendships_sent | friendships_recieved
         friendship = friendships.get(id = kwargs['id'])
+
+        if(friendship.sent is not curr_account):
+            curr_account.all_friends.remove(friendship.sent)
+            friendship.sent.all_friends.remove(curr_account)
+        else:
+            curr_account.all_friends.remove(friendship.received)
+            friendship.received.all_friends.remove(curr_account)
         friendship.status = "Declined"
         friendship.save()
         data = FriendshipSerializer(friendships, many=True)
@@ -110,6 +115,7 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
         friendships_recieved = curr_account.to_friend.all()
         friendships = friendships_sent | friendships_recieved
         friendship = friendships.get(id = kwargs['id'])
+        print(friendship)
         friendship.status = "Accepted"
         friendship.save()
         data = FriendshipSerializer(friendships, many=True)
