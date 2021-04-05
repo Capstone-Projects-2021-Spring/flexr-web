@@ -107,8 +107,6 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
         friendships_sent = curr_account.from_friend.all()
         friendships_recieved = curr_account.to_friend.all()
         friendships = friendships_sent | friendships_recieved
-        print(friendships[0].id )
-        print(friendships[1].id)
         friendship = Friendship.objects.get(id = kwargs['id'])
         print(friendship)
         friendship.status = "Accepted"
