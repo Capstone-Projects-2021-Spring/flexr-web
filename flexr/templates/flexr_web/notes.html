@@ -12,13 +12,14 @@
 </head>
 <body>
     {% include "flexr_web/navbar.html" %}
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+    <h1>Notes:</h1>
 <!--    <h1>{{user.first_name}}&nbsp{{user.last_name}}</h1>-->
 <!--    <h1>{{user.email}}</h1>-->
 <!--    <h2>{{Accounts.0}}</h2>-->
 
     <hr>
-    <h3>Notes:</h3>
-    <p style="display: inline;">Create Note</p> <img style="display:inline;" id="plus-icon" data-toggle="modal" data-target="#add_note" src="{% static 'icons/plus-square.svg' %}">
+    <p style="display: inline;">Create Note</p> <img style="display:inline;" id="plus-icon" data-toggle="modal" data-target="#add_note" src="{% static 'icons/plus.png' %}" width= 15px>
 
     <div class = "row">
         {%for note in Notes%}

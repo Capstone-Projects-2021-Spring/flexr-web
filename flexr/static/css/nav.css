@@ -1,6 +1,8 @@
 .dropdown-menu{
     width: 500%;
-    text-align: center;
+    text-align: right;
+    right: 0;
+    padding-right: 5%;
 }
 
 .nav{
@@ -16,9 +18,11 @@
     width: 90%;
     box-shadow: 1px 5px 15px 1px #ccd3eb;
     margin-left: 5%;
-    padding-left: 15%;
+    margin-right: 5%;
+    padding-left: 2%;
     margin-top: 2%;
 }
+
 
 .nav-link {
 	color: white;

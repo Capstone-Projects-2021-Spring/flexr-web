@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Flexr | Open Tabs</title>
+    {% load static %}
     <style>
         .fa-window-close:hover{
             cursor: pointer;
@@ -13,6 +14,7 @@
 </head>
 <body>
     {% include "flexr_web/navbar.html" %}
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
 <!--    <h1>{{user.first_name}}&nbsp{{user.last_name}}</h1>-->
 <!--    <h1>{{user.email}}</h1>-->
 <!--    <h2>{{Accounts.0}}</h2>-->

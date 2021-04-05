@@ -1,54 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <title>Flexr | Browsing History</title>
 </head>
+
 <body>
+
     {% include "flexr_web/navbar.html" %}
-<!--    <h1>{{user.first_name}}&nbsp{{user.last_name}}</h1>-->
-<!--    <h1>{{user.email}}</h1>-->
-<!--    <h2>{{Accounts.0}}</h2>-->
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+    <h1>Filter Browsing History:</h1>
+    <!--    <h1>{{user.first_name}}&nbsp{{user.last_name}}</h1>-->
+    <!--    <h1>{{user.email}}</h1>-->
+    <!--    <h2>{{Accounts.0}}</h2>-->
 
     <hr>
     <div class="modal-body">
+
         <form method="post">
-             {% csrf_token %}
-             {% for field in form %}
-             <p>
-                 {{ field.label_tag }}<br>
-                 {{ field }} 
-            </p>
+            {% csrf_token %}
+            {% for field in form %}
+            <h3>
+                {{ field.label_tag }}<br>
+                {{ field }}
+            </h3>
 
             {% endfor %}
 
-          <div class="modal-footer">
-             <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
+            <div class="modal-footer">
+                <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
 
-<!--                    <button type="button" class="btn btn-danger" onclick="delete_account()">Delete</button>-->
-              <button type="submit" class="btn btn-primary">Filter</button>
-          </div>
-      </form>
+                <!--                    <button type="button" class="btn btn-danger" onclick="delete_account()">Delete</button>-->
+                <button id="subby" type="submit" class="btn btn-primary">Filter</button>
+            </div>
+        </form>
     </div>
-  </div>
-</div>
-</div>
+    </div>
+    </div>
+    </div>
     <hr>
-    <h3>Browsing History:</h3>
-    <form method = "POST" action="{% url 'delete history'%}">
-    {% csrf_token %}
-    {%for entry in History%}
-    <input type="checkbox" id="{{entry.id}}" name="DELETE" value="{{entry.id}}">
-        <p>Site: <a href="{{entry.site.url}}"> {{entry.site.url}}</a>
-            
-        </p>
-        <p>Visit Date: {{entry.visit_datetime}} </p>
-        
-        <br>
-    {%endfor%}
-    <button type="submit" class="btn btn-primary">Delete</button>
+    <h1>Full Browsing History:</h1>
+    <form method="POST" action="{% url 'delete history'%}">
+        {% csrf_token %}
+        {%for entry in History%}
+                <input type="checkbox" id="{{entry.id}}" name="DELETE" value="{{entry.id}}">
+                <p>Site: <a href="{{entry.site.url}}"> {{entry.site.url}}</a>
+
+                </p>
+                <p>Visit Date: {{entry.visit_datetime}} </p>
+
+                <br>
+
+                {%endfor%}
+        <button type="submit" class="btn btn-primary">Delete</button>
     </form>
     <hr>
 
 </body>
+
 </html>

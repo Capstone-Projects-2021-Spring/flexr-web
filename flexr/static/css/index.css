@@ -1,4 +1,6 @@
 body {
+    margin-left: 3%;
+    margin-right: 3%;
     padding-top: 1%;
     padding-left: 15%;
     padding-right: 15%;
@@ -21,6 +23,11 @@ body {
     height: 3rem;
 }
 
+
+#headdy{
+    margin-left: 10%;
+    padding-left: 10%;
+}
 
 #accounts, #tabs, #bookmarks, #notes, #shared_folders{
     background-color: #f7fdff !important;
@@ -112,6 +119,9 @@ h2{
     text-overflow: ellipsis;
 }
 
+.button{
+    right: 0;
+}
               
 .fa-window-close:hover{
     cursor: pointer;
@@ -121,5 +131,5 @@ h2{
 .form-control{
      width: 30%;
      display: inline;
-     margin-left: 20%;
+     /* margin-left: 20%; */
 }
