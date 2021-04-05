@@ -72,7 +72,7 @@
             <div class="modal-body">
                     
                     <div class = "add_friend">
-                        {% for account in AllAccountsCOMMENTEDOUT %}
+                        {% for account in AllAccounts%}
                             <br>
                             <form  method="post" action = "/add_friend/">
                                 {% csrf_token %}
@@ -80,7 +80,6 @@
                                     <p style="display: inline;">{{account.username}} - {{account.user.first_name}} {{account.user.last_name}} {{account.account_id}}</p>
                                     <button type="submit"><img src="{% static 'icons/remove-user.png'%}"  width = 20px style="display: inline;"></button>
 
-                                    <!-- <button style="display: inline;" type="submit" class="btn btn-primary">Add Friend!</button> -->
                             </form>
                             <hr>
                         {% endfor %}
