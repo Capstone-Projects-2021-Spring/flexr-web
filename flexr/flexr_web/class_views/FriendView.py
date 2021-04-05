@@ -95,7 +95,15 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
         friendships_recieved = curr_account.to_friend.all()
         friendships = friendships_sent | friendships_recieved
         friendship = friendships.get(id = kwargs['id'])
-        friendship.delete()
+
+        if(friendship.sent is not curr_account):
+            curr_account.all_friends.remove(friendship.sent)
+            friendship.sent.all_friends.remove(curr_account)
+        else:
+            curr_account.all_friends.remove(friendship.received)
+            friendship.received.all_friends.remove(curr_account)
+        friendship.status = "Declined"
+        friendship.save()
         data = FriendshipSerializer(friendships, many=True)
         return JsonResponse(data.data, safe=False)
 
