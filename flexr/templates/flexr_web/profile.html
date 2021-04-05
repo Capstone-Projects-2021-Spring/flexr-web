@@ -23,136 +23,138 @@
 </head>
 <body>
     {% include "flexr_web/navbar.html" %}
-    <h1>{{user.first_name}}&nbsp{{user.last_name}}&nbsp@{{user}}</h1>
-    <h1>{{user.email}}</h1>
-    <h2 style="display:inline">{{curr_acc}}</h2><img id = "edit" src="{% static 'icons/pencil-square.svg'%}" data-toggle="modal" data-target="#view_account">
-    <br>
-    <h1 style="display:inline;" >Friends: </h1><i style="display:inline;" class="fas fa-user-plus" data-toggle="modal" data-target="#friend_search" ></i>
-    <div class = "row">
-        {% for friend in Friends %}
-            <div class = "friend card col-md-3" >
-                <p style="display: inline;">{{friend}}</p>
-                <img src="{% static 'icons/remove-user.png'%}" style="display: inline;" id = "friend_delete" onclick="window.location.href = '/remove_friend/{{friend.account_id}}'">
+    <div class="body">
+        <h1>{{user.first_name}}&nbsp{{user.last_name}}&nbsp@{{user}}</h1>
+        <h1>{{user.email}}</h1>
+        <h2 style="display:inline">{{curr_acc}}</h2><img id = "edit" src="{% static 'icons/pencil-square.svg'%}" data-toggle="modal" data-target="#view_account">
+        <br>
+        <h1 style="display:inline;" >Friends: </h1><img id = "edit" width = 20px src="{% static 'icons/plus.png'%}" data-toggle="modal" data-target="#friend_search">
+        <div class = "row">
+            {% for friend in Friends %}
+                <div class = "friend card col-md-3" >
+                    <p style="display: inline;">{{friend}}</p>
+                    <img src="{% static 'icons/remove-user.png'%}" style="display: inline;" id = "friend_delete" onclick="window.location.href = '/remove_friend/{{friend.account_id}}'">
+                </div>
+            {% endfor %}
+        </div>
+        <script>
+            async function friend_search(){
+                var search = document.getElementById("search").value
+
+            }
+        </script>
+        <form onsubmit="friend_search()">
+            <input type="text" placeholder="Search up a user's name" id = "search" style="display: inline;">
+            <button class = "btn btn-primary" type="submit" style="display: inline;">Search</button>
+        </form>
+        
+        <h1 style="display:inline;" >Friend Requests: </h1>
+        <div class = "row">
+        {% for request in friend_requests %}
+            <div class = "folder card col-md-3" >
+                <p style="display: inline;">{{request.sent.user.first_name}} {{request.sent.user.last_name}}</p>
+                <h2>{{request.sent_date}}</h2>
+                <button type="button" style="width: 35%; display: inline;" class="btn btn-danger" onclick="window.location.href = '/deny_friend/{{request.id}}'">Deny</button>
+                <button type="button" style="width: 35%; display: inline;" class="btn btn-success" onclick="window.location.href = '/accept_friend/{{request.id}}'">Accept</button>
             </div>
         {% endfor %}
-    </div>
-    <h1 style="display:inline;" >Friend Requests: </h1>
-    <div class = "row">
-    {% for request in friend_requests %}
-        <div class = "folder card col-md-3" >
-            <p style="display: inline;">{{request.sent.user.first_name}} {{request.sent.user.last_name}}</p>
-            <h2>{{request.sent_date}}</h2>
-            <button type="button" style="width: 35%; display: inline;" class="btn btn-danger" onclick="window.location.href = '/deny_friend/{{request.id}}'">Deny</button>
-            <button type="button" style="width: 35%; display: inline;" class="btn btn-success" onclick="window.location.href = '/accept_friend/{{request.id}}'">Accept</button>
         </div>
-    {% endfor %}
-    </div>
-<!--    friend search -->
-    <div class="modal fade" id="friend_search" tabindex="-1" role="dialog" aria-labelledby="friend_searchLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="friend_searchLabel">Add a friend</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-                {% for account in AllAccounts %}
-                    <br>
-                    <form style="margin: 10%;" method="post" action = "/add_friend/"><p style="display: inline;"><input hidden name = "account_friend" value = "{{account.account_id}}"></input>{{account.username}} - {{account.user.first_name}} {{account.user.last_name}} {{account.account_id}}</p><button style="display: inline;" type="submit" class="btn btn-primary">Add Friend!</button></option>
-                    <br>
-                {% endfor %}
-              <form method="post" action="/add_friend/">
-                   {% csrf_token %}
-<!--                    <input type="text" id="tags" name = "account_friend">-->
-                    <!-- <select name = "account_friend">
-                        {% for account in AllAccounts %}
-                            <option value = {{account.account_id}}>{{account.username}} - {{account.user.first_name}} {{account.user.last_name}} {{account.account_id}}</option>
-                        {% endfor %}
-                    </select> -->
+    <!--    friend search -->
+        <div class="modal fade" id="friend_search" tabindex="-1" role="dialog" aria-labelledby="friend_searchLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="friend_searchLabel">Add a friend</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
                     
-                  <script>
-                  $( function() {
-                        var availableTags = [
-                            {% for account in AllAccounts %}
-                                "{{account.username}} - {{account.user.first_name}} {{account.user.last_name}} {{account.account_id}}",
-                            {% endfor %}
-                        ];
-                        $( "#tags" ).autocomplete({
-                          source: availableTags
-                        });
-                      } );
-                  </script>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <!-- <button type="submit" class="btn btn-primary">Send friend request!</button> -->
-                </div>
-            </form>
-          </div>
+                    <div class = "add_friend">
+                        {% for account in AllAccountsCOMMENTEDOUT %}
+                            <br>
+                            <form  method="post" action = "/add_friend/">
+                                {% csrf_token %}
+                                    <input hidden name = "account_friend" value = "{{account.account_id}}"></input>
+                                    <p style="display: inline;">{{account.username}} - {{account.user.first_name}} {{account.user.last_name}} {{account.account_id}}</p>
+                                    <button type="submit"><img src="{% static 'icons/remove-user.png'%}"  width = 20px style="display: inline;"></button>
+
+                                    <!-- <button style="display: inline;" type="submit" class="btn btn-primary">Add Friend!</button> -->
+                            </form>
+                            <hr>
+                        {% endfor %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <!-- <button type="submit" class="btn btn-primary">Send friend request!</button> -->
+                    </div>
+                </form>
+            </div>
+            </div>
         </div>
-      </div>
-    </div>
+        </div>
 
 
-<!-- edit account -->
-    <div class="modal fade" id="view_account" tabindex="-1" role="dialog" aria-labelledby="view_accountLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="view_accountLabel">Edit your account</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-              <form method="post" action="/edit_account/">
-                   {% csrf_token %}
-                          {% for field in account_form %}
-                        <p>
-                            {{ field.label_tag }}<br>
-                            {{ field }}
-                            {% if field.help_text %}
-                                <small style="color: grey">{{ field.help_text }}</small>
-                            {% endif %}
-                            {% for error in field.errors %}
-                                <p style="color: red">{{ error }}</p>
-                            {% endfor %}
-                        </p>
+    <!-- edit account -->
+        <div class="modal fade" id="view_account" tabindex="-1" role="dialog" aria-labelledby="view_accountLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="view_accountLabel">Edit your account</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="/edit_account/">
+                    {% csrf_token %}
+                            {% for field in account_form %}
+                            <p>
+                                {{ field.label_tag }}<br>
+                                {{ field }}
+                                {% if field.help_text %}
+                                    <small style="color: grey">{{ field.help_text }}</small>
+                                {% endif %}
+                                {% for error in field.errors %}
+                                    <p style="color: red">{{ error }}</p>
+                                {% endfor %}
+                            </p>
+                        {% endfor %}
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-danger" onclick="window.location.href = '/delete_account/{{curr_acc.account_id}}'">Delete</button>
+    <!--                    {% if user.accounts.all|length > 1%}-->
+
+    <!--                        <button type="button" class="btn btn-danger" onclick="delete_account()">Delete</button>-->
+    <!--                    {%endif%}-->
+                        <button type="submit" class="btn btn-primary">Edit account</button>
+                    </div>
+                </form>
+            </div>
+            </div>
+        </div>
+        </div>
+        <hr>
+
+        <h3>Account Preferences:</h3>
+        <form method = "post" action="{% url 'edit account preferences' %}">
+            {% csrf_token %}
+            {% for field in pref_form %}
+                <p>
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.help_text %}
+                        <small style="color: grey">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <p style="color: red">{{ error }}</p>
                     {% endfor %}
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-danger" onclick="window.location.href = '/delete_account/{{curr_acc.account_id}}'">Delete</button>
-<!--                    {% if user.accounts.all|length > 1%}-->
-
-<!--                        <button type="button" class="btn btn-danger" onclick="delete_account()">Delete</button>-->
-<!--                    {%endif%}-->
-                    <button type="submit" class="btn btn-primary">Edit account</button>
-                </div>
-            </form>
-          </div>
-        </div>
-      </div>
+                </p>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">Save changes</button>
+        </form>
     </div>
-    <hr>
-
-    <h3>Account Preferences:</h3>
-    <form method = "post" action="{% url 'edit account preferences' %}">
-        {% csrf_token %}
-        {% for field in pref_form %}
-            <p>
-                {{ field.label_tag }}
-                {{ field }}
-                {% if field.help_text %}
-                    <small style="color: grey">{{ field.help_text }}</small>
-                {% endif %}
-                {% for error in field.errors %}
-                    <p style="color: red">{{ error }}</p>
-                {% endfor %}
-            </p>
-        {% endfor %}
-         <button type="submit" class="btn btn-primary">Save changes</button>
-    </form>
 </body>
 </html>
