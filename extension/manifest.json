@@ -1,0 +1,24 @@
+{
+    "name": "Flexr Extension",
+    "version": "1.0",
+    "description": "Sync your data with the mobile Flexr browser",
+    "permissions": [
+        "activeTab", 
+        "declarativeContent", 
+        "storage",
+        "http://127.0.0.1:8000/",
+        "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"],
+    "background": {
+        "scripts": ["background.js"],
+        "persistent": false
+    },
+    "browser_action": {
+        "default_popup": "popup.html"
+    },
+    "options_page": "options.html",
+
+    "content_security_policy": "script-src 'self' https://ajax.googleapis.com; object-src 'self'",
+
+    "manifest_version": 2
+    
+  }
