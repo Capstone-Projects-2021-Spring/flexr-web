@@ -97,10 +97,9 @@ urlpatterns = [
     path('api/account/<id>/switch/', AccountViewAPI().switch_account, name = "switch account"),
 
     path('api/friendships/', FriendAPIView.as_view()),
-    path('api/friendships/<id>', FriendAPIView.as_view()),
-    path('api/friendships/', FriendAPIView.as_view()),
+    path('api/friendships/<id>/', FriendAPIView.as_view()),
     path('api/friendships/<id>/accept/', FriendAPIView().accept),
-    path('api/friendships/<id>/deny', FriendAPIView().deny),
+    path('api/friendships/<id>/deny/', FriendAPIView().deny),
 
 
     path('api/history/', HistoryViewAPI.as_view()),
