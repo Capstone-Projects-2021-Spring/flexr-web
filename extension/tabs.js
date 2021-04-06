@@ -7,32 +7,13 @@ window.onload = function () {
         window.location.href = '/menu.html'
     }
 
-    let get_tabs = new Promise(function(resolve, reject){
-        var request = new XMLHttpRequest();
-            
-        request.open("GET", "http://127.0.0.1:8000/api/tabs/");
-        //request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        //request.send("username=admin2&password=password");
-        request.send();
-        request.onload = () => {
-            console.log(request);
-            if (request.status == 200){
-                bkg.console.log(JSON.parse(request.response));
-                //userid = JSON.parse(request.response).id
-                tabs = JSON.parse(request.response)
-                
-                resolve('Promise is resolved successfully.')
+    async function get_tabs(){
+        tabs_response = await fetch("http://127.0.0.1:8000/api/tabs/");
 
-            }
-            else{
-                bkg.console.log(`error ${request.status} ${request.statusText}`);
-                reject('Promise is rejected');  
-            }
-        }
-    })
+        tabs = await tabs_response.json();
 
-    get_tabs.then(display_tabs)
-
+        display_tabs();
+    }
 
     function display_tabs(){
 
@@ -49,7 +30,8 @@ window.onload = function () {
             document.body.appendChild(parent);
         }
 
-        
 
     }
+
+    get_tabs();
 }

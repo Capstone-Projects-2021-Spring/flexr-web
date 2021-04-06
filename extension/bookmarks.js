@@ -7,32 +7,13 @@ window.onload = function () {
         window.location.href = '/menu.html'
     }
 
-    let get_bookmarks = new Promise(function(resolve, reject){
-        var request = new XMLHttpRequest();
-            
-        request.open("GET", "http://127.0.0.1:8000/api/bookmarks/");
-        //request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        //request.send("username=admin2&password=password");
-        request.send();
-        request.onload = () => {
-            console.log(request);
-            if (request.status == 200){
-                bkg.console.log(JSON.parse(request.response));
-                //userid = JSON.parse(request.response).id
-                bookmarks = JSON.parse(request.response)
-                
-                resolve('Promise is resolved successfully.')
+    async function get_bookmarks(){
+        bookmarks_response = await fetch("http://127.0.0.1:8000/api/bookmarks/");
 
-            }
-            else{
-                bkg.console.log(`error ${request.status} ${request.statusText}`);
-                reject('Promise is rejected');  
-            }
-        }
-    })
+        bookmarks = await bookmarks_response.json();
 
-    get_bookmarks.then(display_bookmarks);
-
+        display_bookmarks();
+    }
 
     function display_bookmarks(){
 
@@ -49,7 +30,7 @@ window.onload = function () {
             document.body.appendChild(parent);
         }
 
-        
-
     }
+
+    get_bookmarks();
 }

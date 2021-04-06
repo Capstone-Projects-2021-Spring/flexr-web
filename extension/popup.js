@@ -5,119 +5,131 @@ window.onload = function () {
     let userid = -1;
     let accountid = -1;
     let accounts = [];
-    
-    let status =  new Promise(function(resolve, reject){
-        var request = new XMLHttpRequest();
-            
-        request.open("GET", "http://127.0.0.1:8000/api/status/");
-        //request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        //request.send("username=admin2&password=password");
-        request.send();
-        request.onload = () => {
-            console.log(request);
-            if (request.status == 200){
-                bkg.console.log(JSON.parse(request.response));
-                r = JSON.parse(request.response)
-                bkg.console.log(r)
-                
-                if (r == true){
-                    resolve('Promise is resolved successfully.')
-                }
 
-                else {
-                    reject('User not logged in.')
-                }
+    async function login(){
+        let login_response = await fetch('http://127.0.0.1:8000/api/login/',
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'username=admin2&password=password'
+        });
 
-            }
-            else{
-                bkg.console.log(`error ${request.status} ${request.statusText}`);
-                reject('Promise is rejected');  
-            }
+        if (login_response.status != 200){
+            return 'error';
         }
-    });
+
+        user = await login_response.json();
+
+        
+
+
+        let accounts_response = await fetch('http://127.0.0.1:8000/api/accounts/',
+        {
+            method: 'GET'
+        })
+
+        if (accounts_response.status != 200){
+            return 'error';
+        }
+
+        accounts = await accounts_response.json();
+
+        //bkg.console.log(accounts);
+
+        accountid = accounts[0].account_id;
+
+
+        let switch_response = await fetch(`http://127.0.0.1:8000/api/account/${accountid}/switch/`,
+        {
+            method: 'GET'
+        })
+
+        if (switch_response.status != 200){
+            return 'error';
+        }
+
+        to_menu_page();
+
+
+        return 0;
+
+
+    }
+
+    async function check_status(){
+        let status_response = await fetch('http://127.0.0.1:8000/api/status/',
+        {
+            method: 'GET',
+            
+        });
+
+        if (status_response.status != 200){
+            return 'error';
+        }
+
+        status = await status_response.json();
+
+        if(!status){
+            return 'not logged in';
+        }
+
+        
+        
+
+
+        let accounts_response = await fetch('http://127.0.0.1:8000/api/accounts/',
+        {
+            method: 'GET'
+        })
+
+        if (accounts_response.status != 200){
+            return 'error';
+        }
+
+        accounts = await accounts_response.json();
+
+        //bkg.console.log(accounts);
+
+        accountid = accounts[0].account_id;
+
+
+        let switch_response = await fetch(`http://127.0.0.1:8000/api/account/${accountid}/switch/`,
+        {
+            method: 'GET'
+        })
+
+        if (switch_response.status != 200){
+            return 'error';
+        }
+
+        to_menu_page();
+
+
+        return 0;
+
+
+    }
+
+    check_status();
+    
+    
 
 
     loginButton.onclick = function(){
         var username = document.getElementById("username").Value;
         var password = document.getElementById("password").value;
 
-        let login = new Promise(function(resolve, reject){
-            var request = new XMLHttpRequest();
-                
-            request.open("POST", "http://127.0.0.1:8000/api/login/");
-            request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            request.send("username=admin2&password=password");
-            request.onload = () => {
-                bkg.console.log(request);
-                if (request.status == 200){
-                    //bkg.console.log(JSON.parse(request.response));
-                    //r = JSON.parse(request.response)
-                   //bkg.console.log(r)
-                   resolve('Promise is resolved successfully.');
-                    
-                   
-    
-                }
-                else{
-                    bkg.console.log(`error ${request.status} ${request.statusText}`);
-                    reject('Promise is rejected');  
-                }
-            }
-        });
-
-        // this might error sometimes ......
-        login.then(get_accounts).then(switch_account).then(to_menu_page);
+        result = login();
+        bkg.console.log(result);
     
     }
 
     siteButton.onclick = function(){
         window.open('http://127.0.0.1:8000', "_blank");
     }
-
-    status.then(to_menu_page)
-
-    
-    
-    function get_accounts(){
-        bkg.console.log('in accounts')
-        var request = new XMLHttpRequest();
-        request.open("GET", "http://127.0.0.1:8000/api/accounts/")
-        request.send()
-        request.onload = () => {
-            console.log(request);
-            if (request.status == 200){
-                bkg.console.log(JSON.parse(request.response));
-                accounts = JSON.parse(request.response);
-                accountid = accounts[0].account_id
-                bkg.console.log(accountid)
-                
-            }
-            else{
-                bkg.console.log(`error ${request.status} ${request.statusText}`);
-                return
-                
-            }
-        }
-    }
-    
-    function switch_account(){
-        bkg.console.log(accountid)
-        var request = new XMLHttpRequest();
-        request.open("GET", `http://127.0.0.1:8000/api/account/${accountid}/switch/`)
-        request.send()
-        request.onload = () => {
-            console.log(request);
-            if (request.status == 200){
-                bkg.console.log(JSON.parse(request.response));
-                
-            }
-            else{
-                bkg.console.log(`error ${request.status} ${request.statusText}`);
-                return
-                
-            }
-        }
-    }
+  
 
     function to_menu_page(){
         window.location.href = '/menu.html'
