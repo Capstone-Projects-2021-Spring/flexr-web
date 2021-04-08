@@ -18,6 +18,30 @@
 
     <hr>
     <h3>Notes:</h3>
+    <hr>
+    <div class="modal-body">
+        <form method="post">
+             {% csrf_token %}
+             {% for field in fform %}
+             <p>
+                 {{ field.label_tag }}<br>
+                 {{ field }} 
+            </p>
+
+            {% endfor %}
+
+          <div class="modal-footer">
+             <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
+
+<!--                    <button type="button" class="btn btn-danger" onclick="delete_account()">Delete</button>-->
+              <button type="submit" class="btn btn-primary">Filter</button>
+          </div>
+      </form>
+    </div>
+  </div>
+</div>
+</div>
+
     <p style="display: inline;">Create Note</p> <img style="display:inline;" id="plus-icon" data-toggle="modal" data-target="#add_note" src="{% static 'icons/plus-square.svg' %}">
 
     <div class = "row">

@@ -32,6 +32,7 @@ class NotesView(LoginRequiredMixin, View):
 
         # get note form object on the page
         form = notef
+        fform = FilterNoteForm
 
         # request messages for debugging
         if ('message' in self.request.session):
@@ -48,7 +49,43 @@ class NotesView(LoginRequiredMixin, View):
         return render(self.request, "flexr_web/notes.html", 
         {"Notes": notes, 
         "Accounts": accounts, 
-        'form': form})
+        'form': form,
+        'fform': fform})
+
+
+    def post(self, request, *args, **kwargs):
+        """
+        Filter the account's history by datetime range
+        """
+
+        # get current user and current account
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+
+        # get all user's accounts
+        accounts = curr_user.accounts.all()
+
+        # get form object on page
+        form = notef
+        fform = FilterNoteForm
+        # grab date and time information from POST form
+        search = request.POST['search']
+        
+        # grab all history objects
+        notes = curr_account.notes.all()
+
+        # filter based on site if given
+        if search:
+            notes = notes.filter(title__icontains=search)
+
+        # request message for debugging
+        # request.session['message'] = "History Filtered"
+
+        return render(self.request, "flexr_web/notes.html", 
+        {"Notes": notes, 
+        "Accounts": accounts, 
+        'form': form,
+        'fform': fform})
 
     def create_note(self, request, *args, **kwargs):
         """

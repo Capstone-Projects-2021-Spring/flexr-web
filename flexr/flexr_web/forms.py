@@ -82,6 +82,11 @@ class BookmarkFolderForm(ModelForm):
         model = bookmarkFolder
         fields = ('title', 'bookmarks')
 
+class FilterNoteForm(forms.Form):
+    search = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}), required=False)
+    class Meta:
+        pass
+
 class FilterBookmarkForm(forms.Form):
     start_date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), required=False)
     start_time = forms.DateField(widget=forms.widgets.TimeInput(attrs={'type': 'time'}), required=False)
