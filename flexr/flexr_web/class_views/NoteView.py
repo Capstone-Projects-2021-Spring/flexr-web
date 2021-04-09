@@ -126,7 +126,7 @@ class NoteView(LoginRequiredMixin, View):
 @method_decorator(csrf_exempt, name='dispatch')
 class NoteViewAPI(LoginRequiredMixin, DetailView):
 
-    @csrf_exempt
+    @method_decorator(csrf_exempt)
     def post(self, request, *args, **kwargs):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
@@ -153,8 +153,8 @@ class NoteViewAPI(LoginRequiredMixin, DetailView):
         data = NoteSerializer(note, many=False)
         return JsonResponse(data.data, safe=False)
 
-    @csrf_exempt
-    def put (self, request, *args, **kwargs):
+    @method_decorator(csrf_exempt)
+    def put(self, request, *args, **kwargs):
         curr_user = request.user
         curr_acc = curr_user.accounts.get(account_id=request.session['account_id'])
 
