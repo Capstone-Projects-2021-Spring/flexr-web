@@ -9,6 +9,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 import json
 import pytz
+from django.db.models import Q
 
 from ..models import *
 from ..forms import *
@@ -187,6 +188,18 @@ class BookmarkFolderView(LoginRequiredMixin, View):
 
             # return to notes page
         return redirect('/bookmarks')
+
+    def remove_from_folder(self, request, *args, **kwargs):
+        current_acc = request.user.accounts.get(account_id = request.session['account_id'])
+        folder = current_acc.bookmark_folders.get(id=kwargs['id'])
+
+        bookmarks = folder.bookmarks
+        # print(kwargs["pk"])
+        # print(folder.id)
+        # print('deleting')
+        bookmarks.set(bookmarks.filter(~Q(pk = kwargs["pk"])))
+        # bookmarks.exclude(pk = kwargs["pk"]).update()
+        return redirect(request.session['prev_url'])
 
 @method_decorator(csrf_exempt, name='dispatch')
 class BookmarkFoldersViewAPI(LoginRequiredMixin, DetailView):
