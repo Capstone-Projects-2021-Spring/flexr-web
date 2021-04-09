@@ -16,27 +16,33 @@
 <!--    <h1>{{user.first_name}}&nbsp{{user.last_name}}</h1>-->
 <!--    <h1>{{user.email}}</h1>-->
 <!--    <h2>{{Accounts.0}}</h2>-->
+    <div class="body">
+        <h3>Open Tabs:</h3>
+        <form style="display: inline;" method="post" action="/open_tabs/">{% csrf_token %}<input type="text" name = "search" placeholder="Search for tab..." style="margin-right: 1%;"><button  style="margin-right: 1%;" type="submit" class="btn btn-primary">Search</button> </form>
+        {%if filtered%}
+            <button class="btn btn-primary" onclick="window.location.href = '/open_tabs/'">Reset</button>
+        {%endif%}
+        <br>
+        {%if Tabs|length > 6%}
+                            <form style="display: inline;" method="post" action="/">{% csrf_token %}<input class="form-control" width= 20% type="text" name = "search" placeholder="Search for tab..." style="margin-right: 1%;"><button  style="margin-right: 1%;" type="submit" class="btn btn-primary">Search</button> </form>
+                            
+        {%endif%}
+        {%if filtered%}
+            <button class="btn btn-primary form-control" onclick="window.location.href = '/'">Reset</button>
+        {%endif%}
+        <div class = "row">
+            {%for tab in Tabs%}
+                    <div class = "card col-lg-3" style="height: 15%;">
+                        <i class="far fa-window-close" onclick=" var conf = confirm('Do you want to close this tab?'); if(conf){ window.location.href = '/close_tab/{{tab.id}}'}" style="display: inline;"></i>
+                        <p><a href="{{tab.site.url}}">{{tab.site.url}}</a></p>
+                        <p>Created Date: {{tab.created_date}}</p>
+                        <p>Last Visited: {{tab.last_visited}}</p>
+                        <button onclick="window.location.href = '/add_bookmark/{{tab.id}}/'">Bookmark</button>
+                    </div>
+            {%endfor%}
+        </div>
 
-    <hr>
-    <h3>Open Tabs:</h3>
-    <form style="display: inline;" method="post" action="/open_tabs/">{% csrf_token %}<input type="text" name = "search" placeholder="Search for tab..." style="margin-right: 1%;"><button  style="margin-right: 1%;" type="submit" class="btn btn-primary">Search</button> </form>
-    {%if filtered%}
-        <button class="btn btn-primary" onclick="window.location.href = '/open_tabs/'">Reset</button>
-    {%endif%}
-    <br>
-    <div class = "row">
-        {%for tab in Tabs%}
-                <div class = "card col-lg-3" style="height: 15%;">
-                    <i class="far fa-window-close" onclick=" var conf = confirm('Do you want to close this tab?'); if(conf){ window.location.href = '/close_tab/{{tab.id}}'}" style="display: inline;"></i>
-                    <p><a href="{{tab.site.url}}">{{tab.site.url}}</a></p>
-                    <p>Created Date: {{tab.created_date}}</p>
-                    <p>Last Visited: {{tab.last_visited}}</p>
-                    <button onclick="window.location.href = '/add_bookmark/{{tab.id}}/'">Bookmark</button>
-                </div>
-        {%endfor%}
+        <hr>
     </div>
-
-    <hr>
-
 </body>
 </html>

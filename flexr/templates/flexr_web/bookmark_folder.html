@@ -36,6 +36,7 @@
    </div>
 </div>
 </div>
+<div class="body">
 Edit Folder <img id="plus-icon" data-toggle="modal" data-target="#edit_folder" src="{% static 'icons/plus-square.svg' %}">
 
 <div class="modal fade" id="edit_folder" tabindex="-1" role="dialog" aria-labelledby="edit_folderLabel" aria-hidden="true">
@@ -83,6 +84,6 @@ Edit Folder <img id="plus-icon" data-toggle="modal" data-target="#edit_folder" s
     <button onclick="window.location.href = '/delete_bookmark/{{bookmark.id}}/'">Delete Bookmark</button>
     <br>
     {%endfor%}
-
+</div>
 </body>
 </html>

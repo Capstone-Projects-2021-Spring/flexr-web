@@ -7,60 +7,62 @@
 </head>
 <body>
     {% include "flexr_web/navbar.html" %}
-    <h1>Folder title:</h1>
-    <h2>    {{shared_folder.title}}</h2>
-    <h1>Description:</h1>
-    <h2>    {{shared_folder.description}}</h2>
-    <h1>Folder owner:</h1>
-    <h2>    {{shared_folder.owner}}</h2>
-    <h1>Collaborators: </h1>
-    {% for collaborator in Collaborators %}
-        <h2>{{collaborator}}</h2>
-    {% endfor %}
-    <h1>Notes: </h1>
-    {% for note in Notes %}
-        <h2>{{note}}</h2>
-    {% endfor %}
-    <h1>Bookmarks: </h1>
-    {% for bookmark in Bookmarks %}
-        <h2>{{bookmark}}: {{bookmark.url}}</h2>
-    {% endfor %}
-    <h1>Tabs: </h1>
-    {% for tab in Tabs %}
-        <h2>{{tab}}</h2>
-    {% endfor %}
-    <a href="{% url 'delete_shared_folder' shared_folder.pk%}"><p>Delete Folder</p> </a>
-    Edit Folder <img id="plus-icon" data-toggle="modal" data-target="#edit_folder" src="{% static 'icons/plus-square.svg' %}">
+    <div class="body">
+      <h1>Folder title:</h1>
+      <h2>    {{shared_folder.title}}</h2>
+      <h1>Description:</h1>
+      <h2>    {{shared_folder.description}}</h2>
+      <h1>Folder owner:</h1>
+      <h2>    {{shared_folder.owner}}</h2>
+      <h1>Collaborators: </h1>
+      {% for collaborator in Collaborators %}
+          <h2>{{collaborator}}</h2>
+      {% endfor %}
+      <h1>Notes: </h1>
+      {% for note in Notes %}
+          <h2>{{note}}</h2>
+      {% endfor %}
+      <h1>Bookmarks: </h1>
+      {% for bookmark in Bookmarks %}
+          <h2>{{bookmark}}: {{bookmark.url}}</h2>
+      {% endfor %}
+      <h1>Tabs: </h1>
+      {% for tab in Tabs %}
+          <h2>{{tab}}</h2>
+      {% endfor %}
+      <a href="{% url 'delete_shared_folder' shared_folder.pk%}"><p>Delete Folder</p> </a>
+      Edit Folder <img id="plus-icon" data-toggle="modal" data-target="#edit_folder" src="{% static 'icons/plus-square.svg' %}">
 
-        <div class="modal fade" id="edit_folder" tabindex="-1" role="dialog" aria-labelledby="edit_folderLabel" aria-hidden="true">
-          <div class="modal-dialog" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="edit_folderLabel">Edit your folder</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div class="modal-body">
-                    <form method = "POST" action="{% url 'edit_shared_folder' shared_folder.pk%}">
-                            {% csrf_token %}
-                            {% for field in form %}
-                            <p>
-                                {{ field.label_tag }}<br>
-                                {{ field }}
-                                {% if field.help_text %}
-                                    <small style="color: grey">{{ field.help_text }}</small>
-                                {% endif %}
-                                {% for error in field.errors %}
-                                    <p style="color: red">{{ error }}</p>
-                                {% endfor %}
-                            </p>
-                            {% endfor %}
-                            <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Confirm edit</button>
-                    </div>
-                    </form>
+          <div class="modal fade" id="edit_folder" tabindex="-1" role="dialog" aria-labelledby="edit_folderLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="edit_folderLabel">Edit your folder</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                      <form method = "POST" action="{% url 'edit_shared_folder' shared_folder.pk%}">
+                              {% csrf_token %}
+                              {% for field in form %}
+                              <p>
+                                  {{ field.label_tag }}<br>
+                                  {{ field }}
+                                  {% if field.help_text %}
+                                      <small style="color: grey">{{ field.help_text }}</small>
+                                  {% endif %}
+                                  {% for error in field.errors %}
+                                      <p style="color: red">{{ error }}</p>
+                                  {% endfor %}
+                              </p>
+                              {% endfor %}
+                              <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                          <button type="submit" class="btn btn-primary">Confirm edit</button>
+                      </div>
+                      </form>
+                </div>
               </div>
             </div>
           </div>
