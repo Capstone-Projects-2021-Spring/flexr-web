@@ -14,29 +14,28 @@
 <body>
     {% include "flexr_web/navbar.html" %}
     <hr>
-    <div class="modal-body">
-        <form method="post">
-            {% csrf_token %}
-            {% for field in form %}
-            <p>
-                {{ field.label_tag }}<br>
-                {{ field }} 
-            </p>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <div class="body">
+        <div class="main">
+            <div class="modal-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <p>
+                        {{ field.label_tag }}<br>
+                        {{ field }} 
+                    </p>
 
-            {% endfor %}
+                    {% endfor %}
 
-         <div class="modal-footer">
-         <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
+                <div class="modal-footer">
+                    <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
 
-<!--                    <button type="button" class="btn btn-danger" onclick="delete_account()">Delete</button>-->
-          <button type="submit" class="btn btn-primary">Filter</button>
-         </div>
-        </form>
-    </div>
-   </div>
-</div>
-</div>
-<div class="body">
+            <!--                    <button type="button" class="btn btn-danger" onclick="delete_account()">Delete</button>-->
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                </div>
+                </form>
+            </div>
 Edit Folder <img id="plus-icon" data-toggle="modal" data-target="#edit_folder" src="{% static 'icons/plus-square.svg' %}">
 
 <div class="modal fade" id="edit_folder" tabindex="-1" role="dialog" aria-labelledby="edit_folderLabel" aria-hidden="true">
@@ -84,6 +83,8 @@ Edit Folder <img id="plus-icon" data-toggle="modal" data-target="#edit_folder" s
     <button onclick="window.location.href = '/delete_bookmark/{{bookmark.id}}/'">Delete Bookmark</button>
     <br>
     {%endfor%}
+
+</div>
 </div>
 </body>
 </html>
