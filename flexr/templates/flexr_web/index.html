@@ -71,13 +71,7 @@
                 <div class = "card-header sticky-top">
                     <h2 style="display:inline">Open tabs</h2>
                     <img id="plus-icon" class="plus-icon" width = 20px; data-toggle="modal" data-target="#add_tab" src="{% static 'icons/plus.png' %}">
-                    {%if Tabs|length > 6%}
-                        <form style="display: inline;" method="post" action="/">{% csrf_token %}<input class="form-control" width= 20% type="text" name = "search" placeholder="Search for tab..." style="margin-right: 1%;"><button  style="margin-right: 1%;" type="submit" class="btn btn-primary">Search</button> </form>
-                        
-                    {%endif%}
-                    {%if filtered%}
-                        <button class="btn btn-primary form-control" onclick="window.location.href = '/'">Reset</button>
-                    {%endif%}
+                    
                 </div>
                 <script>
                     $(document).ready(function(){
@@ -105,10 +99,9 @@
                                 });
                             </script>
                             <div class="card-body"  style="">
-
                                 <p onclick="window.open('{{tab.site.url}}')" style="display: inline;">{{tab.site}}</p>
                                 <span style="display: inline;">
-                                
+                                    <!-- <p>{{tab.site.bookmarked}}</p> -->
                                     {%if tab.site.bookmarked > 0%}
                                         <img class="bm" onclick="window.location.href = 'delete_bookmark/{{tab.site.bookmarked}}'" src="{% static 'icons/bookmarked.png' %}" width= 15px>
                                     {%else%}

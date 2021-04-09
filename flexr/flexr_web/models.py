@@ -304,17 +304,24 @@ class Bookmark(models.Model):
 
     @classmethod
     def create_bookmark(cls, tab, curr_account, last_visited=None):
-        try:
-            bm = Bookmark.objects.create(account = curr_account, bookmark_name = name, site=tab.site)
-            bm.save()
-            return bm.id
-        except:
-            print('bookmark already exists')
+        # try:
+        bm = Bookmark.objects.create(account = curr_account, bookmark_name = tab.site.name, site=tab.site)
+        bm.save()
+        bm.site.bookmarked = bm.id
+        print("Bookmark: create_bookmark", bm)
+        bm.site.save()
+        return bm.id
+        # except:
+        #     print('bookmark already exists')
         
     
     @classmethod
     def delete_bookmark(cls, id):
+        bookmark = Bookmark.objects.get(id = id)
+        bookmark.site.bookmarked = 0
+        bookmark.site.save()
         bookmark = Bookmark.objects.filter(pk=id).delete()
+        
         print('bookmark deleted')
 
     def save(self, *args, **kwargs):

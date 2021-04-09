@@ -48,11 +48,11 @@ body {
 #tabs, #notes{
     margin-right: 2%;
     max-height: 25rem;
-    overflow: scroll;
+    overflow: auto;
 }
 #bookmarks, #shared_folders{
     max-height: 25rem;
-    overflow: scroll;
+    overflow: auto;
 }
 
 

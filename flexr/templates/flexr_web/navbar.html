@@ -159,14 +159,6 @@
     <div class = "suggested sidenav">
      
       <a class="navbar-brand" href="/"><img src="{% static 'flexr_logo_2.png' %}" width="100%"></a>
-      <h2 id = "sites-head">Bookmarks</h2>
-      {%for site in Suggested_Sites%}
-              <div id = "site" class = "site card col-lg-12" onclick="window.open('{{site.url}}'); ">
-                      <p>{{site.name}}</p>
-              </div>
-      {%endfor%}
- 
-     
       <h2 id = "sites-head">Suggested Sites</h2>
       {%for site in Suggested_Sites%}
               <div id = "site" class = "site card col-lg-12" onclick="window.open('{{site.url}}'); ">
