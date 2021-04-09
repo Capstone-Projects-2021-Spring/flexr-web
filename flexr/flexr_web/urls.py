@@ -118,6 +118,7 @@ urlpatterns = [
     path('api/account_preferences/', AccountPreferencesAPIView.as_view()),
 
     path('api/notes/<id>/', NoteViewAPI.as_view()),
+    path('api/notes/', NoteViewAPI().get_all),
 
     path('api/shared_folders/', FoldersViewAPI.as_view()),
     path('api/shared_folders/<id>/', FoldersViewAPI.as_view()),

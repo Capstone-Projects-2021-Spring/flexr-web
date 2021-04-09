@@ -138,11 +138,18 @@ class NoteViewAPI(LoginRequiredMixin, DetailView):
         data = NoteSerializer(note)
         return JsonResponse(data.data, safe=False)
 
+    def get_all(self, request):
+        curr_user = request.user
+        curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
+        notes = curr_account.notes.all()
+        data = NoteSerializer(notes, many=True)
+        return JsonResponse(data.data, safe=False)
+
     def get(self, request, *args, **kwargs):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
-        note = Note.objects.filter(account=curr_account)
-        data = NoteSerializer(note, many=True)
+        note = curr_account.notes.get(id = kwargs['id'])
+        data = NoteSerializer(note, many=False)
         return JsonResponse(data.data, safe=False)
 
     @method_decorator(csrf_exempt)
