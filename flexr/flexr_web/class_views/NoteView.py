@@ -130,11 +130,8 @@ class NoteViewAPI(LoginRequiredMixin, DetailView):
     def post(self, request, *args, **kwargs):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
-
         data = json.loads(request.body)
         # TODO: make this work
-        note = curr_account.notes.get(pk=kwargs['pk'])
-        data['id'] = note.id
         note = Note.objects.create(account=curr_account, **data)
         data = NoteSerializer(note)
         return JsonResponse(data.data, safe=False)
@@ -159,7 +156,7 @@ class NoteViewAPI(LoginRequiredMixin, DetailView):
         curr_acc = curr_user.accounts.get(account_id=request.session['account_id'])
 
         # TODO: make this access and update properly
-        note = curr_acc.notes.get(pk=kwargs['pk'])
+        note = curr_acc.notes.get(pk=kwargs['id'])
         request_data = json.loads(request.body)
         note.edit_title = request_data['title']
         note.edit_content = request_data['content']
@@ -170,10 +167,10 @@ class NoteViewAPI(LoginRequiredMixin, DetailView):
         data = NoteSerializer(note)
         return JsonResponse(data.data, safe=False)
 
-    def delete_note(self, request, *args, **kwargs):
+    def delete(self, request, *args, **kwargs):
         curr_user = request.user
         curr_acc = curr_user.accounts.get(account_id=request.session['account_id'])
-        note = curr_acc.notes.get(pk=kwargs['pk']).delete()
+        note = curr_acc.notes.get(pk=kwargs['id']).delete()
         return JsonResponse({"success": "bookmark deleted"})
 
 
