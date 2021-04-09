@@ -14,11 +14,11 @@
 <body>
     <!-- TODO: verify Note.(something) will be work the way Preferences.(something) works in profile.html  --> 
     {% include "flexr_web/navbar.html" %}
-<!--    <h1>{{user.first_name}}&nbsp{{user.last_name}}</h1>-->
-<!--    <h1>{{user.email}}</h1>-->
-<!--    <h2>{{Accounts.0}}</h2>-->
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
 
-    <div class="body">
+<div class = "body">
+    <div class = "main">
+
         {%if locked%}
             <h2>This note is locked</h2>
             <form method = "POST" action="{% url 'unlock note' object.pk%}">
@@ -61,6 +61,7 @@
                                 {% endfor %}
                                 <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type = "button" class = "btn btn-danger" onclick="window.location.href='/delete-note/{{object.id}}/'">Delete</button>
                             <button type="submit" class="btn btn-primary">Confirm edit</button>
                         </div>
                         </form>
@@ -69,9 +70,7 @@
             </div>
             </div>
         {% endif%}
-
-        <hr>
-
+        </div>
     </div>
 </body>
 </html>

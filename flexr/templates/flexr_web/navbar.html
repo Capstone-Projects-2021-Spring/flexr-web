@@ -143,7 +143,16 @@
         </span>
         <!-- <div style="border: 10px solid white; margin-top: -1.5%; margin-bottom: 5%;"></div> -->
       
-        <h2 id = "sites-head">Accounts</h2>
+        <h2 id = "sites-head">Accounts</h2><img class="plus-icon" id="plus-icon" width="20px" data-toggle="modal" data-target="#add_account" src = "{% static 'icons/plus.png' %}" >
+        <script>
+            $(document).ready(function(){
+                $('.plus-icon').hover(function() {
+                $(this).attr('src', "{% static 'icons/plus-circle.png' %}");
+                }, function() {
+                $(this).attr('src', "{% static 'icons/plus.png' %}");
+                });
+            });
+        </script>
           {%for acc in Accounts%}          
               <div id = "acc" class = "col-lg-10" >
                   {%if acc.account_id == curr_acc.account_id%}

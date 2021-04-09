@@ -144,6 +144,14 @@ class NoteViewAPI(LoginRequiredMixin, DetailView):
         return JsonResponse(data.data, safe=False)
 
     def get(self, request, *args, **kwargs):
+        url = request.path.split('/')
+
+        if url[-2] == 'notes':
+            return self.get_all(request, *args, **kwargs)
+        else:
+            return self.get_note(request, *args, **kwargs)
+
+    def get_note(self, request, *args, **kwargs):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
         note = curr_account.notes.get(id = kwargs['id'])

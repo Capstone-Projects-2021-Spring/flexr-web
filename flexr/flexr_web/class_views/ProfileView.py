@@ -97,8 +97,8 @@ class ProfileView(LoginRequiredMixin, View):
         print("friend requests", friend_requests)
         pending_friends = curr_account.all_pending_friends.all()
         print(pending_friends)
-        all_accounts = Account.objects.filter(~Q(account_id__in=[o.account_id for o in
-                                                                 accounts]))  # this needs to be filter on account preferences searchable
+        accounts_not_curr_user = Account.objects # this needs to be filter on account preferences searchable
+        all_accounts = Account.objects.exclude(account_id__in = friends).exclude(user = curr_user) 
         # all_accounts = accounts
         print(all_accounts)
         request.session['prev_url'] = '/profile/'

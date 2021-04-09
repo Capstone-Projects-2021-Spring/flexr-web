@@ -1,0 +1,28 @@
+.main{
+    margin-left: 3%;
+    margin-right: 3%;
+}
+
+#account, #tab, #note,  #history, #bookmark, #sf {
+    border-radius: 7px; 
+    text-align:center;
+    margin: 1%;
+}
+
+#account:hover, #tab:hover, #note:hover, #history:hover, #bookmark:hover, #sf:hover{
+    text-align:center;
+    box-shadow: 1px 2px 15px 1px #ccd3eb;
+    cursor: pointer;
+    position: relative; 
+    top: -2px;
+}
+
+.card{
+    /* box-shadow: 1px 1px 10px 1px #ccd3eb; */
+    border: 1px solid #e5f7fc ;
+    padding: 1%;
+    height: 6rem;
+    word-wrap: break-word;
+    text-overflow: ellipsis;
+}
+      
