@@ -106,6 +106,7 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
         data = FriendshipSerializer(friendships)
         return JsonResponse(data.data, safe=False)
 
+    @method_decorator(csrf_exempt)
     def accept(self, request, *args, **kwargs):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
@@ -119,6 +120,7 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
         data = FriendshipSerializer(friendships)
         return JsonResponse(data.data, safe=False)
 
+    @method_decorator(csrf_exempt)
     def deny(self, request, *args, **kwargs):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
