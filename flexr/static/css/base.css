@@ -26,3 +26,35 @@
     text-overflow: ellipsis;
 }
       
+
+.tab{
+    height: 20% !important;
+    margin: 1%;
+}
+
+.close:hover{
+    cursor: pointer;
+}
+#plus-icon:hover{
+    cursor: pointer;
+}
+#plus-icon:hover{
+    cursor: pointer;
+}
+.close{
+    margin-top: -1%;
+}
+#plus-icon{
+    margin-left: 10px;
+    padding-bottom: 10px;
+    display: inline;
+}
+
+#bm-icon{
+    width: 20px;
+
+}
+#bm-icon:hover{
+    width: 22px;
+    cursor: pointer;
+}

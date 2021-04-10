@@ -42,30 +42,7 @@
     
     <div class = "body">
 
-        <div class="modal fade" id="add_tab" tabindex="-1" role="dialog" aria-labelledby="add_tabLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="add_tabLabel">Add a tab!</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form method = "post" action="{% url 'add tab' %}">
-                    {% csrf_token %}
-                    <label for = "url">URL</label>
-                    <input type="url" id = "url" name = "url">
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Add tab</button>
-                    </div>
-                </form>
-            </div>
-            </div>
-        </div>
-        </div>
-
+        
         <div class="bm-tabs row justify-content-center">
             <div id = "tabs" class="card col-lg-4">
                 <div class = "card-header sticky-top">

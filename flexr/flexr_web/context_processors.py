@@ -1,5 +1,5 @@
 def add_variable_to_context(request):
-    if request.user.is_authenticated and not request.user.is_superuser:
+    if request.user.is_authenticated and request.user.accounts.all().count() > 0:
         print(request.user.accounts.get(account_id = request.session['account_id']))
 
         return {

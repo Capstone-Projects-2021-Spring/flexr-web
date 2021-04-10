@@ -36,7 +36,15 @@ class NoteView(LoginRequiredMixin, View):
         # get form object and initialize it with data
         form = EditNoteForm()
         form.fields['title'].initial = obj.title
+        form.fields['title'].label = ""
         form.fields['content'].initial = obj.content
+        form.fields['content'].label = ""
+        form.fields['lock'].label = "Lock:"
+        form.fields['lock'].initial = obj.lock
+        form.fields['password'].label = "Password:"
+        form.fields['password'].initial = obj.password
+        form.fields['password'].attribute = "password"
+        print(form.fields['password'])
 
         # request messages for debugging
         if ('message' in self.request.session):
@@ -77,26 +85,51 @@ class NoteView(LoginRequiredMixin, View):
 
         # check if form is valid
         if form.is_valid():
-
+            
             # get current account
-            curr_acc = Account.objects.get(account_id = request.session['account_id'])
-            
-            # get information from form
-            title = request.POST.get('title')
-            content = request.POST.get('content')
-            
-            # get requested note and update with requested data
-            obj = curr_acc.notes.get(pk=kwargs['pk'])
-            obj.title = title
-            obj.content = content
-            obj.save()
+            acc = request.user.accounts.get(account_id = request.session['account_id'])
+            noteid = kwargs['pk']
+            print(noteid)
+            print(acc.notes.all())
+            note = acc.notes.get(id = noteid)
+            print(note)
+            # grab note information from the form 
+            tit = request.POST.get('title')
+            cont = request.POST.get('content')
+            lo = request.POST.get('locked')
+            passw = request.POST.get('password')
+            passw2 = request.POST.get('password2')
+            if passw != note.password and passw != passw2:
+                request.session['note_unlocked'] = noteid
+                request.session['err_message'] = "Note not edited. Passwords do not match"
+                return redirect(request.session['prev_url'])
 
-        # request messages for debugging
+            # check whether note is password locked
+            if lo == 'on':
+                lo = True
+
+            else:
+                if (passw not in EMPTY_VALUES):
+                    print("reached",passw)
+                    request.session['note_unlocked'] = noteid
+                    request.session['err_message'] = "Note not edited. Please put a password on locked note"
+                    return redirect(request.session['prev_url'])
+                lo = False
+
+            note.title = tit
+            note.content = cont
+            note.locked = lo
+            note.password = passw
+
+            note.save()
+            request.session['note_unlocked'] = noteid
             request.session['message'] = "Note edited"
-        else:
-            request.session['err_message'] = "Note could not be edited"
 
-        # display requested note after editing 
+        else:
+            request.session['note_unlocked'] = noteid
+            request.session['err_message'] = "Note not edited. Please put a password on locked note"
+            #print(form.errors)
+
         return redirect(request.session['prev_url'])
 
     def unlock_note(self, request, *args, **kwargs):

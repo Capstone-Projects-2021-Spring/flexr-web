@@ -8,16 +8,16 @@
 <body>
     {% include "flexr_web/navbar.html" %}
     <link rel="stylesheet" href="{% static 'css/index.css' %}">
-    <h1 id = "title" >{{shared_folder.title}}</h1> 
-    <img id="plus-icon" data-toggle="modal" data-target="#edit_folder" src="{% static 'icons/pencil-square.svg' %}" width="30px">
-
+    <div id = "head">
+        <h1 id = "title">{{shared_folder.title}}</h1> 
+        <img id="plus-icon" data-toggle="modal" data-target="#edit_folder" src="{% static 'icons/edit.png' %}" width="30px">
+    </div>
     <div class="modal fade" id="edit_folder" tabindex="-1" role="dialog" aria-labelledby="edit_folderLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="edit_folderLabel">Edit your folder</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
+                <img type="button" data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
                 </button>
             </div>
             <div class="modal-body">
@@ -36,14 +36,14 @@
                             </p>
                             {% endfor %}
                             <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        
                         <button type="submit" class="btn btn-primary">Confirm edit</button>
                     </div>
                     </form>
             </div>
             </div>
         </div>
-        </div>
+    </div>
     <div class = "suggested sidenav">
      
       <a class="navbar-brand" href="/"><img src="{% static 'flexr_logo_2.png' %}" width="100%"></a>

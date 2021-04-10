@@ -32,7 +32,16 @@ body {
     border-bottom: 10px solid #f7fdff;
 }
 
-#title{
+#title, #plus-icon{
+    display: inline;
+}
+
+#plus-icon:hover{
+    cursor: pointer;
+}
+
+
+#head{
     text-align: center;
     margin-bottom: 1%;
 }

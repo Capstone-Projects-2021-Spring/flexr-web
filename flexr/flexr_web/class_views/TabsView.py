@@ -32,7 +32,7 @@ class TabsView(LoginRequiredMixin, View):
         # get all accounts for current user and
         # get all tabs for current account
         accounts = curr_user.accounts.all()
-        tabs = curr_account.tabs.all()
+        tabs = curr_account.tabs.order_by('-last_visited')
 
         # request messages for debugging
         if ('message' in self.request.session):

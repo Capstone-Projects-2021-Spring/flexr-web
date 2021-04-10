@@ -28,7 +28,7 @@
         <div class="main">
             <h1>{{user.first_name}}&nbsp{{user.last_name}}&nbsp@{{user}}</h1>
             <h1>{{user.email}}</h1>
-            <h2 style="display:inline">{{curr_acc}}</h2><img id = "edit" src="{% static 'icons/pencil-square.svg'%}" data-toggle="modal" data-target="#view_account">
+            <h2 style="display:inline">{{curr_acc}}</h2><img id = "edit" style="padding-bottom: 1%; margin-left: 1%;" width = 20px src="{% static 'icons/edit.png'%}" data-toggle="modal" data-target="#view_account">
             <br>
             <h1 style="display:inline;" >Friends: </h1><img id = "edit" width = 20px src="{% static 'icons/plus.png'%}" data-toggle="modal" data-target="#friend_search">
             <div class = "row">
@@ -39,17 +39,6 @@
                     </div>
                 {% endfor %}
             </div>
-            <script>
-                async function friend_search(){
-                    var search = document.getElementById("search").value
-
-                }
-            </script>
-            <form onsubmit="friend_search()">
-                <input type="text" placeholder="Search up a user's name" id = "search" style="display: inline;">
-                <button class = "btn btn-primary" type="submit" style="display: inline;">Search</button>
-            </form>
-            
             <h1 style="display:inline;" >Friend Requests: </h1>
             <div class = "row">
             {% for request in friend_requests %}
@@ -67,27 +56,35 @@
                 <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="friend_searchLabel">Add a friend</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                    <img type="button" data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
                     </button>
                 </div>
                 <div class="modal-body">
                         
                         <div class = "add_friend">
+                            <script>
+                                async function friend_search(){
+                                    var search = document.getElementById("search").value
+                
+                                }
+                            </script>
+                            <form onsubmit="friend_search()">
+                                <input type="text" placeholder="Search up a user's name" id = "search" style="display: inline;">
+                                <button class = "btn btn-primary" type="submit" style="display: inline;">Search</button>
+                            </form>
                             {% for account in AllAccounts%}
                                 <br>
-                                <form  method="post" action = "/add_friend/">
+                                <form  method="post" action = "/add_friend/" id = "add_friend_form">
                                     {% csrf_token %}
                                         <input hidden name = "account_friend" value = "{{account.account_id}}"></input>
-                                        <p style="display: inline;">{{account.username}} - {{account.user.first_name}} {{account.user.last_name}} {{account.account_id}}</p>
-                                        <button type="submit"><img src="{% static 'icons/add-user.png'%}"  width = 20px style="display: inline;"></button>
-
+                                        <p style="display: inline;">{{account.user.first_name}} {{account.user.last_name}} - {{account}}</p>
+                                        <img  src="{% static 'icons/add-user.png'%}"  width = 20px style="display: inline;" id = "add-user" onclick="document.getElementById('add_friend_form').submit()">
                                 </form>
                                 <hr>
                             {% endfor %}
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            
                             <!-- <button type="submit" class="btn btn-primary">Send friend request!</button> -->
                         </div>
                     </form>
@@ -103,8 +100,7 @@
                 <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="view_accountLabel">Edit your account</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                    <img type="button" data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
                     </button>
                 </div>
                 <div class="modal-body">
@@ -124,7 +120,7 @@
                             {% endfor %}
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            
                             <button type="button" class="btn btn-danger" onclick="window.location.href = '/delete_account/{{curr_acc.account_id}}'">Delete</button>
         <!--                    {% if user.accounts.all|length > 1%}-->
 

@@ -29,7 +29,7 @@
                     {% endfor %}
 
                 <div class="modal-footer">
-                    <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
+                    <!--  -->
 
             <!--                    <button type="button" class="btn btn-danger" onclick="delete_account()">Delete</button>-->
                     <button type="submit" class="btn btn-primary">Filter</button>
@@ -43,8 +43,7 @@ Edit Folder <img id="plus-icon" data-toggle="modal" data-target="#edit_folder" s
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="edit_noteLabel">Edit a note!</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
+        <img type="button" data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
         </button>
       </div>
       <div class="modal-body">
@@ -63,7 +62,7 @@ Edit Folder <img id="plus-icon" data-toggle="modal" data-target="#edit_folder" s
                     </p>
                     {% endfor %}
                     <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                
                 <button type="submit" class="btn btn-primary">Confirm edit</button>
             </div>
             </form>

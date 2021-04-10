@@ -62,6 +62,9 @@ body{
     cursor: pointer;
 }
 
+#add-user:hover{
+    cursor: pointer;
+}
 #account{
     height: 3rem;
 }

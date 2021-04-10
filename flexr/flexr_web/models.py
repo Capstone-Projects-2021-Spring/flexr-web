@@ -58,7 +58,7 @@ class Account(models.Model):
             self.account_preferences = Account_Preferences.objects.create(home_page = site)
 
     def __str__(self):
-        return str(self.username)+str(self.account_id) + " " + str(self.type_of_account)
+        return str(self.username)+" #"+str(self.account_id)
 
     def rank_sites(self):
         # print("Ranking sites", self.sites.all())
@@ -135,7 +135,7 @@ class History(models.Model):
     def save(self, *args, **kwargs):
         self.site.visited()
         self.url = self.site.url
-        super().save(*args, **kwargs)
+        super().save()
 
 class Site(models.Model):
     name = models.CharField(max_length=50)
@@ -232,7 +232,6 @@ class Tab(models.Model):
             site.visited()
             tab = Tab(account = curr_account, site = site, status = "open")
             history = History.objects.create(account = curr_account, site = site, visit_datetime=last_visit)
-            history.save()
             
         except: # if site doesn't exist create it and create tab
             site = Site.objects.create(account = curr_account , url = site_url, 
@@ -282,7 +281,6 @@ class Tab(models.Model):
         site =  Site.objects.filter(pk = self.site_id)[0]
         self.url = self.site.url
         print("self.url", self.url)
-        tab = Tab.open_tab(site.url, account, self.created_date, self.last_visited, toSave=False)
         super(Tab, self).save(*args, **kwargs)
         # create corresponding site object
 
