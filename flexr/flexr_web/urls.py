@@ -53,11 +53,13 @@ urlpatterns = [
     path('bookmarks/', BookmarksView.as_view(), name = "bookmarks"), #broken
     path('add_bookmark/<id>/', BookmarksView().add_bookmark, name = "add bookmark"),
     path('delete_bookmark/<id>/', BookmarksView().delete_bookmark, name = "delete bookmark"),
+    # path('delete_bookmark/<id>/', BookmarksView().delete_bookmark, name = "delete bookmark"),
 
     path('create_bookmark_folder/', BookmarkFolderView().create_bookmark_folder_web, name='create_bookmark_folder'),
     path('bookmark_folder/<int:pk>/', BookmarkFolderView.as_view(), name='bookmark-folder-detail'),
     path('delete_bookmark_folder/<int:pk>/', BookmarkFolderView().delete_bookmark_folder_web, name='delete-bookmark-folder'),
     path('edit_bookmark_folder/<int:pk>', BookmarkFolderView().edit_bookmark_folder, name='edit_bookmark_folder'),
+    path('remove_from_folder/<int:pk>/<int:id>/', BookmarkFolderView().remove_from_folder, name='remove_from_folder'),
 
     path('shared_folders/', SharedFoldersView.as_view(), name = "shared folders"),
     path('add_shared_folder/', SharedFoldersView().create_shared_folder, name = "add shared folder"),
