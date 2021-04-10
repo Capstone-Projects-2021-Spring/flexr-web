@@ -74,8 +74,8 @@ class FriendView(LoginRequiredMixin, DetailView):
         request.session['message'] = "Friend deleted"
         return redirect(request.session['prev_url'])
 
+@method_decorator(csrf_exempt, name='dispatch')
 class FriendAPIView(LoginRequiredMixin, DetailView):
-    @method_decorator(csrf_exempt)
     def get(self, request):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
@@ -87,8 +87,7 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
         data = FriendshipSerializer(friendships, many=True)
         return JsonResponse(data.data, safe=False)
 
-    @method_decorator(csrf_exempt)
-    def delete_friend(self, request, *args, **kwargs):
+    def delete(self, request, *args, **kwargs):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
         friendships_sent = curr_account.from_friend.all()
@@ -104,7 +103,7 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
             friendship.received.all_friends.remove(curr_account)
         friendship.status = "Declined"
         friendship.save()
-        data = FriendshipSerializer(friendships, many=True)
+        data = FriendshipSerializer(friendships)
         return JsonResponse(data.data, safe=False)
 
     @method_decorator(csrf_exempt)
@@ -118,7 +117,7 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
         print(friendship)
         friendship.status = "Accepted"
         friendship.save()
-        data = FriendshipSerializer(friendships, many=True)
+        data = FriendshipSerializer(friendships)
         return JsonResponse(data.data, safe=False)
 
     @method_decorator(csrf_exempt)
@@ -131,7 +130,7 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
         friendship = friendships.get(id = kwargs['id'])
         friendship.status = "Declined"
         friendship.save()
-        data = FriendshipSerializer(friendships, many=True)
+        data = FriendshipSerializer(friendships)
         return JsonResponse(data.data, safe=False)
 
     @method_decorator(csrf_exempt)
