@@ -14,32 +14,28 @@
     {% include "flexr_web/navbar.html" %}
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
 
-    <hr>
-    <h3>Notes:</h3>
-    <hr>
-    <div class="modal-body">
-        <form method="post">
-             {% csrf_token %}
-             {% for field in fform %}
-             <p>
-                 {{ field.label_tag }}<br>
-                 {{ field }} 
-            </p>
 
-            {% endfor %}
-
-          <div class="modal-footer">
-              <button type="submit" class="btn btn-primary">Search</button>
-          </div>
-      </form>
-    </div>
-  </div>
-</div>
-</div>
-
-    <p style="display: inline;">Create Note</p> <img style="display:inline;" id="plus-icon" data-toggle="modal" data-target="#add_note" src="{% static 'icons/plus-square.svg' %}">
     <div class = "body">
         <div class = "main">
+            <hr>
+                <h3>Notes:</h3>
+                <hr>
+                <div class="modal-body">
+                    <form method="post">
+                         {% csrf_token %}
+                         {% for field in fform %}
+                         <p>
+                             {{ field.label_tag }}<br>
+                             {{ field }}
+                        </p>
+
+                        {% endfor %}
+
+                      <div class="modal-footer">
+                          <button type="submit" class="btn btn-primary">Search</button>
+                      </div>
+                  </form>
+                </div>
             <p style="display: inline;">Create Note</p><img style="display:inline;" id="plus-icon" width = 20px data-toggle="modal" data-target="#add_note" src="{% static 'icons/plus.png' %}">
 
             <div class = "card-body row">
