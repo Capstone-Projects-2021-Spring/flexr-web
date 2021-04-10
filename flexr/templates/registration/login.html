@@ -13,7 +13,7 @@
         <div class = "form">
             <h1>Welcome to Flexr!</h1>
             {% if form.errors %}
-                <p>There's an error with what you entered</p>
+                <p>{{form.errors}}</p>
             {% endif %}
 
             {% if next %}
