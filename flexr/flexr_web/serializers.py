@@ -4,16 +4,26 @@ from .models import *
 
 
 class UserSerializer(serializers.ModelSerializer):
+    
     class Meta:
         model = User
         fields = ['id', 'username', 'first_name','last_name', 'email']
 
-class AccountSerializer(serializers.ModelSerializer):
+class MutualFriendSerializer(serializers.ModelSerializer):
     user = UserSerializer(many=False, read_only=True)
     class Meta:
         model = Account
-        fields = ['account_id', 'user', 'username', 'email', 'phone_number', 'date_joined', 'type_of_account',
-        'account_preferences', 'account_id']
+        fields = ['account_id', 'username', 'user']
+
+class AccountSerializer(serializers.ModelSerializer):
+    user = UserSerializer(many=False, read_only=True)
+    mutual_friends = MutualFriendSerializer(many= True, read_only = True)
+    class Meta: 
+        model = Account
+        fields = ['account_id', 'user', 'username', 'email', 'phone_number', 'mutual_friends','date_joined', 'type_of_account',
+        'account_preferences']
+
+
 
 class SiteSerializer(serializers.ModelSerializer):
     account = AccountSerializer(many=False, read_only=False)
