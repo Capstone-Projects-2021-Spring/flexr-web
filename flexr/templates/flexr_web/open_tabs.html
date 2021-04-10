@@ -36,9 +36,9 @@
                             <span style="display: inline;">
                                 <!-- <p>{{tab.site.bookmarked}}</p> -->
                                 {%if tab.site.bookmarked > 0%}
-                                    <img id="bm-icon" onclick="window.location.href = '/delete_bookmark/{{tab.site.bookmarked}}'" src="{% static 'icons/bookmarked.png' %}" width= 15px>
+                                    <img id="bm-icon" onclick="window.location.href = '/delete_bookmark/{{tab.site.bookmarked}}'" src="{% static 'icons/bookmarked.png' %}" width= 20px>
                                 {%else%}
-                                    <img id="bm-icon" onclick="window.location.href = '/add_bookmark/{{tab.id}}'" src="{% static 'icons/empty-bookmark.png' %}" width= 15px>
+                                    <img id="bm-icon" onclick="window.location.href = '/add_bookmark/{{tab.id}}'" src="{% static 'icons/empty-bookmark.png' %}" width= 20px>
                                 {%endif%}
                             </span>
                             <p><a href="{{tab.site.url}}">{{tab.site.url}}</a></p>

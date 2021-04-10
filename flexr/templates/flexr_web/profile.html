@@ -33,20 +33,21 @@
             <h1 style="display:inline;" >Friends: </h1><img id = "edit" width = 20px src="{% static 'icons/plus.png'%}" data-toggle="modal" data-target="#friend_search">
             <div class = "row">
                 {% for friend in Friends %}
-                    <div class = "friend card col-md-3" >
-                        <p style="display: inline;">{{friend}}</p>
-                        <img src="{% static 'icons/remove-user.png'%}" style="display: inline;" id = "friend_delete" onclick="window.location.href = '/remove_friend/{{friend.account_id}}'">
+                    <div class = "friend card col-md-2" >
+                        <span><p id = "friendship">{{friend}}</p><img id = "friend_delete" src="{% static 'icons/remove-user.png'%}"   onclick="window.location.href = '/remove_friend/{{friend.account_id}}'"></span>
                     </div>
                 {% endfor %}
             </div>
             <h1 style="display:inline;" >Friend Requests: </h1>
             <div class = "row">
             {% for request in friend_requests %}
-                <div class = "folder card col-md-3" >
+                <div class = "friend_requests card col-md-3" >
                     <p style="display: inline;">{{request.sent.user.first_name}} {{request.sent.user.last_name}}</p>
-                    <h2>{{request.sent_date}}</h2>
-                    <button type="button" style="width: 35%; display: inline;" class="btn btn-danger" onclick="window.location.href = '/deny_friend/{{request.id}}'">Deny</button>
-                    <button type="button" style="width: 35%; display: inline;" class="btn btn-success" onclick="window.location.href = '/accept_friend/{{request.id}}'">Accept</button>
+                    <p>{{request.sent_date}}</p>
+                    <span>
+                        <button type="button" style="width: 35%; display: inline;" class="btn btn-danger" onclick="window.location.href = '/deny_friend/{{request.id}}'">Deny</button>
+                        <button type="button" style="width: 35%; display: inline;" class="btn btn-success" onclick="window.location.href = '/accept_friend/{{request.id}}'">Accept</button>
+                    </span>
                 </div>
             {% endfor %}
             </div>
@@ -72,16 +73,21 @@
                                 <input type="text" placeholder="Search up a user's name" id = "search" style="display: inline;">
                                 <button class = "btn btn-primary" type="submit" style="display: inline;">Search</button>
                             </form>
-                            {% for account in AllAccounts%}
+                            <h2>Mutual Friends</h2>
+                            {% for account in mutual_friends%}
                                 <br>
-                                <form  method="post" action = "/add_friend/" id = "add_friend_form">
+                                <form  method="post" action = "/add_friend/" id = "add_friend_form{{account.account_id}}">
                                     {% csrf_token %}
                                         <input hidden name = "account_friend" value = "{{account.account_id}}"></input>
                                         <p style="display: inline;">{{account.user.first_name}} {{account.user.last_name}} - {{account}}</p>
-                                        <img  src="{% static 'icons/add-user.png'%}"  width = 20px style="display: inline;" id = "add-user" onclick="document.getElementById('add_friend_form').submit()">
+                                        <img  src="{% static 'icons/add-user.png'%}"  width = 20px style="display: inline;" id = "add-user" onclick="document.getElementById('add_friend_form{{account.account_id}}').submit()">
                                 </form>
                                 <hr>
                             {% endfor %}
+                            <br>
+                            <hr>
+                            <br>
+                            
                         </div>
                         <div class="modal-footer">
                             

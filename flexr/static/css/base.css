@@ -58,3 +58,16 @@
     width: 22px;
     cursor: pointer;
 }
+
+#friendship{
+    display: inline;
+}
+
+.friend{
+    text-align: center;
+    height: 3rem;
+}
+
+.friend_requests{
+    height: 10rem;
+}

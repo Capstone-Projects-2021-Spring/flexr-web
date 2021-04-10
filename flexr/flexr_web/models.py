@@ -45,6 +45,7 @@ class Account(models.Model):
     friends = models.ManyToManyField("Account", related_name= "all_friends", blank=True) # this probably needs to be another table
     notifs = models.ManyToManyField("Friendship",  blank=True)
     pending_friends = models.ManyToManyField("Account", related_name="all_pending_friends",  blank=True)
+    mutual_friends = models.ManyToManyField("Account", related_name="all_mutual_friends",  blank=True)
 
     account_preferences = models.OneToOneField("Account_Preferences", on_delete=models.CASCADE, blank=True, null = True)
     account_id = models.AutoField(primary_key=True)
@@ -414,14 +415,40 @@ class Friendship(models.Model):
 
     def save(self, *args, **kwargs):
         if(self.status == "Accepted" ):
+
             self.accepted_date = timezone.now()
             super().save(*args, **kwargs)
+            try:
+                self.sent.mutual_friends.remove(self.received)
+            except:
+                pass
+            try:
+                self.received.mutual_friends.remove(self.sent)
+            except:
+                pass
+            sent_friends = self.sent.friends.exclude(account_id__in=self.received.friends.all()).exclude(
+                user=self.sent.user)
+            print("sent friends", sent_friends)
+            # self.received.mutual_friends.add(sent_friends)
+            for friend in sent_friends:
+                self.received.mutual_friends.add(friend)
+                friend.mutual_friends.add(self.sent)
+
+            received_friends = self.received.friends.exclude(account_id__in=self.sent.friends.all()).exclude(
+                user=self.received.user)
+            print("received friends", received_friends)
+            # self.sent.mutual_friends.add(received_friends)
+            for friend in received_friends:
+                self.sent.mutual_friends.add(friend)
+                friend.mutual_friends.add(self.received)
 
             self.sent.friends.add(self.received)
             self.received.friends.add(self.sent)
 
+
             self.received.notifs.remove(self)
             self.sent.notifs.add(self)
+
 
             self.sent.pending_friends.remove(self.received)
             self.received.pending_friends.remove(self.sent)
@@ -442,7 +469,6 @@ class Friendship(models.Model):
             self.received.notifs.remove(self)
             self.sent.pending_friends.remove(self.received)
             self.received.pending_friends.remove(self.sent)
-
             self.sent.save()
             self.received.save()
             self.delete()

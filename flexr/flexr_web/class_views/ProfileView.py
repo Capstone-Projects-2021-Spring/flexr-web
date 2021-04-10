@@ -97,8 +97,13 @@ class ProfileView(LoginRequiredMixin, View):
         print("friend requests", friend_requests)
         pending_friends = curr_account.all_pending_friends.all()
         print(pending_friends)
+
+        # This needs to exclude all of the people you've already sent request to
+
         accounts_not_curr_user = Account.objects # this needs to be filter on account preferences searchable
         all_accounts = Account.objects.exclude(account_id__in = friends).exclude(user = curr_user) 
+
+        mutual_friends = curr_account.mutual_friends.all()
         # all_accounts = accounts
         print(all_accounts)
         request.session['prev_url'] = '/profile/'
@@ -106,6 +111,7 @@ class ProfileView(LoginRequiredMixin, View):
                                                                "Preferences": acc_pref, "pref_form": pref_form,
                                                                "account_form": account_form, "Friends": friends,
                                                                "AllAccounts": all_accounts,
+                                                               "mutual_friends": mutual_friends,
                                                                "friend_requests": friend_requests})
 
     def edit_account(self, request, *args, **kwargs):
