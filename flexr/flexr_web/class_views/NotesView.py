@@ -141,4 +141,8 @@ class NotesView(LoginRequiredMixin, View):
         obj.delete()
 
         # return to notes page
-        return redirect(request.session['prev_url'])
+        if(request.session['prev_url'] != '/opennote/'+str(kwargs['pk'])+'/'):
+            return redirect(request.session['prev_url'])
+        else:
+            print(request.session['prev_url'])
+            return redirect('/notes/')

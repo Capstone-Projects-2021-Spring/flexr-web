@@ -3,26 +3,26 @@ body {
     padding-left: 15%;
     padding-right: 15%;
     background-color: #e5f7fc !important;
+    overflow-x: hidden;
 }
 
 .container{
     max-width: 100%;
 }
-.nav{
-    background-color: #00C4EE;
-    color: white;
-}
 
 #plus-icon:hover{
     cursor: pointer;
 }
-
-#account{
-    height: 3rem;
+.close{
+    margin-top: -1%;
 }
 
+#plus-icon{
+    margin-left: 10px;
+    padding-bottom: 10px;
+}
 
-#accounts, #tabs, #bookmarks, #notes, #shared_folders{
+#tabs, #bookmarks, #notes, #shared_folders{
     background-color: #f7fdff !important;
     box-shadow: 1px 5px 15px 1px #e5e8f3;
     border-radius: 7px;
@@ -30,15 +30,20 @@ body {
     transition: all 1s ease;
     padding: inherit !important;
     border-bottom: 10px solid #f7fdff;
-
 }
 
-#accounts:hover{
-    box-shadow: 1px 7px 12px 2px #c3c6d4;
-    -webkit-transition: all 1s ease;
-	-moz-transition: all 1s ease;
-	-o-transition: all 1s ease;
-	-ms-transform: all 1s ease;
+#title, #plus-icon{
+    display: inline;
+}
+
+#plus-icon:hover{
+    cursor: pointer;
+}
+
+
+#head{
+    text-align: center;
+    margin-bottom: 1%;
 }
 
 #tabs, #bookmarks, .header, #notes, #shared_folders{
@@ -47,14 +52,14 @@ body {
 
 #tabs, #notes{
     margin-right: 2%;
-    max-height: 25rem;
-    overflow: scroll;
-}
-#bookmarks, #shared_folders{
-    max-height: 25rem;
-    overflow: scroll;
+    max-height: 27rem;
+    overflow: auto;
 }
 
+#bookmarks, #shared_folders{
+    max-height: 27rem;
+    overflow: auto;
+}
 
 .card-header{
     /* position: sticky; */
@@ -85,18 +90,7 @@ h2{
     position: relative; 
     top: -2px;
 }
-.close{
-    margin-top: -1%;
-}
 
-#plus-icon{
-    margin-left: 10px;
-    padding-bottom: 10px;
-}
-
-#plus-icon:hover{
-    cursor: pointer;
-}
 
 #active_acc{
     color: #0087C2;
@@ -107,19 +101,11 @@ h2{
     border: 1px solid #e5f7fc ;
     padding: 1%;
     height: 6rem;
-    overflow: hidden;
     word-wrap: break-word;
     text-overflow: ellipsis;
 }
-
-              
+      
 .fa-window-close:hover{
     cursor: pointer;
     color: grey;
-}
-
-.form-control{
-     width: 30%;
-     display: inline;
-     margin-left: 20%;
 }

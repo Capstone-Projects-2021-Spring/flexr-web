@@ -42,42 +42,13 @@
     
     <div class = "body">
 
-        <div class="modal fade" id="add_tab" tabindex="-1" role="dialog" aria-labelledby="add_tabLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="add_tabLabel">Add a tab!</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form method = "post" action="{% url 'add tab' %}">
-                    {% csrf_token %}
-                    <label for = "url">URL</label>
-                    <input type="url" id = "url" name = "url">
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Add tab</button>
-                    </div>
-                </form>
-            </div>
-            </div>
-        </div>
-        </div>
-
+        
         <div class="bm-tabs row justify-content-center">
             <div id = "tabs" class="card col-lg-4">
                 <div class = "card-header sticky-top">
                     <h2 style="display:inline">Open tabs</h2>
                     <img id="plus-icon" class="plus-icon" width = 20px; data-toggle="modal" data-target="#add_tab" src="{% static 'icons/plus.png' %}">
-                    {%if Tabs|length > 6%}
-                        <form style="display: inline;" method="post" action="/">{% csrf_token %}<input class="form-control" width= 20% type="text" name = "search" placeholder="Search for tab..." style="margin-right: 1%;"><button  style="margin-right: 1%;" type="submit" class="btn btn-primary">Search</button> </form>
-                        
-                    {%endif%}
-                    {%if filtered%}
-                        <button class="btn btn-primary form-control" onclick="window.location.href = '/'">Reset</button>
-                    {%endif%}
+                    
                 </div>
                 <script>
                     $(document).ready(function(){
@@ -94,7 +65,19 @@
                     {%for tab in Tabs%}
 
                         <div id = "tab" class = "tab card col-lg-5 "  >
-                            <img class="close" onclick=" var conf = confirm('Do you want to close this tab?'); if(conf){ window.location.href = 'close_tab/{{tab.id}}'}" src="{% static 'icons/cancel.png' %}" width= 15px>
+                            <div class="card-body"  style="">
+                                <img class="close" onclick=" var conf = confirm('Do you want to close this tab?'); if(conf){ window.location.href = 'close_tab/{{tab.id}}'}" src="{% static 'icons/cancel.png' %}" width= 15px>
+                                <p onclick="window.open('{{tab.site.url}}')" style="display: inline;">{{tab.site}}</p>
+                                <span style="display: inline;">
+                                    <!-- <p>{{tab.site.bookmarked}}</p> -->
+                                    {%if tab.site.bookmarked > 0%}
+                                        <img class="bm" onclick="window.location.href = 'delete_bookmark/{{tab.site.bookmarked}}'" src="{% static 'icons/bookmarked.png' %}" width= 15px>
+                                    {%else%}
+                                        <img class="bm" onclick="window.location.href = 'add_bookmark/{{tab.id}}'" src="{% static 'icons/empty-bookmark.png' %}" width= 15px>
+                                    {%endif%}
+                                </span>
+                            </div>
+
                             <script>
                                 $(document).ready(function(){
                                     $('.close').hover(function() {
@@ -104,18 +87,6 @@
                                     });
                                 });
                             </script>
-                            <div class="card-body"  style="">
-
-                                <p onclick="window.open('{{tab.site.url}}')" style="display: inline;">{{tab.site}}</p>
-                                <span style="display: inline;">
-                                
-                                    {%if tab.site.bookmarked > 0%}
-                                        <img class="bm" onclick="window.location.href = 'delete_bookmark/{{tab.site.bookmarked}}'" src="{% static 'icons/bookmarked.png' %}" width= 15px>
-                                    {%else%}
-                                        <img class="bm" onclick="window.location.href = 'add_bookmark/{{tab.id}}'" src="{% static 'icons/empty-bookmark.png' %}" width= 15px>
-                                    {%endif%}
-                                </span>
-                            </div>
 
                         </div>
                     {%endfor%}
@@ -202,16 +173,6 @@
                 </div>
             </div>
         </div>
-
-    <!--    <div class = "history">-->
-    <!--        <h2>Recent Site history:</h2>-->
-    <!--        {%for hist in History%}-->
-    <!--                <div id = "history" class = "tab card col-lg-4"  onclick="window.open('{{hist.site.url}}')">-->
-    <!--                        <h3 >{{hist.site.url}}</h3>-->
-    <!--                </div>-->
-    <!--        {%endfor%}-->
-    <!--    </div>-->
-
     </div>
 
 </body>

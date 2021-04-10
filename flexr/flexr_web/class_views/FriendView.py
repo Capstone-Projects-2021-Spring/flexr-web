@@ -25,7 +25,7 @@ class FriendView(LoginRequiredMixin, DetailView):
 
     def add_friend(self, request):
         friend_acc_id = request.POST.get('account_friend')
-        print(friend_acc_id)
+        print("FriendView: add_friend : friend_acc_id",friend_acc_id)
         friend_account = Account.objects.get(account_id=friend_acc_id)
         user_account = request.user.accounts.get(account_id=request.session['account_id'])
         friend_request = Friendship.objects.get_or_create(sent=user_account, received=friend_account)
@@ -74,8 +74,8 @@ class FriendView(LoginRequiredMixin, DetailView):
         request.session['message'] = "Friend deleted"
         return redirect(request.session['prev_url'])
 
+@method_decorator(csrf_exempt, name='dispatch')
 class FriendAPIView(LoginRequiredMixin, DetailView):
-    @method_decorator(csrf_exempt)
     def get(self, request):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
@@ -87,8 +87,7 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
         data = FriendshipSerializer(friendships, many=True)
         return JsonResponse(data.data, safe=False)
 
-    @method_decorator(csrf_exempt)
-    def delete_friend(self, request, *args, **kwargs):
+    def delete(self, request, *args, **kwargs):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
         friendships_sent = curr_account.from_friend.all()
@@ -104,7 +103,7 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
             friendship.received.all_friends.remove(curr_account)
         friendship.status = "Declined"
         friendship.save()
-        data = FriendshipSerializer(friendships, many=True)
+        data = FriendshipSerializer(friendships)
         return JsonResponse(data.data, safe=False)
 
     @method_decorator(csrf_exempt)
@@ -118,7 +117,7 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
         print(friendship)
         friendship.status = "Accepted"
         friendship.save()
-        data = FriendshipSerializer(friendships, many=True)
+        data = FriendshipSerializer(friendships)
         return JsonResponse(data.data, safe=False)
 
     @method_decorator(csrf_exempt)
@@ -131,14 +130,20 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
         friendship = friendships.get(id = kwargs['id'])
         friendship.status = "Declined"
         friendship.save()
-        data = FriendshipSerializer(friendships, many=True)
+        data = FriendshipSerializer(friendships)
         return JsonResponse(data.data, safe=False)
 
     @method_decorator(csrf_exempt)
     def post(self, request):
-        friend_acc_id = request.POST.get('accountId')
-        friend_account = Account.objects.get(account_id=friend_acc_id)
         user_account = request.user.accounts.get(account_id=request.session['account_id'])
-        friend_request = Friendship.objects.get_or_create(sent=user_account, received=friend_account)
-        data = FriendshipSerializer(friend_request, many=True)
-        return JsonResponse(data.data, safe=False)
+        friend_username = request.POST.get('friend_username')
+        friend_id = request.POST.get('friend_id')
+        try:
+            friend_account = Account.objects.get(account_id=friend_id, username = friend_username)
+            friend_request = Friendship.objects.get_or_create(sent=user_account, received=friend_account)
+            data = FriendshipSerializer(friend_request, many=True)
+        except:
+            return JsonResponse({"error": "Account not found."}, status = 404)
+        
+        
+        

@@ -102,8 +102,6 @@ urlpatterns = [
     path('api/friendships/<id>/', FriendAPIView.as_view()),
     path('api/friendships/<id>/accept/', FriendAPIView().accept),
     path('api/friendships/<id>/deny/', FriendAPIView().deny),
-    path('api/friendships/<id>/delete/', FriendAPIView().delete_friend),
-
 
     path('api/history/', HistoryViewAPI.as_view()),
     path('api/history/filter/', HistoryViewAPI.as_view()),
@@ -119,7 +117,8 @@ urlpatterns = [
 
     path('api/account_preferences/', AccountPreferencesAPIView.as_view()),
 
-    path('api/opennote/<id>/', NoteViewAPI.as_view()),
+    path('api/note/<id>/', NoteViewAPI.as_view()),
+    path('api/notes/', NoteViewAPI.as_view()),
 
     path('api/shared_folders/', FoldersViewAPI.as_view()),
     path('api/shared_folders/<id>/', FoldersViewAPI.as_view()),

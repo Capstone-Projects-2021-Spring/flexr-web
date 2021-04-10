@@ -42,10 +42,10 @@ class IndexView(LoginRequiredMixin, View):
         accounts = curr_user.accounts.all()
         history = curr_account.history.all()
         sites = curr_account.sites.all()
-        tabs = curr_account.tabs.all()
-        bookmarks = curr_account.bookmarks.all()
-        notes = curr_account.notes.all()
-        folders = curr_account.shared_folders.all()
+        tabs = curr_account.tabs.all()[:6]
+        bookmarks = curr_account.bookmarks.all()[:6]
+        notes = curr_account.notes.all()[:6]
+        folders = curr_account.shared_folders.all()[:6]
         suggested_sites = curr_account.suggested_sites.order_by('-site_ranking')
         # suggested_sites = curr_account.suggested_sites()
 

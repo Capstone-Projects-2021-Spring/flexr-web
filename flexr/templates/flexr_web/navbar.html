@@ -128,7 +128,11 @@
       {% for message in messages%}
 
           {% if message.tags == "success"%}
-              <script>toastr.success('{{message}}')</script>
+          <style>
+            
+          </style>
+              <script>toastr.success('{{message}}')
+               toastr.options= {"postitionClass": "toast-top-center"}</script>
           {% elif message.tags == "error"%}
               <script>toastr.error('{{message}}')</script>
           {%endif%}
@@ -143,13 +147,22 @@
         </span>
         <!-- <div style="border: 10px solid white; margin-top: -1.5%; margin-bottom: 5%;"></div> -->
       
-        <h2 id = "sites-head">Accounts</h2>
+        <h2 id = "sites-head">Accounts</h2><img class="plus-icon" id="plus-icon" width="20px" data-toggle="modal" data-target="#add_account" src = "{% static 'icons/plus.png' %}" >
+        <script>
+            $(document).ready(function(){
+                $('.plus-icon').hover(function() {
+                $(this).attr('src', "{% static 'icons/plus-circle.png' %}");
+                }, function() {
+                $(this).attr('src', "{% static 'icons/plus.png' %}");
+                });
+            });
+        </script>
           {%for acc in Accounts%}          
               <div id = "acc" class = "col-lg-10" >
                   {%if acc.account_id == curr_acc.account_id%}
-                      <h3 class = "active_acc" onclick="window.location.href = '/profile'">{{acc}}</h3>
+                      <h3 class = "active_acc" onclick="window.location.href = '/profile'">{{acc}} {{acc.type_of_account}}</h3>
                   {%else%}
-                      <p onclick="window.location.href = '/switch_account/{{acc.account_id}}'">{{acc}}</p>
+                      <p onclick="window.location.href = '/switch_account/{{acc.account_id}}'">{{acc}} {{acc.type_of_account}}</p>
                   {%endif%}
               </div>
           {%endfor%}
@@ -159,14 +172,6 @@
     <div class = "suggested sidenav">
      
       <a class="navbar-brand" href="/"><img src="{% static 'flexr_logo_2.png' %}" width="100%"></a>
-      <h2 id = "sites-head">Bookmarks</h2>
-      {%for site in Suggested_Sites%}
-              <div id = "site" class = "site card col-lg-12" onclick="window.open('{{site.url}}'); ">
-                      <p>{{site.name}}</p>
-              </div>
-      {%endfor%}
- 
-     
       <h2 id = "sites-head">Suggested Sites</h2>
       {%for site in Suggested_Sites%}
               <div id = "site" class = "site card col-lg-12" onclick="window.open('{{site.url}}'); ">
@@ -182,8 +187,7 @@
         <div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title" id="add_accountLabel">Add an account!</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
+            <img type="button" data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
             </button>
         </div>
         <div class="modal-body">
@@ -204,7 +208,7 @@
 
                 <!-- {{ form }} -->
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    
                     <button type="submit" class="btn btn-primary">Create account</button>
                 </div>
             </form>
@@ -212,5 +216,29 @@
         </div>
     </div>
     </div>
+
+    <div class="modal fade" id="add_tab" tabindex="-1" role="dialog" aria-labelledby="add_tabLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+          <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="add_tabLabel">Add a tab!</h5>
+              <img type="button" data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
+              </button>
+          </div>
+          <div class="modal-body">
+              <form method = "post" action="{% url 'add tab' %}">
+                  {% csrf_token %}
+                  <label for = "url">URL</label>
+                  <input type="url" id = "url" name = "url">
+                  <div class="modal-footer">
+                      
+                      <button type="submit" class="btn btn-primary">Add tab</button>
+                  </div>
+              </form>
+          </div>
+          </div>
+      </div>
+  </div>
+
 </body>
 </html>

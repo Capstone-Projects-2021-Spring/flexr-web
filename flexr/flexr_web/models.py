@@ -45,6 +45,7 @@ class Account(models.Model):
     friends = models.ManyToManyField("Account", related_name= "all_friends", blank=True) # this probably needs to be another table
     notifs = models.ManyToManyField("Friendship",  blank=True)
     pending_friends = models.ManyToManyField("Account", related_name="all_pending_friends",  blank=True)
+    mutual_friends = models.ManyToManyField("Account", related_name="all_mutual_friends",  blank=True)
 
     account_preferences = models.OneToOneField("Account_Preferences", on_delete=models.CASCADE, blank=True, null = True)
     account_id = models.AutoField(primary_key=True)
@@ -58,7 +59,7 @@ class Account(models.Model):
             self.account_preferences = Account_Preferences.objects.create(home_page = site)
 
     def __str__(self):
-        return str(self.username)+str(self.account_id) + " " + str(self.type_of_account)
+        return str(self.username)+" #"+str(self.account_id)
 
     def rank_sites(self):
         # print("Ranking sites", self.sites.all())
@@ -135,7 +136,7 @@ class History(models.Model):
     def save(self, *args, **kwargs):
         self.site.visited()
         self.url = self.site.url
-        super().save(*args, **kwargs)
+        super().save()
 
 class Site(models.Model):
     name = models.CharField(max_length=50)
@@ -232,7 +233,6 @@ class Tab(models.Model):
             site.visited()
             tab = Tab(account = curr_account, site = site, status = "open")
             history = History.objects.create(account = curr_account, site = site, visit_datetime=last_visit)
-            history.save()
             
         except: # if site doesn't exist create it and create tab
             site = Site.objects.create(account = curr_account , url = site_url, 
@@ -282,7 +282,6 @@ class Tab(models.Model):
         site =  Site.objects.filter(pk = self.site_id)[0]
         self.url = self.site.url
         print("self.url", self.url)
-        tab = Tab.open_tab(site.url, account, self.created_date, self.last_visited, toSave=False)
         super(Tab, self).save(*args, **kwargs)
         # create corresponding site object
 
@@ -304,17 +303,24 @@ class Bookmark(models.Model):
 
     @classmethod
     def create_bookmark(cls, tab, curr_account, last_visited=None):
-        try:
-            bm = Bookmark.objects.create(account = curr_account, bookmark_name = name, site=tab.site)
-            bm.save()
-            return bm.id
-        except:
-            print('bookmark already exists')
+        # try:
+        bm = Bookmark.objects.create(account = curr_account, bookmark_name = tab.site.name, site=tab.site)
+        bm.save()
+        bm.site.bookmarked = bm.id
+        print("Bookmark: create_bookmark", bm)
+        bm.site.save()
+        return bm.id
+        # except:
+        #     print('bookmark already exists')
         
     
     @classmethod
     def delete_bookmark(cls, id):
+        bookmark = Bookmark.objects.get(id = id)
+        bookmark.site.bookmarked = 0
+        bookmark.site.save()
         bookmark = Bookmark.objects.filter(pk=id).delete()
+        
         print('bookmark deleted')
 
     def save(self, *args, **kwargs):
@@ -409,14 +415,40 @@ class Friendship(models.Model):
 
     def save(self, *args, **kwargs):
         if(self.status == "Accepted" ):
+
             self.accepted_date = timezone.now()
             super().save(*args, **kwargs)
+            try:
+                self.sent.mutual_friends.remove(self.received)
+            except:
+                pass
+            try:
+                self.received.mutual_friends.remove(self.sent)
+            except:
+                pass
+            sent_friends = self.sent.friends.exclude(account_id__in=self.received.friends.all()).exclude(
+                user=self.sent.user)
+            print("sent friends", sent_friends)
+            # self.received.mutual_friends.add(sent_friends)
+            for friend in sent_friends:
+                self.received.mutual_friends.add(friend)
+                friend.mutual_friends.add(self.sent)
+
+            received_friends = self.received.friends.exclude(account_id__in=self.sent.friends.all()).exclude(
+                user=self.received.user)
+            print("received friends", received_friends)
+            # self.sent.mutual_friends.add(received_friends)
+            for friend in received_friends:
+                self.sent.mutual_friends.add(friend)
+                friend.mutual_friends.add(self.received)
 
             self.sent.friends.add(self.received)
             self.received.friends.add(self.sent)
 
+
             self.received.notifs.remove(self)
             self.sent.notifs.add(self)
+
 
             self.sent.pending_friends.remove(self.received)
             self.received.pending_friends.remove(self.sent)
@@ -437,7 +469,6 @@ class Friendship(models.Model):
             self.received.notifs.remove(self)
             self.sent.pending_friends.remove(self.received)
             self.received.pending_friends.remove(self.sent)
-
             self.sent.save()
             self.received.save()
             self.delete()
