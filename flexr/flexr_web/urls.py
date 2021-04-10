@@ -100,7 +100,6 @@ urlpatterns = [
     path('api/friendships/<id>/', FriendAPIView.as_view()),
     path('api/friendships/<id>/accept/', FriendAPIView().accept),
     path('api/friendships/<id>/deny/', FriendAPIView().deny),
-    path('api/friendships/<id>/delete/', FriendAPIView().delete_friend),
 
     path('api/history/', HistoryViewAPI.as_view()),
     path('api/history/filter/', HistoryViewAPI.as_view()),
