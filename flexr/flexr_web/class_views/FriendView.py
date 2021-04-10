@@ -74,8 +74,8 @@ class FriendView(LoginRequiredMixin, DetailView):
         request.session['message'] = "Friend deleted"
         return redirect(request.session['prev_url'])
 
+@method_decorator(csrf_exempt, name='dispatch')
 class FriendAPIView(LoginRequiredMixin, DetailView):
-    @method_decorator(csrf_exempt)
     def get(self, request):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
@@ -87,8 +87,7 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
         data = FriendshipSerializer(friendships, many=True)
         return JsonResponse(data.data, safe=False)
 
-    @method_decorator(csrf_exempt)
-    def delete_friend(self, request, *args, **kwargs):
+    def delete(self, request, *args, **kwargs):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
         friendships_sent = curr_account.from_friend.all()
@@ -107,7 +106,6 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
         data = FriendshipSerializer(friendships, many=True)
         return JsonResponse(data.data, safe=False)
 
-    @method_decorator(csrf_exempt)
     def accept(self, request, *args, **kwargs):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
@@ -121,7 +119,6 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
         data = FriendshipSerializer(friendships, many=True)
         return JsonResponse(data.data, safe=False)
 
-    @method_decorator(csrf_exempt)
     def deny(self, request, *args, **kwargs):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
@@ -134,8 +131,7 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
         data = FriendshipSerializer(friendships, many=True)
         return JsonResponse(data.data, safe=False)
 
-    @method_decorator(csrf_exempt)
-    def add_friend(self, request):
+    def post(self, request):
         user_account = request.user.accounts.get(account_id=request.session['account_id'])
         friend_username = request.POST.get('friend_username')
         friend_id = request.POST.get('friend_id')
