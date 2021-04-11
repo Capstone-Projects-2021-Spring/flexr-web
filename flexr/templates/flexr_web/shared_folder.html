@@ -33,8 +33,8 @@
           <div class="modal-body">
                 <form method = "POST" action="{% url 'edit_notes_shared_folder' shared_folder.pk%}">
                   {% csrf_token %}
-                    {{ form.notes.label_tag }}<br>
-                    {{ form.notes }}
+                    {{ noteform.notes.label_tag }}<br>
+                    {{ noteform.notes }}
 
                         <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -69,8 +69,8 @@
             <div class="modal-body">
                   <form method = "POST" action="{% url 'edit_tabs_shared_folder' shared_folder.pk%}">
                     {% csrf_token %}
-                      {{ form.tabs.label_tag }}<br>
-                      {{ form.tabs }}
+                      {{ tabform.tabs.label_tag }}<br>
+                      {{ tabform.tabs }}
   
                           <div class="modal-footer">
                       <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
