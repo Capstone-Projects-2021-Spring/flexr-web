@@ -45,7 +45,7 @@ class IndexView(LoginRequiredMixin, View):
         tabs = curr_account.tabs.all()[:6]
         bookmarks = curr_account.bookmarks.all()[:6]
         notes = curr_account.notes.all()[:6]
-        folders = curr_account.shared_folders.all()[:6]
+        folders = curr_account.collab_shared_folders.all()[:6]
         suggested_sites = curr_account.suggested_sites.order_by('-site_ranking')
         # suggested_sites = curr_account.suggested_sites()
 

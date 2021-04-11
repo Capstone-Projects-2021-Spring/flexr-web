@@ -53,7 +53,7 @@
             </div>
         <!--    friend search -->
             <div class="modal fade" id="friend_search" tabindex="-1" role="dialog" aria-labelledby="friend_searchLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
+            <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="friend_searchLabel">Add a friend</h5>
@@ -63,24 +63,23 @@
                 <div class="modal-body">
                         
                         <div class = "add_friend">
-                            <script>
-                                async function friend_search(){
-                                    var search = document.getElementById("search").value
-                
-                                }
-                            </script>
-                            <form onsubmit="friend_search()">
-                                <input type="text" placeholder="Search up a user's name" id = "search" style="display: inline;">
-                                <button class = "btn btn-primary" type="submit" style="display: inline;">Search</button>
+                            <form method="post" action = "/add_friend/">
+                                <h2>Add friend by username and ID!</h2>
+                                {% csrf_token %}
+                                @<input type="text" placeholder="Username" name = "search_username" style="display: inline; width: 50%;">
+                                #<input type="text" placeholder="User id" name = "search_id" style="display: inline; width: 15%;"></input>
+                                <button class = "btn btn-primary" type="submit" style="display: inline;">Add friend</button>
                             </form>
+                            <hr>
                             <h2>Mutual Friends</h2>
                             {% for account in mutual_friends%}
                                 <br>
                                 <form  method="post" action = "/add_friend/" id = "add_friend_form{{account.account_id}}">
                                     {% csrf_token %}
-                                        <input hidden name = "account_friend" value = "{{account.account_id}}"></input>
-                                        <p style="display: inline;">{{account.user.first_name}} {{account.user.last_name}} - {{account}}</p>
-                                        <img  src="{% static 'icons/add-user.png'%}"  width = 20px style="display: inline;" id = "add-user" onclick="document.getElementById('add_friend_form{{account.account_id}}').submit()">
+                                    <input hidden name = "search_id" value = "{{account.account_id}}"></input>
+                                    <input hidden name = "search_username" value = "{{account.username}}"></input>
+                                    <p style="display: inline;">{{account.user.first_name}} {{account.user.last_name}} - {{account}}</p>
+                                    <img  src="{% static 'icons/add-user.png'%}"  width = 20px style="display: inline;" id = "add-user" onclick="document.getElementById('add_friend_form{{account.account_id}}').submit()">
                                 </form>
                                 <hr>
                             {% endfor %}

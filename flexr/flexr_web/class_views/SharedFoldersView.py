@@ -27,15 +27,19 @@ class SharedFoldersView(LoginRequiredMixin, View):
         curr_account = curr_user.accounts.get(account_id = self.request.session['account_id'])
 
         # get all folders for the current account
-        folders = curr_account.shared_folders.all()
+        folders = curr_account.collab_shared_folders.all()
 
         # created a shared folder and populate its attributes
         folder_form = EditSharedFolder()
-        folder_form.fields['bookmarks'].queryset = curr_account.bookmarks.all()
-        folder_form.fields['tabs'].queryset = curr_account.tabs.all()
-        folder_form.fields['notes'].queryset = curr_account.notes.all()
-        folder_form.fields['collaborators'].initial = curr_account
-
+        friends = curr_account.friends.all() 
+        print(friends)
+        curr_account_set = Account.objects.filter(account_id = request.session['account_id'])
+        collab_set = friends | curr_account_set
+        collab_set = collab_set.distinct()
+        
+        folder_form.fields["collaborators"].queryset = collab_set
+        folder_form.fields["collaborators"].initial = curr_account
+        
         # request messages for debugging
         if ('message' in self.request.session):
             message = self.request.session['message']
@@ -71,16 +75,10 @@ class SharedFoldersView(LoginRequiredMixin, View):
             desc = form.cleaned_data['description']
             owner = request.user.accounts.get(account_id = request.session['account_id'])
             collaborators =  form.cleaned_data['collaborators']
-            tabs = form.cleaned_data['tabs']
-            notes = form.cleaned_data['notes']
-            bookmarks = form.cleaned_data['bookmarks']
 
             # create shared folder object and set its attributes
             folder = sharedFolder.objects.create(title = title, description = desc, owner = owner)
             folder.collaborators.set(collaborators)
-            folder.tabs.set(tabs)
-            folder.notes.set(notes)
-            folder.bookmarks.set(bookmarks)
             folder.save()
 
         # request message for debugging

@@ -20,6 +20,7 @@
     <div class = "main">
 
         {%if locked%}
+            <h1>{{object.title}}</h1>
             <h2>This note is locked</h2>
             <form method = "POST" action="{% url 'unlock note' object.pk%}">
                     {% csrf_token %}
@@ -43,7 +44,7 @@
                         {% endfor %}
                     </p>
                     {% endfor %}
-                    <label>Retype password: </label><input type = "text" name = "password2"> 
+                    <label>Retype password: </label><input type = "password" name = "password2"> 
                     <br>
                     <br>
                     <div class="modal-footer">
