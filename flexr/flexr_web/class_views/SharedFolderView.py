@@ -42,9 +42,13 @@ class SharedFolderView(LoginRequiredMixin, View):
         notes = shared_folder.notes.all()
 
         form = EditSharedFolder()
+        noteform = EditNotesSharedFolder()
+        tabform = EditTabsSharedFolder()
         form.fields['bookmarks'].queryset = current_acc.bookmarks.all()
         form.fields['tabs'].queryset = current_acc.tabs.all()
         form.fields['notes'].queryset = current_acc.notes.all()
+        noteform.fields['notes'].queryset = current_acc.notes.all()
+        tabform.fields['tabs'].queryset = current_acc.tabs.all()
         
         form.fields["title"].initial = shared_folder.title
         form.fields["description"].initial = shared_folder.description
@@ -52,6 +56,8 @@ class SharedFolderView(LoginRequiredMixin, View):
         form.fields["bookmarks"].initial = shared_folder.bookmarks.all()
         form.fields["tabs"].initial = shared_folder.tabs.all()
         form.fields["notes"].initial = shared_folder.notes.all()
+        noteform.fields["notes"].initial = shared_folder.notes.all()
+        tabform.fields["tabs"].initial = shared_folder.tabs.all()
 
         # if a tab, bookmark, note is in the shared folder. Then the way we have the api's set up the user that doesn't own the object will now not be able to view, edit, or delete the object
         # we may want to add a field to each object that says "shared"
@@ -66,7 +72,9 @@ class SharedFolderView(LoginRequiredMixin, View):
           "Tabs":tabs, 
           "Bookmarks": bookmarks, 
           "Notes": notes,
-          "form": form})
+          "form": form,
+          "noteform": noteform,
+          "tabform": tabform})
 
     def edit_shared_folder(self, request, *args, **kwargs):
         current_acc = request.user.accounts.get(account_id=request.session['account_id'])
@@ -102,6 +110,27 @@ class SharedFolderView(LoginRequiredMixin, View):
         #   "Notes": notes},
         #   "form: form")
 
+    def edit_notes_shared_folder(self, request, *args, **kwargs):
+        current_acc = request.user.accounts.get(account_id=request.session['account_id'])
+        shared_folder = current_acc.shared_folders.get(id=kwargs['pk'])
+        form = EditNotesSharedFolder(request.POST)
+        if form.is_valid():
+            notes = form.cleaned_data['notes']
+            shared_folder.notes.set(notes)
+        shared_folder.save()
+        context = {'form': form}
+        return redirect(request.session['prev_url'])
+
+    def edit_tabs_shared_folder(self, request, *args, **kwargs):
+        current_acc = request.user.accounts.get(account_id=request.session['account_id'])
+        shared_folder = current_acc.shared_folders.get(id=kwargs['pk'])
+        form = EditTabsSharedFolder(request.POST)
+        if form.is_valid():
+            tabs = form.cleaned_data['tabs']
+            shared_folder.tabs.set(tabs)
+        shared_folder.save()
+        context = {'form': form}
+        return redirect(request.session['prev_url'])
     # def edit_shared_folder(self, request, *args, **kwargs):
     #     """
     #     Edit a note

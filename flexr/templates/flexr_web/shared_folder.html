@@ -17,7 +17,36 @@
     {% for collaborator in Collaborators %}
         <h2>{{collaborator}}</h2>
     {% endfor %}
-    <h1>Notes: </h1>
+    <h1>Notes:
+
+    <img id="plus-icon" data-toggle="modal" data-target="#edit_folder_notes" src="{% static 'icons/plus-square.svg' %}">
+</h1>
+    <div class="modal fade" id="edit_folder_notes" tabindex="-1" role="dialog" aria-labelledby="edit_folder_notesLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="edit_folderLabel">Edit folder Notes</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+                <form method = "POST" action="{% url 'edit_notes_shared_folder' shared_folder.pk%}">
+                  {% csrf_token %}
+                    {{ form.notes.label_tag }}<br>
+                    {{ form.notes }}
+
+                        <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Confirm edit</button>
+                </div>
+                </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
     {% for note in Notes %}
         <h2>{{note}}</h2>
     {% endfor %}
@@ -25,7 +54,33 @@
     {% for bookmark in Bookmarks %}
         <h2>{{bookmark}}: {{bookmark.url}}</h2>
     {% endfor %}
-    <h1>Tabs: </h1>
+    <h1>Tabs:
+      <img id="plus-icon" data-toggle="modal" data-target="#edit_folder_tabs" src="{% static 'icons/plus-square.svg' %}">
+  </h1>
+      <div class="modal fade" id="edit_folder_tabs" tabindex="-1" role="dialog" aria-labelledby="edit_folder_tabsLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="edit_folderLabel">Edit Folder tabs</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                  <form method = "POST" action="{% url 'edit_tabs_shared_folder' shared_folder.pk%}">
+                    {% csrf_token %}
+                      {{ form.tabs.label_tag }}<br>
+                      {{ form.tabs }}
+  
+                          <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      <button type="submit" class="btn btn-primary">Confirm edit</button>
+                  </div>
+                  </form>
+            </div>
+          </div>
+        </div>
+      </div>
     {% for tab in Tabs %}
         <h2>{{tab}}</h2>
     {% endfor %}

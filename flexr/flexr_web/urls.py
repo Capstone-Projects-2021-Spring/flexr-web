@@ -65,6 +65,8 @@ urlpatterns = [
     path('add_shared_folder/', SharedFoldersView().create_shared_folder, name = "add shared folder"),
     path('delete_shared_folder/<int:pk>/', SharedFoldersView().delete_shared_folder, name = "delete_shared_folder"),
     path('edit_shared_folder/<int:pk>/', SharedFolderView().edit_shared_folder, name = "edit_shared_folder"),
+    path('edit_notes_shared_folder/<int:pk>/', SharedFolderView().edit_notes_shared_folder, name = "edit_notes_shared_folder"),
+    path('edit_tabs_shared_folder/<int:pk>/', SharedFolderView().edit_tabs_shared_folder, name = "edit_tabs_shared_folder"),
 
     path('shared_folder/<int:pk>/', SharedFolderView.as_view(), name = "shared folder"),
 
