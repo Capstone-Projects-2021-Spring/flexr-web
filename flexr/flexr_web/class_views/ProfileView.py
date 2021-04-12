@@ -42,8 +42,11 @@ class ProfileView(LoginRequiredMixin, View):
 
         # get form object for preferences
         pref_form = PreferencesForm()
-        # if(acc_pref):
-        #    curr_account.account_preferences = Account_Preferences.objects.create()
+        if(acc_pref is none):
+            site = Site.objects.get_or_create(account=new_account, url="https://google.com")[0]
+            site.save()
+            curr_account.account_preferences = Account_Preferences.objects.create(home_page = site)
+            curr_account.save()
 
         # set form data for home page if exists
         if curr_account.account_preferences.home_page is not None:
