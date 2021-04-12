@@ -185,8 +185,42 @@ class FoldersViewAPI(LoginRequiredMixin, DetailView):
         usero = request.user
         accounto = usero.accounts.get(account_id = request.session['account_id'])
         data = json.loads(request.body)
-        shared_folder = sharedFolder.objects.filter(pk = kwargs["id"])
-        shared_folder.update(**data)
+        shared_folder = sharedFolder.objects.get(pk = kwargs["id"])
+        
+        shared_folder.title = data['title']
+        shared_folder.description = data['description']
+        shared_folder.created_date = data['created_date']
+        owner_id = data['owner']['account_id']
+        shared_folder.owner = Account.objects.get(account_id = owner_id)
+        # TODO need to have this be a many to many field
+        collaborators = data['collaborators']
+        shared_folder.collaborators.clear()
+        for acc in collaborators:
+            account = Account.objects.get(account_id = acc['account_id'])
+            shared_folder.collaborators.add(account)
+    
+        bookmarks = data['bookmarks']
+        shared_folder.bookmarks.clear()
+        for bm in bookmarks:
+            bm_id = bm['id']
+            bkmk = Bookmark.objects.get(id = bm_id)
+            shared_folder.bookmarks.add(bkmk)
+
+        tabs = data['tabs']
+        shared_folder.tabs.clear()
+        for tb in tabs:
+            tb_id = tb['id']
+            tab = Tab.objects.get(id = tb_id)
+            shared_folder.tabs.add(tab)
+
+        notes = data['notes']
+        shared_folder.notes.clear()
+        for nt in notes:
+            nt_id = nt['id']
+            note = Note.objects.get(id = nt_id)
+            shared_folder.notes.add(note)
+        shared_folder.save()
+        # shared_folder.update(**data)
         data = SharedFolderSerializer(shared_folder)
         return JsonResponse(data.data, safe=False)
 
