@@ -54,7 +54,7 @@ window.onload = function () {
     }
 
     async function get_tabs(){
-        tabs_response = await fetch("http://127.0.0.1:8000/api/tabs/");
+        tabs_response = await fetch("http://18.221.147.115:8000/api/tabs/");
 
         tabs = await tabs_response.json();
 
@@ -82,7 +82,7 @@ window.onload = function () {
     async function add_tab(tabId, tabUrl){
         var storage = window.localStorage;
     
-        add_response = await fetch("http://127.0.0.1:8000/api/tabs/", {
+        add_response = await fetch("http://18.221.147.115:8000/api/tabs/", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

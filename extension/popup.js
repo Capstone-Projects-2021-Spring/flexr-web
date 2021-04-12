@@ -9,7 +9,7 @@ window.onload = function () {
     let password = document.getElementById("password").value;
 
     async function login(){
-        let login_response = await fetch('http://127.0.0.1:8000/api/login/',
+        let login_response = await fetch('http://18.221.147.115:8000/api/login/',
         {
             method: 'POST',
             headers: {
@@ -29,7 +29,7 @@ window.onload = function () {
         
 
 
-        let accounts_response = await fetch('http://127.0.0.1:8000/api/accounts/',
+        let accounts_response = await fetch('http://18.221.147.115:8000/api/accounts/',
         {
             method: 'GET'
         })
@@ -45,7 +45,7 @@ window.onload = function () {
         accountid = accounts[0].account_id;
 
 
-        let switch_response = await fetch(`http://127.0.0.1:8000/api/account/${accountid}/switch/`,
+        let switch_response = await fetch(`http://18.221.147.115:8000/api/account/${accountid}/switch/`,
         {
             method: 'GET'
         })
@@ -63,7 +63,7 @@ window.onload = function () {
     }
 
     async function check_status(){
-        let status_response = await fetch('http://127.0.0.1:8000/api/status/',
+        let status_response = await fetch('http://18.221.147.115:8000/api/status/',
         {
             method: 'GET',
             
@@ -83,7 +83,7 @@ window.onload = function () {
         
 
 
-        let accounts_response = await fetch('http://127.0.0.1:8000/api/accounts/',
+        let accounts_response = await fetch('http://18.221.147.115:8000/api/accounts/',
         {
             method: 'GET'
         })
@@ -99,7 +99,7 @@ window.onload = function () {
         accountid = accounts[0].account_id;
 
 
-        let switch_response = await fetch(`http://127.0.0.1:8000/api/account/${accountid}/switch/`,
+        let switch_response = await fetch(`http://18.221.147.115:8000/api/account/${accountid}/switch/`,
         {
             method: 'GET'
         })
@@ -134,7 +134,7 @@ window.onload = function () {
     }
 
     siteButton.onclick = function(){
-        window.open('http://127.0.0.1:8000', "_blank");
+        window.open('http://18.221.147.115:8000', "_blank");
     }
   
 
