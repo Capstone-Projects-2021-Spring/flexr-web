@@ -71,12 +71,15 @@ class SharedFolderView(LoginRequiredMixin, View):
             messages.error(self.request, message)
 
         myNotes = current_acc.notes.exclude(id__in = notes)
-
+        myTabs = current_acc.tabs.exclude(id__in = tabs)
+        myBookmarks =current_acc.bookmarks.exclude(id_in = bookmarks)
 
         # display the page
         return render(self.request, "flexr_web/shared_folder.html",
          {"shared_folder": shared_folder,
          'MyNotes':myNotes,
+         "MyBookmarks": myBookmarks,
+         "MyTabs": myTabs,
           "Collaborators": collaborators, 
           "Friends":friends_not_collab,
           "Tabs":tabs, 

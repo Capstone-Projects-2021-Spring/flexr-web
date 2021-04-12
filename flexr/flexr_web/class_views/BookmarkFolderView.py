@@ -217,15 +217,17 @@ class BookmarkFoldersViewAPI(LoginRequiredMixin, DetailView):
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
 
         data = json.loads(request.body)
-
-        # if 'url' in data:
-        #     site = Site.objects.get_or_create(account = curr_account, url = data['url'])[0]
-        #     data['site_id'] = site.id
-
-        bookmark_folder = bookmarkFolder.objects.create(owner=curr_account, **data)
-
+        bookmark_folder = bookmarkFolder.objects.create(owner = curr_account)
+        bookmark_folder.title = data['title']
+        # TODO need to have this be a many to many field
+        bookmarks = data['bookmarks']
+        bookmark_folder.bookmarks.clear()
+        for bm in bookmarks:
+            bm_id = bm['id']
+            bkmk = Bookmark.objects.get(id = bm_id)
+            bookmark_folder.bookmarks.add(bkmk)
+        bookmark_folder.save()
         data = BookmarkFolderSerializer(bookmark_folder)
-        
         return JsonResponse(data.data, safe=False)
 
     def get(self, request, *args, **kwargs):
@@ -267,14 +269,17 @@ class BookmarkFoldersViewAPI(LoginRequiredMixin, DetailView):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
 
-        data = json.loads(request.body)
-
-        # if 'url' in data:
-        #     site = Site.objects.get_or_create(account = curr_account, url = data['url'])[0]
-        #     data['site_id'] = site.id
-
-        result = bookmarkFolder.objects.filter(owner = curr_account, pk = kwargs["id"]).update(**data)
-
-        # data = BookmarkFolderSerializer(result)
-        
-        return JsonResponse({"successful": "folder updated"})
+        data = json.loads(request.body) 
+        bookmark_folder = bookmarkFolder.objects.get(pk = kwargs["id"])
+        bookmark_folder.title = data['title']
+        # TODO need to have this be a many to many field
+        bookmarks = data['bookmarks']
+        bookmark_folder.bookmarks.clear()
+        for bm in bookmarks:
+            bm_id = bm['id']
+            bkmk = Bookmark.objects.get(id = bm_id)
+            bookmark_folder.bookmarks.add(bkmk)
+        bookmark_folder.save()
+        data = BookmarkFolderSerializer(bookmark_folder)
+        return JsonResponse(data.data, safe=False)
+        # return JsonResponse({"successful": "folder updated"})
