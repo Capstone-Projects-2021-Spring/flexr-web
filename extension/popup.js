@@ -5,6 +5,8 @@ window.onload = function () {
     let userid = -1;
     let accountid = -1;
     let accounts = [];
+    let username = document.getElementById("username").value;
+    let password = document.getElementById("password").value;
 
     async function login(){
         let login_response = await fetch('http://127.0.0.1:8000/api/login/',
@@ -13,8 +15,10 @@ window.onload = function () {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
-            body: 'username=admin2&password=password'
+            body: `username=${username}&password=${password}`
         });
+
+        
 
         if (login_response.status != 200){
             return 'error';
@@ -118,11 +122,14 @@ window.onload = function () {
 
 
     loginButton.onclick = function(){
-        var username = document.getElementById("username").Value;
-        var password = document.getElementById("password").value;
+        username = document.getElementById("username").value;
+        password = document.getElementById("password").value;
+
+        //bkg.console.log(username)
+        //bkg.console.log(password)
 
         result = login();
-        bkg.console.log(result);
+        //bkg.console.log(result);
     
     }
 
