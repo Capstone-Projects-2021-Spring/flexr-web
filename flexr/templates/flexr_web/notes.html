@@ -21,7 +21,7 @@
                 <h3>Notes:</h3>
                 <hr>
                 <div class="modal-body">
-                    <form method="post">
+                    <form method="POST" action="/search_notes/">
                          {% csrf_token %}
                          {% for field in fform %}
                          <p>

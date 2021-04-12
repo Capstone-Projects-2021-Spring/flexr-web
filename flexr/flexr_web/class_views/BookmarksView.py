@@ -148,7 +148,7 @@ class BookmarksView(LoginRequiredMixin, View):
         tab = curr_account.tabs.get(pk = kwargs['id'])
 
         # create requested bookmark object
-        Bookmark.create_bookmark(tab, curr_account)
+        Bookmark.create_bookmark(tab.site, curr_account)
         # request message for debugging
         request.session['message'] = "Bookmark Created"
 
@@ -193,9 +193,8 @@ class BookmarksViewAPI(LoginRequiredMixin, DetailView):
 
         if 'url' in data:
             site = Site.objects.get_or_create(account = curr_account, url = data['url'])[0]
-            data['site_id'] = site.id
-
-        bookmark = Bookmark.objects.create(account=curr_account, **data)
+            
+            Bookmark.create_bookmark(site, curr_account)
 
         data = BookmarkSerializer(bookmark)
         
@@ -264,8 +263,8 @@ class BookmarksViewAPI(LoginRequiredMixin, DetailView):
         """
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
-
-        bookmark = Bookmark.objects.filter(account = curr_account, pk = kwargs["id"]).delete()
+        Bookmark.delete_bookmark(kwargs['id'])
+        # bookmark = Bookmark.objects.filter(account = curr_account, pk = kwargs["id"]).delete()
 
         return JsonResponse({"success": "bookmark deleted"})
 
