@@ -72,7 +72,7 @@ class SharedFolderView(LoginRequiredMixin, View):
 
         myNotes = current_acc.notes.exclude(id__in = notes)
         myTabs = current_acc.tabs.exclude(id__in = tabs)
-        myBookmarks =current_acc.bookmarks.exclude(id_in = bookmarks)
+        myBookmarks =current_acc.bookmarks.exclude(id__in = bookmarks)
 
         # display the page
         return render(self.request, "flexr_web/shared_folder.html",
@@ -175,6 +175,24 @@ class SharedFolderView(LoginRequiredMixin, View):
         note = Note.objects.get(id = note_id)
         shared_folder.notes.remove(note)
         request.session['message'] = "Note removed!"
+        return redirect(request.session['prev_url'])
+
+    def add_tab(self, request, *args, **kwargs):
+        user_account = request.user.accounts.get(account_id=request.session['account_id'])
+        tab_id = request.POST.get('tab_id')
+        shared_folder = sharedFolder.objects.get(id = kwargs['id'])
+        tab = Tab.objects.get(id = tab_id)
+        shared_folder.tabs.add(tab)
+        request.session['message'] = "Tab added!"
+        return redirect(request.session['prev_url'])
+
+    def remove_tab(self, request, *args, **kwargs):
+        user_account = request.user.accounts.get(account_id=request.session['account_id'])
+        tab_id = request.POST.get('tab_id')
+        shared_folder = sharedFolder.objects.get(id = kwargs['id'])
+        tab = Tab.objects.get(id = tab_id)
+        shared_folder.tabs.remove(tab)
+        request.session['message'] = "Tab removed!"
         return redirect(request.session['prev_url'])
 
 

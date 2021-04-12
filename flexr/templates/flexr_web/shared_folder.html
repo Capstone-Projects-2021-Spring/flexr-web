@@ -112,13 +112,39 @@
             </div>
         </div>
         </div>
+        <div class="modal fade" id="add_tab_sf" tabindex="-1" role="dialog" aria-labelledby="add_tab_sfLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content" id = "edit_collabs_modal">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="add_tab_sfLabel">Add notes</h5>
+                    <img type="button" data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
+                    </button>
+                </div>
+                <div class="modal-body">
+                        <div class = "add_friend">
+                            <div class = "row justify-content-center">
+                                <div class="col-md-12">
+                                    {% for tab in MyTabs%}
+                                        <form  method="post" action = "/shared_folder/{{shared_folder.id}}/add_tab/" id = "add_tab_form{{tab.id}}">
+                                            {% csrf_token %}
+                                            <input hidden name = "tab_id" value = "{{tab.id}}"></input>
+                                            <p style="display: inline;">{{tab}}</p>
+                                            <img  src="{% static 'icons/plus.png'%}"  width = 20px style="display: inline;" id = "add-user" onclick="document.getElementById('add_tab_form{{tab.id}}').submit()">
+                                        </form>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                </div>
+                </div>
+            </div>
+        </div>
     <div class="body">
       <div class="bm-tabs row justify-content-center">
         <div id = "tabs" class="card col-lg-4">
             <div class = "card-header sticky-top">
                 <h2 style="display:inline">Open tabs</h2>
-                <img id="plus-icon" class="plus-icon" width = 20px; data-toggle="modal" data-target="#add_tab" src="{% static 'icons/plus.png' %}">
-                
+                <img id="plus-icon" class="plus-icon" width = 20px; data-toggle="modal" data-target="#add_tab_sf" src="{% static 'icons/plus.png' %}">
             </div>
             <script>
                 $(document).ready(function(){
@@ -135,17 +161,13 @@
                 {%for tab in Tabs%}
 
                     <div id = "tab" class = "tab card col-lg-5 "  >
-                        <div class="card-body"  style="">
-                            <img class="close" onclick=" var conf = confirm('Do you want to close this tab?'); if(conf){ window.location.href = 'close_tab/{{tab.id}}'}" src="{% static 'icons/cancel.png' %}" width= 15px>
-                            <p onclick="window.open('{{tab.site.url}}')" style="display: inline;">{{tab.site}}</p>
-                            <span style="display: inline;">
-                                <!-- <p>{{tab.site.bookmarked}}</p> -->
-                                {%if tab.site.bookmarked > 0%}
-                                    <img class="bm" onclick="window.location.href = 'delete_bookmark/{{tab.site.bookmarked}}'" src="{% static 'icons/bookmarked.png' %}" width= 15px>
-                                {%else%}
-                                    <img class="bm" onclick="window.location.href = 'add_bookmark/{{tab.id}}'" src="{% static 'icons/empty-bookmark.png' %}" width= 15px>
-                                {%endif%}
-                            </span>
+                        <div class="card-body"  style="">                            
+                            <form  method="post" action = "/shared_folder/{{shared_folder.id}}/remove_tab/" id = "remove_tab_form{{tab.id}}">
+                                {% csrf_token %}
+                                <img  src="{% static 'icons/cancel.png'%}"  width = 15px style="display: inline;" class="close" onclick="document.getElementById('remove_tab_form{{tab.id}}').submit()">
+                                <input hidden name = "tab_id" value = "{{tab.id}}"></input>
+                                <p onclick="window.open('{{tab.site.url}}')" style="display: inline;">{{tab.site}}</p>
+                            </form>
                         </div>
 
                         <script>
@@ -255,12 +277,8 @@
                                 {%if note.lock%}
                                 <img style= "display: inline;" class="lock" src="{% static 'icons/lock.png' %}" width= 15px>
                                 {%endif%}
-                                
                             </form>
-                            
-
                         </div>
-
                     </div>
                 {%endfor%}
             </div>
