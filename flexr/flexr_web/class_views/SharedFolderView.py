@@ -50,9 +50,6 @@ class SharedFolderView(LoginRequiredMixin, View):
         print(collabs)
         collab_set = friends | collabs
         collab_set = collab_set.distinct()
-        
-        form.fields["collaborators"].queryset = collab_set
-        form.fields["collaborators"].initial = shared_folder.collaborators.all()
 
         # if a tab, bookmark, note is in the shared folder. Then the way we have the api's set up the user that doesn't own the object will now not be able to view, edit, or delete the object
         # we may want to add a field to each object that says "shared"
