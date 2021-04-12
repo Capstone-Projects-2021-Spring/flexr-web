@@ -282,7 +282,7 @@ class FoldersViewAPI(LoginRequiredMixin, DetailView):
     def get(self, request, *args, **kwargs):
         usero = request.user
         accounto = usero.accounts.get(account_id = request.session['account_id'])
-        foldos = sharedFolder.objects.filter(owner=accounto)
+        foldos = accounto.collab_shared_folders.all()
         data = SharedFolderSerializer(foldos, many=True)
         return JsonResponse(data.data, safe=False)
 

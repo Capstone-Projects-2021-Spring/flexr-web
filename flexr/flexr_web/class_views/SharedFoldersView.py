@@ -33,12 +33,6 @@ class SharedFoldersView(LoginRequiredMixin, View):
         folder_form = EditSharedFolder()
         friends = curr_account.friends.all() 
         print(friends)
-        curr_account_set = Account.objects.filter(account_id = request.session['account_id'])
-        collab_set = friends | curr_account_set
-        collab_set = collab_set.distinct()
-        
-        folder_form.fields["collaborators"].queryset = collab_set
-        folder_form.fields["collaborators"].initial = curr_account
         
         # request messages for debugging
         if ('message' in self.request.session):

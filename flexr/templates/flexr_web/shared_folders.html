@@ -26,7 +26,7 @@
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
     <div class="body">
         <div class = "main">
-            <h1 style="display: inline;">Shared Folders:</h1><img id = "add_folder_icon" src="{% static 'icons/plus-square.svg'%}" data-toggle="modal" data-target="#folder">
+            <h1 style="display: inline;">Shared Folders </h1><img style = "padding-bottom: 1%;" width = 20px id = "add_folder_icon" src="{% static 'icons/plus.png'%}" data-toggle="modal" data-target="#folder">
             <div class = "row">
                 {% for folder in Folders %}
                     <div class = "folder card col-md-3" style="height: auto;" onclick="window.location.href = '/shared_folder/{{folder.id}}'">

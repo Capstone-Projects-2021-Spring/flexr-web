@@ -76,7 +76,7 @@ class EditNoteForm(ModelForm):
 class EditSharedFolder(ModelForm):
     class Meta:
         model = sharedFolder
-        fields = ('title', 'description', 'collaborators')
+        fields = ('title', 'description')
 
 class BookmarkFolderForm(ModelForm):
     class Meta:

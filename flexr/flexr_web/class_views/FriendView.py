@@ -148,6 +148,7 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
             friend_account = Account.objects.get(account_id=friend_id, username = friend_username)
             friend_request = Friendship.objects.get_or_create(sent=user_account, received=friend_account)
             data = FriendshipSerializer(friend_request, many=True)
+            return JsonResponse(data.data, safe=False)
         except:
             return JsonResponse({"error": "Account not found."}, status = 404)
         
