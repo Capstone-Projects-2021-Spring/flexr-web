@@ -68,7 +68,6 @@ class FilterHistoryForm(forms.Form):
 
 class EditNoteForm(ModelForm):
     password = forms.CharField(widget=forms.PasswordInput, required=False)
-
     class Meta:
         model = Note
         # Make homepage a url field? may need to apppend https://www.
@@ -77,7 +76,7 @@ class EditNoteForm(ModelForm):
 class EditSharedFolder(ModelForm):
     class Meta:
         model = sharedFolder
-        fields = ('title', 'description', 'collaborators', 'bookmarks', 'tabs', 'notes')
+        fields = ('title', 'description', 'collaborators')
 
 class BookmarkFolderForm(ModelForm):
     class Meta:

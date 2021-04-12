@@ -378,7 +378,7 @@ class sharedFolder(models.Model):
     created_date = models.DateTimeField(default= timezone.now)
     owner = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="shared_folders")
     # TODO need to have this be a many to many field
-    collaborators = models.ManyToManyField(Account)
+    collaborators = models.ManyToManyField(Account, related_name="collab_shared_folders")
     bookmarks = models.ManyToManyField(Bookmark, blank=True)
     tabs = models.ManyToManyField(Tab , blank=True)
     notes = models.ManyToManyField(Note , blank=True)

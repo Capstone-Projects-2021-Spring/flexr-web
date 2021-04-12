@@ -29,7 +29,7 @@ class SharedFolderView(LoginRequiredMixin, View):
 
         # get the current account and requested shared folder
         current_acc = self.request.user.accounts.get(account_id = self.request.session['account_id'])
-        shared_folder = current_acc.shared_folders.get(id = kwargs['pk'])
+        shared_folder = current_acc.collab_shared_folders.get(id = kwargs['pk'])
 
         # grab attributes for the shared folder
         owner = shared_folder.owner
@@ -42,27 +42,43 @@ class SharedFolderView(LoginRequiredMixin, View):
         notes = shared_folder.notes.all()
 
         form = EditSharedFolder()
-        form.fields['bookmarks'].queryset = current_acc.bookmarks.all()
-        form.fields['tabs'].queryset = current_acc.tabs.all()
-        form.fields['notes'].queryset = current_acc.notes.all()
-        
         form.fields["title"].initial = shared_folder.title
         form.fields["description"].initial = shared_folder.description
+        friends = current_acc.friends.all() 
+        collabs = shared_folder.collaborators.all()
+        print(friends)
+        print(collabs)
+        collab_set = friends | collabs
+        collab_set = collab_set.distinct()
+        
+        form.fields["collaborators"].queryset = collab_set
         form.fields["collaborators"].initial = shared_folder.collaborators.all()
-        form.fields["bookmarks"].initial = shared_folder.bookmarks.all()
-        form.fields["tabs"].initial = shared_folder.tabs.all()
-        form.fields["notes"].initial = shared_folder.notes.all()
 
         # if a tab, bookmark, note is in the shared folder. Then the way we have the api's set up the user that doesn't own the object will now not be able to view, edit, or delete the object
         # we may want to add a field to each object that says "shared"
 
         # return render(request, "flexr_web/shared_folder.html", {"SharedFolder": shared_folder, "Collaborators": collaborators, "Tabs": tabs, "Bookmarks": bookmarks, "Notes": notes})
-
+        friends_not_collab = current_acc.friends.exclude(account_id__in = collabs)
         request.session['prev_url'] = '/shared_folder/'+str(kwargs['pk'])+'/'
+        # request messages for debugging
+        if ('message' in self.request.session):
+            message = self.request.session['message']
+            del self.request.session['message']
+            messages.success(self.request, message)
+        elif ('err_message' in self.request.session):
+            message = self.request.session['err_message']
+            del self.request.session['err_message']
+            messages.error(self.request, message)
+
+        myNotes = current_acc.notes.exclude(id__in = notes)
+
+
         # display the page
         return render(self.request, "flexr_web/shared_folder.html",
          {"shared_folder": shared_folder,
+         'MyNotes':myNotes,
           "Collaborators": collaborators, 
+          "Friends":friends_not_collab,
           "Tabs":tabs, 
           "Bookmarks": bookmarks, 
           "Notes": notes,
@@ -83,13 +99,8 @@ class SharedFolderView(LoginRequiredMixin, View):
             tileo = form.cleaned_data['title']
             descrippy = form.cleaned_data['description']
             collaboratoros = form.cleaned_data['collaborators']
-            bookmarkos = form.cleaned_data['bookmarks']
-            tabos = form.cleaned_data['tabs']
-            noteso = form.cleaned_data['notes']
             shared_folder.collaborators.set(collaboratoros)
-            shared_folder.bookmarks.set(bookmarkos)
-            shared_folder.notes.set(noteso)
-            shared_folder.tabs.set(tabos)
+
         shared_folder.save()
         context = {'form': form}
         # return render('shared_folder/' + str(shared_folder.pk))
@@ -102,36 +113,67 @@ class SharedFolderView(LoginRequiredMixin, View):
         #   "Notes": notes},
         #   "form: form")
 
-    # def edit_shared_folder(self, request, *args, **kwargs):
-    #     """
-    #     Edit a note
-    #     """
-    #
-    #     # get form object on the page
-    #     form = EditSharedFolder(request.POST)
-    #     # print("Note edited")
-    #     obj = Account.objects.get(account_id=request.session['account_id']).shared_folders.get(pk=kwargs['pk'])
-    #     # check if form is valid
-    #     if form.is_valid():
-    #         # get current account
-    #         curr_acc = Account.objects.get(account_id=request.session['account_id'])
-    #
-    #         # get information from form
-    #         title = request.POST.get('title')
-    #         # content = request.POST.get('content')
-    #
-    #         # get requested note and update with requested data
-    #         obj = curr_acc.shared_folders.get(pk=kwargs['pk'])
-    #         obj.title = title
-    #         obj.content = content
-    #         obj.save()
-    #
-    #         # request messages for debugging
-    #         request.session['message'] = "Note edited"
-    #     request.session['err_message'] = "Note could not be edited"
-    #
-    #     # display requested note after editing
-    #     return redirect('/opennote/' + str(obj.id))
+    def add_collaborator(self, request, *args, **kwargs):
+        user_account = request.user.accounts.get(account_id=request.session['account_id'])
+        collab_id = request.POST.get('search_id')
+        shared_folder = sharedFolder.objects.get(id = kwargs['id'])
+        print("SharedFolderView: add_collaborator(): collab_id: ", collab_id)
+        collab_acc_username = request.POST.get('search_username')
+        print("SharedFolderView: add_collaborator(): collab_acc_username:", collab_acc_username)
+        try:
+            collab_account = Account.objects.get(account_id=collab_id, username = collab_acc_username)
+            shared_folder.collaborators.add(collab_account)
+            request.session['message'] = "User added as collaborator"
+            return redirect(request.session['prev_url'])
+        except:
+            request.session['err_message'] = "User could not be added as collaborator"
+            return redirect(request.session['prev_url'])
+
+    def remove_collaborator(self, request, *args, **kwargs):
+        user_account = request.user.accounts.get(account_id=request.session['account_id'])
+        collab_id = request.POST.get('search_id')
+        shared_folder = sharedFolder.objects.get(id = kwargs['id'])
+        print("SharedFolderView: remove_collaborator(): collab_id: ", collab_id)
+        collab_acc_username = request.POST.get('search_username')
+        print("SharedFolderView: remove_collaborator(): collab_acc_username:", collab_acc_username)
+        try:
+            collab_account = Account.objects.get(account_id=collab_id, username = collab_acc_username)
+            shared_folder.collaborators.remove(collab_account)
+            if(collab_account == shared_folder.owner):
+                if(shared_folder.collaborators.all().count() > 0):
+                    shared_folder.owner = shared_folder.collaborators.all()[0]
+                    shared_folder.save()
+                    request.session['message'] = "User removed as collaborator and ownership was transferred"
+                    return redirect(request.session['prev_url'])
+                else:
+                    request.session['message'] = "Shared folder deleted."
+                    shared_folder.delete()
+                    return redirect('/shared_folders/')
+            else:
+                request.session['message'] = "User removed as collaborator"
+                return redirect(request.session['prev_url'])
+        except:
+            request.session['err_message'] = "User could not be removed as collaborator"
+            return redirect(request.session['prev_url'])
+
+    def add_note(self, request, *args, **kwargs):
+        user_account = request.user.accounts.get(account_id=request.session['account_id'])
+        note_id = request.POST.get('note_id')
+        shared_folder = sharedFolder.objects.get(id = kwargs['id'])
+        note = Note.objects.get(id = note_id)
+        shared_folder.notes.add(note)
+        request.session['message'] = "Note added!"
+        return redirect(request.session['prev_url'])
+
+    def remove_note(self, request, *args, **kwargs):
+        user_account = request.user.accounts.get(account_id=request.session['account_id'])
+        note_id = request.POST.get('note_id')
+        shared_folder = sharedFolder.objects.get(id = kwargs['id'])
+        note = Note.objects.get(id = note_id)
+        shared_folder.notes.remove(note)
+        request.session['message'] = "Note removed!"
+        return redirect(request.session['prev_url'])
+
 
 @method_decorator(csrf_exempt, name='dispatch')
 class FoldersViewAPI(LoginRequiredMixin, DetailView):

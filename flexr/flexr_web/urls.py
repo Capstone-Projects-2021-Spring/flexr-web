@@ -67,6 +67,10 @@ urlpatterns = [
     path('edit_shared_folder/<int:pk>/', SharedFolderView().edit_shared_folder, name = "edit_shared_folder"),
 
     path('shared_folder/<int:pk>/', SharedFolderView.as_view(), name = "shared folder"),
+    path('shared_folder/<id>/add_collaborator/', SharedFolderView().add_collaborator, name = "add collaborator"),
+    path('shared_folder/<id>/remove_collaborator/', SharedFolderView().remove_collaborator, name = "remove collaborator"),
+    path('shared_folder/<id>/add_note/', SharedFolderView().add_note, name = "add note"),
+     path('shared_folder/<id>/remove_note/', SharedFolderView().remove_note, name = "remove note"),
 
     path('profile/', ProfileView.as_view(), name='profile'), #broken
     path('edit_account/', ProfileView().edit_account, name="edit account"),

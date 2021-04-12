@@ -166,14 +166,24 @@
                 </div>
                 <div class = "card-body row justify-content-center">
                     {%for sf in Folders%}
-                        <div id = "bookmark" class = "tab card col-lg-5"  onclick="window.location.href = 'shared_folder/{{sf.id}}/'">
-                            <p >{{sf}}</p>
+                        <div id = "bookmark" class = "tab card col-lg-5" >
+                            <form  method="post" action = "/shared_folder/{{sf.id}}/remove_collaborator/" id = "remove_collab_form{{account.account_id}}">
+                                {% csrf_token %}
+                                <span>
+                                    <input hidden name = "search_id" value = "{{curr_acc.account_id}}"></input>
+                                    <input hidden name = "search_username" value = "{{curr_acc.username}}"></input>
+                                    <img  src="{% static 'icons/cancel.png'%}"  width = 20px style="display: inline;" id = "add-user" onclick="var conf = confirm('Would you like to remove yourself from {{sf}} shared folder?'); if(conf){ document.getElementById('remove_collab_form{{account.account_id}}').submit()}">
+                                    <div onclick="window.location.href = 'shared_folder/{{sf.id}}/'">
+                                        <p style="display: inline;">{{sf}}</p>
+                                    </div>
+                                </span>
+                            </form>
+                            
                         </div>
                     {%endfor%}
                 </div>
             </div>
         </div>
     </div>
-
 </body>
 </html>
