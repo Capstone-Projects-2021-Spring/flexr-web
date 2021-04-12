@@ -235,7 +235,7 @@ class FoldersViewAPI(LoginRequiredMixin, DetailView):
         shared_folder.title = data['title']
         shared_folder.description = data['description']
         shared_folder.created_date = data['created_date']
-        shared_folder.owner = Account.objects.get(account_id = owner_id)
+        shared_folder.owner = Account.objects.get(account_id = request.session['account_id'])
         # TODO need to have this be a many to many field
         collaborators = data['collaborators']
         for acc in collaborators:
