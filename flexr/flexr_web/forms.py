@@ -57,19 +57,53 @@ class PreferencesForm(ModelForm):
         fields = ('home_page', 'sync_enabled', 'searchable_profile', 'cookies_enabled', 'popups_enabled', 'is_dark_mode')
 
 class FilterHistoryForm(forms.Form):
-    start_date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
-    start_time = forms.DateField(widget=forms.widgets.TimeInput(attrs={'type': 'time'}))
-    end_date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
-    end_time = forms.DateField(widget=forms.widgets.TimeInput(attrs={'type': 'time'}))
-
+    site = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}), required=False)
+    start_date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), required=False)
+    start_time = forms.DateField(widget=forms.widgets.TimeInput(attrs={'type': 'time'}), required=False)
+    end_date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), required=False)
+    end_time = forms.DateField(widget=forms.widgets.TimeInput(attrs={'type': 'time'}), required=False)
 
     class Meta:
         pass
-        #fields = ['start_date']
-        #widgets = {'start_date': forms.DateInput()}
 
 class EditNoteForm(ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput, required=False)
     class Meta:
         model = Note
         # Make homepage a url field? may need to apppend https://www.
-        fields = ('title', 'content')
+        fields = ('title', 'content', 'lock', 'password')
+
+class EditSharedFolder(ModelForm):
+    class Meta:
+        model = sharedFolder
+        fields = ('title', 'description')
+
+class BookmarkFolderForm(ModelForm):
+    class Meta:
+        model = bookmarkFolder
+        fields = ('title', 'bookmarks')
+
+class FilterNoteForm(forms.Form):
+    search = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}), required=False)
+    class Meta:
+        pass
+
+class FilterBookmarkForm(forms.Form):
+    start_date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), required=False)
+    start_time = forms.DateField(widget=forms.widgets.TimeInput(attrs={'type': 'time'}), required=False)
+    end_date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), required=False)
+    end_time = forms.DateField(widget=forms.widgets.TimeInput(attrs={'type': 'time'}), required=False)
+
+    class Meta:
+        pass
+
+class BookmarkOnFile(forms.Form):
+    class Meta:
+        model = bookmarkFolder
+        fields = ('bookmarks')
+
+class EditBookmarkForm(ModelForm):
+    class Meta:
+        model = bookmarkFolder
+        # Make homepage a url field? may need to apppend https://www.
+        fields = ('title', 'bookmarks')

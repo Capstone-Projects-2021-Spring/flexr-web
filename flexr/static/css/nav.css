@@ -1,0 +1,272 @@
+.dropdown-menu{
+    width: 500%;
+    text-align: center;
+}
+
+.nav{
+    background-color: #00C4EE;
+    color: white;
+}
+
+#navDiv{
+    background-image: linear-gradient(90deg, #00C4EE,#0087C2);
+    margin-bottom: 2%;
+    border-radius: 7px;
+    width: 90%;
+    box-shadow: 1px 5px 15px 1px #ccd3eb;
+    margin-top: 2%;
+}
+
+.nav-link {
+	color: white;
+    border-radius: 7px;
+    font-size: x-large;
+    transition: all .5s ease;
+    
+}
+
+.nav-item:hover {
+	color: #00C4EE;
+    background-color: #e5f7fc;
+    border-radius: 7px;
+	-webkit-transition: all .5s ease;
+	-moz-transition: all .5s ease;
+	-o-transition: all .5s ease;
+	-ms-transform: all .5s ease;
+}
+
+#toast-container {
+    top: auto !important;
+    left: auto !important;
+    top: 5%;
+    right:5%;
+}
+
+.body{
+    margin-left: 2%;
+    margin-right: 2%;
+    overflow-x: hidden;
+}
+
+body{
+    padding-top: 1%;
+    padding-left: 15%;
+    padding-right: 15%;
+    font-family: 'Ubuntu', sans-serif;
+    background-color: #e5f7fc !important;
+    overflow-x: hidden;
+}
+    
+
+#plus-icon:hover{
+    cursor: pointer;
+}
+
+#add-user:hover{
+    cursor: pointer;
+}
+#account{
+    height: 3rem;
+}
+
+
+#accounts, #tabs, #bookmarks{
+    background-color: #f7fdff !important;
+    box-shadow: 1px 5px 15px 1px #e5e8f3;
+    border-radius: 7px;
+    margin-bottom: 2%;
+    transition: all 1s ease;
+}
+
+#accounts:hover{
+    box-shadow: 1px 7px 12px 2px #c3c6d4;
+    -webkit-transition: all 1s ease;
+	-moz-transition: all 1s ease;
+	-o-transition: all 1s ease;
+	-ms-transform: all 1s ease;
+}
+
+#tabs, #bookmarks{
+    width: 45%;
+    height: 30%;
+}
+#tabs{
+    margin-right: 2%;
+}
+
+h2{
+    color: #001872;
+}
+
+
+#account, #tab, #note, #history, #bookmark, #sf {
+    border-radius: 7px; 
+    text-align:center;
+    margin: 1%;
+    max-height: 8rem;
+    word-wrap: break-word;
+}
+
+#account:hover, #tab:hover, #note:hover, #history:hover, #bookmark:hover, #sf:hover{
+    text-align:center;
+    box-shadow: 1px 2px 15px 1px #ccd3eb;
+    cursor: pointer;
+    position: relative; 
+    top: -2px;
+
+}
+.close{
+    margin-top: 3%;
+}
+
+#plus-icon{
+    margin-left: 10px;
+    padding-bottom: 10px;
+    display: inline;
+}
+
+#plus-icon:hover{
+    cursor: pointer;
+}
+
+#active_acc{
+    color: #0087C2;
+}
+
+#sites-head{
+    color: white;
+    font-size: x-large;
+    display: inline;
+}
+#site{
+    
+    height: 3rem;
+    width: 102%;
+    font-size: larger;
+    padding: 1%;
+    margin-top: 5% !important;
+}
+#site:hover{
+    cursor: pointer;
+}
+
+.card{
+    /* box-shadow: 1px 1px 10px 1px #ccd3eb; */
+    border: 1px solid #e5f7fc ;
+    padding: .5%;
+    height: 5rem;
+    word-wrap: break-word;
+}
+.site{
+    border: none !important;
+    font-size: .7rem !important;
+    z-index: -1;
+    max-height: 5rem;
+    padding: 1%;
+    color: white;
+    word-wrap: break-word;
+    background-color: inherit;
+    /* box-shadow: inset 10px 0px 10px -10px #001872, inset -30px 0px 30px -30px #001872; */
+    /* box-shadow: inset  1px 1px 5px ; */
+}
+
+.site:hover{
+    color: black;
+    z-index: 1;
+    background-color: #e5f7fc;
+    box-shadow: 1px 1px 10px 0px #001872;
+    transition: width 2s;
+    transition-timing-function: linear;
+    text-align: center;
+    /* -webkit-transition: all 1s ease;
+	-moz-transition: all 1s ease;
+	-o-transition: all 1s ease;
+	-ms-transform: all 1s ease; */
+}
+
+/* The sidebar menu */
+.sidenav {
+    color: white;
+    text-align:center;
+    height: 88.5%; /* Full-height: remove this if you want "auto" height */
+    width: 14%; /* Set the width of the sidebar */
+    margin-left:2%;
+    margin-right: 2%;
+    margin-top: 2.4%;
+    border-radius: 7px;
+    position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+    z-index: 1; /* Stay on top */
+    top: 0; /* Stay at the top */
+    left: 0;
+    /* background-color: #0087C2; */
+    background-image: linear-gradient( #00C4EE,#0087C2, #00559F
+    , #001872);
+    padding-top: 20px;
+    box-shadow: inset  0 0 10px #001872;
+}   
+
+/* The sidebar menu */
+.sidenav4 {
+    color: white;
+    font-size: .7rem;
+    text-align:center;
+    height: 88.5%; /* Full-height: remove this if you want "auto" height */
+    width: 14%; /* Set the width of the sidebar */
+    margin-left:2%;
+    margin-right: 2%;
+    margin-top: 2.4%;
+    border-radius: 7px;
+    position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+    z-index: 1; /* Stay on top */
+    top: 0; /* Stay at the top */
+    right: 0;
+    /* background-color: #0087C2; */
+    background-image: linear-gradient(#00C4EE,#0087C2, #00559F);
+    padding-top: 20px;
+    box-shadow: inset  0 0 10px #001872;
+}   
+
+.sidenav2{
+    color: white;
+    font-size: .7rem;
+    text-align:center;
+    height: 44%; /* Full-height: remove this if you want "auto" height */
+    width: 14%; /* Set the width of the sidebar */
+    margin-left: 2%;
+    margin-right: 2%;
+    margin-top: 2.4%;
+    border-radius: 7px;
+    position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+    z-index: 1; /* Stay on top */
+    top: 0; /* Stay at the top */
+    right: 0;
+    /* background-color: #0087C2; */
+    background-image: linear-gradient(#00C4EE,#0087C2, #00559F);
+    padding-top: 20px;
+    box-shadow: inset  0 0 10px #001872;
+}
+
+#acc{
+    width: 105%;
+    font-size: 1.2rem;
+}
+#acc:hover{
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: black;
+    background-color: #e5f7fc;
+    box-shadow: 1px 1px 10px 0px #001872;
+}
+
+.active_acc{
+    font-size: 1.2rem;
+    color: black;
+    background-color: #e5f7fc;
+    box-shadow: 1px 1px 10px 0px #001872;
+}
+
+
+.fa-window-close:hover{
+    cursor: pointer;
+    color: grey;
+}

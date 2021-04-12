@@ -3,8 +3,8 @@ from django.core.validators import RegexValidator  # used for phone number and e
 from django.db import models
 from datetime import datetime
 from django.utils import timezone
-from datetime import datetime
-
+from datetime import datetime, timedelta
+from django.db.models import Sum
 # Create your models here.
 
 class Account(models.Model):
@@ -40,21 +40,69 @@ class Account(models.Model):
 
     # TODO Pushkin: Change teams to shared_folders
     # teams = models.ManyToManyField("Team", blank=True, null = True) #I don't think this should be a manytomany field this should be a list of teams got by a method?
-    shared_folder = models.ManyToManyField("sharedFolder", blank=True)
+    # shared_folder = models.ManyToManyField("sharedFolder", blank=True, related_name = "shared_folders")
 
-    # friends = models.ManyToManyField("Account", blank=True, null = True) # this probably needs to be another table
+    friends = models.ManyToManyField("Account", related_name= "all_friends", blank=True) # this probably needs to be another table
+    notifs = models.ManyToManyField("Friendship",  blank=True)
+    pending_friends = models.ManyToManyField("Account", related_name="all_pending_friends",  blank=True)
+    mutual_friends = models.ManyToManyField("Account", related_name="all_mutual_friends",  blank=True)
+
     account_preferences = models.OneToOneField("Account_Preferences", on_delete=models.CASCADE, blank=True, null = True)
     account_id = models.AutoField(primary_key=True)
 
-
     def save(self,  *args, **kwargs):
-
-        if self.pk is None: #new users
-            self.account_preferences = Account_Preferences.objects.create()
         super().save(*args, **kwargs)  # Call the "real" save() method.
 
+        if self.account_preferences is None: #new users
+            site = Site.objects.create(account=self, url="https://google.com")
+            site.save()
+            self.account_preferences = Account_Preferences.objects.create(home_page = site)
+
     def __str__(self):
-        return str(self.username) + " " + str(self.type_of_account)
+        return str(self.username)+" #"+str(self.account_id)
+
+    def rank_sites(self):
+        # print("Ranking sites", self.sites.all())
+        min_secdelta = 86400000
+        max_freq = 1
+        max_visits = 1
+        for site in self.sites.all().iterator():
+            secdelta = (timezone.now() - site.last_visit).days * 86400 # 1440 minutes in a day
+            # this may be unnessesary
+            site.recent_frequency = site.calculate_frequency()
+            site.save()
+            if secdelta < min_secdelta:
+                min_secdelta = secdelta
+            if site.recent_frequency > max_freq:
+                max_freq = site.recent_frequency
+            if site.number_of_visits > max_visits:
+                max_visits = site.number_of_visits
+        # print("Account.rank_sites: min_mindelta ",min_mindelta)
+        # print("Account.rank_sites: max_freq ",max_freq)
+        # print("Account.rank_sites: max_visits ",max_visits)
+        for site in self.sites.all().iterator():
+            secdelta = (timezone.now() - site.last_visit).days * 86400 # 1440 minutes in a day
+            print((min_secdelta+.1)/(secdelta+.1))
+            site.site_ranking = ((min_secdelta+1)/(secdelta+1))*(20)+(site.recent_frequency/max_freq)*(65)+(site.number_of_visits/ max_visits)*(15)
+            site.site_ranking =(site.recent_frequency / max_freq) * (65) + (site.number_of_visits / max_visits) * (15)
+            site.save()
+            # print("Account.rank_sites: site.site_ranking: ",site, site.site_ranking)
+
+        for x in self.suggested_sites.all().iterator():
+            self.suggested_sites.remove(x)
+        #
+        for x in self.sites.order_by('-site_ranking')[:5].iterator():
+            self.suggested_sites.add(x)
+        # print(self.suggested_sites.all())
+
+        if(self.suggested_sites.all().count() < 5):
+            # print("not enuf")
+            for x in self.sites.all().iterator():
+                self.suggested_sites.add(x)
+        # print(self.suggested_sites.all())
+        self.save()
+        # for
+        print("Account.rank_sites: suggested sites: ", self.suggested_sites.all())
 
 # TODO get rid of this class once it is turned into shared_folder
 class Team(models.Model):
@@ -75,18 +123,25 @@ class Team(models.Model):
 class History(models.Model):
     site = models.ForeignKey("Site", on_delete=models.CASCADE, related_name="site_history")
     account = models.ForeignKey("Account", on_delete=models.CASCADE, related_name="history") # don't do foreignkey here make it so that there is a method that gets the account from the site
+    url = models.CharField(max_length=2500)
     visit_datetime = models.DateTimeField(default=timezone.now)
 
     class Meta:
         verbose_name_plural = "histories"
+        ordering = ('-visit_datetime',)
 
     def __str__(self):
         return "User " + str(self.account.account_id)+ ": " + str(self.visit_datetime) + " " + str(self.site.url)
 
+    def save(self, *args, **kwargs):
+        self.site.visited()
+        self.url = self.site.url
+        super().save()
 
 class Site(models.Model):
     name = models.CharField(max_length=50)
     account = models.ForeignKey("Account", on_delete=models.CASCADE, related_name="sites") #this collection of sites is the history
+    suggested_sites = models.ForeignKey("Account", on_delete=models.CASCADE, related_name="suggested_sites", blank=True, null = True)
 
     url = models.URLField(max_length=2500)
 
@@ -99,12 +154,28 @@ class Site(models.Model):
 
     # TODO Are these necessary?
     open_tab = models.BooleanField(verbose_name="Is this site opened in a tab?", default=True)
-    bookmarked = models.BooleanField(verbose_name="Is this site bookmarked?", default = False)
+    bookmarked = models.IntegerField(verbose_name="Is this site bookmarked?", default = 0)
 
     # TODO Add functionality once a site is visited (check the Tab class)
     def visited(self):
-        self.last_visit = datetime.now()
+        self.last_visit = timezone.now()
+        self.recent_frequency = self.calculate_frequency()
+        self.save()
+        # self.rank_site()
         # site_ranking = # update site ranking here
+
+    def calculate_frequency(self):
+        last_week =  timezone.now() - timedelta(days = 7)
+        history = History.objects.filter(site = self,
+                                         visit_datetime__gt = last_week)
+        # print("Site.calculate_frequency ",history.count())
+        freq = history.count()
+        return freq
+
+    # def rank_site(self):
+    #     mindelta = (timezone.now() - self.last_visit).days * 1440 # 1440 minutes in a day
+    #     print("Site rank_site: mindelta: ",mindelta)
+
 
     #TODO This needs to be implemented
     #Pseudocode for rankSite, a method that returns a number between 0 and 100, where the lower return value is the greater site ranking
@@ -116,15 +187,14 @@ class Site(models.Model):
 
     def save(self, *args, **kwargs):
         # call super method to create Tab entry
-        print("URL: ", )
+        # print("URL: ", )
         url1 = str(self.url).split('?')[0]
         url2 = url1.split('/')
-        print("URL: ", url1 )
+        #print("URL: ", url1 )
         try:
             self.name = url2[2] + "/" + url2[3]
         except:
             self.name = url2[2]
-
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -143,6 +213,7 @@ class Tab(models.Model):
 
     # TODO we should implement a setting to have tabs automatically deleted after a certain amount of time
     last_visited = models.DateTimeField(default=timezone.now) #maybe add auto now to this
+    url = models.CharField(max_length=2500)
 
     # TODO Have this be a choice field
     # TODO make the status of a tab calculated using a method
@@ -162,7 +233,6 @@ class Tab(models.Model):
             site.visited()
             tab = Tab(account = curr_account, site = site, status = "open")
             history = History.objects.create(account = curr_account, site = site, visit_datetime=last_visit)
-            history.save()
             
         except: # if site doesn't exist create it and create tab
             site = Site.objects.create(account = curr_account , url = site_url, 
@@ -172,7 +242,7 @@ class Tab(models.Model):
             history.save()
 
         if toSave:
-            super(Tab, tab).save()
+            tab.save()
             
         return tab
 
@@ -181,26 +251,26 @@ class Tab(models.Model):
         try:
             # print("Models", tabID)
             tab = Tab.objects.filter(account = curr_account).get(id = tabID)
-
             tab.delete()
             return "successful"
-        except:
-            return "Tab doesn't exist for the current user"
+        except Exception as e:
+            return e
 
     @classmethod
     def visit_tab(cls, tabID, curr_account):
         try:
-            tab = Tab.objects.filter(account = curr_account).get(pk = tabID)[0]
+            tab = Tab.objects.filter(account = curr_account).get(pk = tabID)
             tab.last_visited = datetime.now()
             status = "active"
             tab.save()
-            try:
-                site = Site.objects.filter(account = curr_account).get(url = tab.url)[0]
-            except:
-                return "Site instance doesn't exist for the current user"
-            return "successful"
-        except:
-            return "Tab instance doesn't exist for the current user"
+            site = Site.objects.filter(account=curr_account).get(url=tab.url)
+            site.visited()
+            history = History.objects.create(account=curr_account, site=site, visit_datetime=tab.last_visited)
+            history.save()
+            site = Site.objects.filter(account = curr_account).get(url = tab.url)
+            return tab
+        except Exception as e:
+            return e
 
     def __str__(self):
         return str(self.site.url)
@@ -210,19 +280,20 @@ class Tab(models.Model):
         # call super method to create Tab entry
         account = Account.objects.filter(pk = self.account_id)[0]
         site =  Site.objects.filter(pk = self.site_id)[0]
-        tab = Tab.open_tab(site.url, account, self.created_date, self.last_visited, toSave=False)
+        self.url = self.site.url
+        print("self.url", self.url)
         super(Tab, self).save(*args, **kwargs)
-
         # create corresponding site object
 
 class Bookmark(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="bookmarks")
     bookmark_name = models.CharField(verbose_name= "Bookmark name", max_length=50)
     created_date = models.DateTimeField(default=timezone.now) #keeps track of creation date
-    site = models.OneToOneField(Site, on_delete=models.CASCADE) #if the site gets deleted the bookmark gets deleted
+    site = models.ForeignKey(Site, on_delete=models.CASCADE) #if the site gets deleted the bookmark gets deleted
     last_visited = models.DateTimeField(default=timezone.now) #keeps track of last visited date
     recent_frequency = models.IntegerField(default=1) # number of visits in the last week
     number_of_visits = models.IntegerField(default=1)# keeps track of number of visits
+    url = models.CharField(max_length=2500)
 
     # TODO create a visited method
     #TODO create a method to calculate frequency
@@ -231,19 +302,31 @@ class Bookmark(models.Model):
         return str(self.bookmark_name)
 
     @classmethod
-    def create_bookmark(cls, tab, curr_account, name='bookmark', last_visited=None):
-        try:
-            Bookmark.objects.create(account = curr_account, bookmark_name = name, site=tab.site)
-        except:
-            print('bookmark already exists')
+    def create_bookmark(cls, tab, curr_account, last_visited=None):
+        # try:
+        bm = Bookmark.objects.create(account = curr_account, bookmark_name = tab.site.name, site=tab.site)
+        bm.save()
+        bm.site.bookmarked = bm.id
+        print("Bookmark: create_bookmark", bm)
+        bm.site.save()
+        return bm.id
+        # except:
+        #     print('bookmark already exists')
+        
     
     @classmethod
     def delete_bookmark(cls, id):
+        bookmark = Bookmark.objects.get(id = id)
+        bookmark.site.bookmarked = 0
+        bookmark.site.save()
         bookmark = Bookmark.objects.filter(pk=id).delete()
+        
         print('bookmark deleted')
 
-
-    
+    def save(self, *args, **kwargs):
+        # call super method to create Tab entry
+        self.url =  self.site.url
+        super().save(*args, **kwargs)
 
 # TODO change bookmark status in the Site model on save
 # Gerald: What is bookmark status?
@@ -252,8 +335,8 @@ class Bookmark(models.Model):
 # TODO need to finalize the fields here
 class Account_Preferences(models.Model):
     name = models.CharField(default="Account Preferences", max_length=10)
-    home_page = models.OneToOneField(Site, on_delete=models.CASCADE, null= True)
-
+    home_page = models.ForeignKey(Site, on_delete=models.CASCADE, null= True)
+    home_page_url = models.URLField()
     # sync
     sync_enabled = models.BooleanField(default=True) # not sure if this is possible or useful
     # sharing
@@ -261,26 +344,16 @@ class Account_Preferences(models.Model):
     # security
     cookies_enabled = models.BooleanField(default=True)
     popups_enabled = models.BooleanField(default=True)
-    # maybe split into device preferences too?
-    # Misc
-    #   home page
 
-    # Display?
-    #     Dark mode
     is_dark_mode = models.BooleanField(default=False)
-    #     font-size
 
-    # syncing
-    #   sync_on?
-
-    # sharing
-    #   searchable profile?
-    # security
-        # Cookies
-        # Popups
     def __str__(self):
        return str(self.name) + " " +str(self.id)
 
+    def save(self, *args, **kwargs):
+        # call super method to create Tab entry
+        self.home_page_url =  self.home_page.url
+        super().save(*args, **kwargs)
 
 class Note(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="notes")
@@ -300,15 +373,119 @@ class sharedFolder(models.Model):
     #ownerAccount 
     #Title was going to have a CharField in place of Textfield, but I got the following error:
     #AttributeError: module 'django.db.models' has no attribute 'charField'
-    title = models.TextField(verbose_name="Shared Folder Title", max_length=100, default="sharedFolder")
+    title = models.CharField(verbose_name="Shared Folder Title", max_length=100)
     description = models.TextField(verbose_name="Shared Folder description")
     created_date = models.DateTimeField(default= timezone.now)
     owner = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="shared_folders")
-
     # TODO need to have this be a many to many field
-    collaborators = models.ManyToManyField(Account)
-    #bookmarks = models.ManyToManyField(Bookmark)
-    #tabs = models.ManyToManyField(Tab)
-    #notes = models.ManyToManyField(Note)
+    collaborators = models.ManyToManyField(Account, related_name="collab_shared_folders")
+    bookmarks = models.ManyToManyField(Bookmark, blank=True)
+    tabs = models.ManyToManyField(Tab , blank=True)
+    notes = models.ManyToManyField(Note , blank=True)
     def __str__(self):
         return str(self.title)
+
+    def save(self, *args, **kwargs):
+        # call super method to create Tab entry
+        
+        super().save(*args, **kwargs)
+        print(self.collaborators.all())
+
+class bookmarkFolder(models.Model):
+    title = models.CharField(verbose_name="Bookmark Folder Title", max_length=100)
+    created_date = models.DateTimeField(default= timezone.now)
+    owner = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="bookmark_folders")
+    bookmarks = models.ManyToManyField(Bookmark, blank=True)
+
+class Friendship(models.Model):
+    sent = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="from_friend")
+    received = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="to_friend")
+    status = models.CharField(verbose_name="Status", max_length=50,
+                                   choices=(("Accepted", "Accepted"),
+                                            ("Pending", "Pending"),
+                                            ("Declined", "Declined")),
+                                   default="Pending")
+    sent_date = models.DateTimeField(default= timezone.now)
+    accepted_date = models.DateTimeField(blank = True, null=True)
+    def __str__(self):
+        return str(self.sent) + " -> " + str(self.received) + " | " + str(self.status)
+
+    class Meta:
+        ordering = ['sent_date']
+
+    def save(self, *args, **kwargs):
+        if(self.status == "Accepted" ):
+            
+            self.accepted_date = timezone.now()
+            super().save(*args, **kwargs)
+            sent_mutual_friends = self.sent.mutual_friends.all()
+            if(self.received in sent_mutual_friends):
+                self.sent.mutual_friends.remove(self.received)
+            
+            received_mutual_friends = self.received.mutual_friends.all()
+            if(self.sent  in sent_mutual_friends):
+                self.received.mutual_friends.remove(self.sent)
+
+            sent_friends = self.sent.friends.exclude(account_id__in=self.received.friends.all()).exclude(
+                user=self.sent.user)
+
+            print("sent friends", sent_friends)
+            # self.received.mutual_friends.add(sent_friends)
+            for friend in sent_friends:
+                self.received.mutual_friends.add(friend)
+                friend.mutual_friends.add(self.sent)
+
+            received_friends = self.received.friends.exclude(account_id__in=self.sent.friends.all()).exclude(
+                user=self.received.user)
+            print("received friends", received_friends)
+            # self.sent.mutual_friends.add(received_friends)
+            for friend in received_friends:
+                self.sent.mutual_friends.add(friend)
+                friend.mutual_friends.add(self.received)
+
+            self.sent.friends.add(self.received)
+            self.received.friends.add(self.sent)
+
+            self.received.notifs.remove(self)
+            self.sent.notifs.add(self)
+
+            self.sent.pending_friends.remove(self.received)
+            self.received.pending_friends.remove(self.sent)
+
+            self.sent.save()
+            self.received.save()
+
+        elif (self.status == "Pending"):
+            super().save(*args, **kwargs)
+            self.received.notifs.add(self)
+            self.sent.pending_friends.add(self.received)
+            self.received.pending_friends.add(self.sent)
+            self.sent.save()
+            self.received.save()
+
+        else:
+            super().save(*args, **kwargs)
+            # friend 1 has friends 2, 3, 4, 5
+            # Friend 2 has friends 6 7 8 
+            # friend 3 has friends 6 7 8 9
+
+            # Friend 1 has friends 6 7 8 9 as mutual friends
+            # What happens when we remove the 1-2 friendship
+            # self.received.mutual_friends.clear()
+            # for friend in self.received.friends.all():
+            #     for fr in friend.friends.all():
+            #         self.received.mutual_friends.add(fr)
+            # self.received.mutual_friends.set(self.received.mutual_friends.distinct())
+
+            # self.sent.mutual_friends.clear()
+            # for friend in self.sent.friends.all():
+            #     for fr in friend.friends.all():
+            #         self.sent.mutual_friends.add(fr)
+            # self.sent.mutual_friends.set(self.sent.mutual_friends.distinct())
+
+            self.received.notifs.remove(self)
+            self.sent.pending_friends.remove(self.received)
+            self.received.pending_friends.remove(self.sent)
+            self.sent.save()
+            self.received.save()
+            self.delete()

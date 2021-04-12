@@ -33,215 +33,157 @@
             return cookieValue;
         }
     </script>
-    <style>
-                /* The sidebar menu */
-        .sidenav {
-          font-size: .7rem;
-          text-align:center;
-          height: 100%; /* Full-height: remove this if you want "auto" height */
-          width: 13%; /* Set the width of the sidebar */
-          padding: 1%;
-          position: fixed; /* Fixed Sidebar (stay in place on scroll) */
-          z-index: 1; /* Stay on top */
-          top: 0; /* Stay at the top */
-          left: 0;
-          background-color: #d9d9d9; /* Black */
-          overflow-x: hidden; /* Disable horizontal scroll */
-          padding-top: 20px;
-        }
-
-    </style>
-    <style>
-        body {
-            padding-left: 15%;
-            padding-right: 15%;
-        }
-        #plus-icon:hover{
-            cursor: pointer;
-        }
-        #account, #tab, #note, #site, #history, #bookmark {
-            text-align:center;
-            margin: 1%;
-            max-height: 8rem;
-            overflow: hidden;
-            word-wrap: break-word;
-            text-overflow: ellipsis;
-
-        }
-        #account:hover, #tab:hover, #note:hover, #site:hover, #history:hover, #bookmark:hover{
-            text-align:center;
-            border: 1px solid black;
-            cursor: pointer;
-        }
-        #active_acc{
-            font-weight: bold;
-        }
-
-        .card{
-            font-size:
-            padding: 1%;
-            max-height: 10rem;
-            overflow: hidden;
-            word-wrap: break-word;
-            text-overflow: ellipsis;
-        }
-        .site{
-            max-height: 5rem;
-            padding: 2%;
-            overflow: hidden;
-            word-wrap: break-word;
-        }
-        .fa-window-close:hover{
-            cursor: pointer;
-            color: grey;
-        }
-
-    </style>
+    
 </head>
 
 <body>
     {% include "flexr_web/navbar.html" %}
-    <div id = "accounts">
-        <h2 style="display:inline;" >Accounts:</h2> <img id="plus-icon" data-toggle="modal" data-target="#add_account" src="{% static 'icons/plus-square.svg' %}">
-        <div class = "row">
-            {%for acc in Accounts%}
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+    
+    <div class = "body">
 
-                <div id = "account" class = "card col-lg-3" onclick="window.location.href = 'switch_account/{{acc.account_id}}'">
-                    {%if acc.account_id == curr_acc.account_id%}
-                        <h3 id = "active_acc" onclick="window.location.href = '/profile'">{{acc}}</h3>
-                    {%else%}
-                        <p>{{acc}}</p>
-                    {%endif%}
+        
+        <div class="bm-tabs row justify-content-center">
+            <div id = "tabs" class="card col-lg-4">
+                <div class = "card-header sticky-top">
+                    <h2 style="display:inline">Open tabs</h2>
+                    <img id="plus-icon" class="plus-icon" width = 20px; data-toggle="modal" data-target="#add_tab" src="{% static 'icons/plus.png' %}">
+                    
                 </div>
-            {%endfor%}
+                <script>
+                    $(document).ready(function(){
+                        $('.plus-icon').hover(function() {
+                        $(this).attr('src', "{% static 'icons/plus-circle.png' %}");
+                        }, function() {
+                        $(this).attr('src', "{% static 'icons/plus.png' %}");
+                        });
+                    });
+                </script>
+                
+                <div class = "card-body row justify-content-center">
+                    
+                    {%for tab in Tabs%}
+
+                        <div id = "tab" class = "tab card col-lg-5 "  >
+                            <div class="card-body"  style="">
+                                <img class="close" onclick=" var conf = confirm('Do you want to close this tab?'); if(conf){ window.location.href = 'close_tab/{{tab.id}}'}" src="{% static 'icons/cancel.png' %}" width= 15px>
+                                <p onclick="window.open('{{tab.site.url}}')" style="display: inline;">{{tab.site}}</p>
+                                <span style="display: inline;">
+                                    <!-- <p>{{tab.site.bookmarked}}</p> -->
+                                    {%if tab.site.bookmarked > 0%}
+                                        <img class="bm" onclick="window.location.href = 'delete_bookmark/{{tab.site.bookmarked}}'" src="{% static 'icons/bookmarked.png' %}" width= 15px>
+                                    {%else%}
+                                        <img class="bm" onclick="window.location.href = 'add_bookmark/{{tab.id}}'" src="{% static 'icons/empty-bookmark.png' %}" width= 15px>
+                                    {%endif%}
+                                </span>
+                            </div>
+
+                            <script>
+                                $(document).ready(function(){
+                                    $('.close').hover(function() {
+                                    $(this).attr('src', "{% static 'icons/cancel-circle.png' %}");
+                                    }, function() {
+                                    $(this).attr('src', "{% static 'icons/cancel.png' %}");
+                                    });
+                                });
+                            </script>
+
+                        </div>
+                    {%endfor%}
+                </div>
+            </div>
+            <div id = "bookmarks" class="col-lg-4">
+                <div class = "card-header sticky-top">
+                    <h2>Bookmarks</h2>
+                </div>
+                <div class = "card-body row justify-content-center">
+                    {%for bm in Bookmarks%}
+                    
+                        <div id = "bookmark" class = "tab card col-lg-5"  >
+                            <p onclick="window.open('{{bm.site.url}}')"  style="display: inline;">{{bm.site}}</p>
+                            <span style="display: inline;">
+                                <img class="bm" onclick="window.location.href = 'delete_bookmark/{{bm.site.bookmarked}}'" src="{% static 'icons/bookmarked.png' %}" width= 15px>
+                            </span>
+                        </div>
+
+                    {%endfor%}
+                </div>
+            </div>
+        </div>
+
+        <div class="bm-tabs row justify-content-center">
+            <div id = "tabs" class="card col-lg-4">
+                <div class = "card-header sticky-top">
+                    <h2 style="display:inline">Notes</h2>
+                </div>
+                <script>
+                    $(document).ready(function(){
+                        $('.plus-icon').hover(function() {
+                        $(this).attr('src', "{% static 'icons/plus-circle.png' %}");
+                        }, function() {
+                        $(this).attr('src', "{% static 'icons/plus.png' %}");
+                        });
+                    });
+                </script>
+                
+                <div class = "card-body row justify-content-center">
+                    
+                    {%for note in Notes%}
+
+                        <div id = "note" class = "note card col-lg-5 "  >
+                            <span style="text-align: left;">
+                                {%if not note.lock%}
+                                    <img style= "display: inline;"  class="close" onclick=" var conf = confirm('Do you want to delete this note?'); if(conf){ window.location.href = 'delete-note/{{note.id}}'}" src="{% static 'icons/cancel.png' %}" width= 15px>
+                                {%else%}
+                                    <img style= "display: inline;"  class="close" onclick=" var conf = confirm('You must unlock this note to delete it.'); if(conf){ window.location.href = 'opennote/{{note.id}}'}" src="{% static 'icons/cancel.png' %}" width= 15px>
+                                {%endif%}
+                            </span>
+                           <script>
+                                $(document).ready(function(){
+                                    $('.close').hover(function() {
+                                    $(this).attr('src', "{% static 'icons/cancel-circle.png' %}");
+                                    }, function() {
+                                    $(this).attr('src', "{% static 'icons/cancel.png' %}");
+                                    });
+                                });
+                            </script>
+                            <div class="card-body" onclick="window.location.href = '/opennote/{{note.id}}'" style="">
+
+                                <p style="display: inline;">{{note}}</p>
+                                {%if note.lock%}
+                                    <img style= "display: inline;" class="lock" src="{% static 'icons/lock.png' %}" width= 15px>
+                                {%endif%}
+
+                            </div>
+
+                        </div>
+                    {%endfor%}
+                </div>
+            </div>
+            <div id = "bookmarks" class="col-lg-4">
+                <div class = "card-header sticky-top">
+                    <h2>Shared Folders</h2>
+                </div>
+                <div class = "card-body row justify-content-center">
+                    {%for sf in Folders%}
+                        <div id = "bookmark" class = "tab card col-lg-5" >
+                            <form  method="post" action = "/shared_folder/{{sf.id}}/remove_collaborator/" id = "remove_collab_form{{account.account_id}}">
+                                {% csrf_token %}
+                                <span>
+                                    <input hidden name = "search_id" value = "{{curr_acc.account_id}}"></input>
+                                    <input hidden name = "search_username" value = "{{curr_acc.username}}"></input>
+                                    <img  src="{% static 'icons/cancel.png'%}"  width = 20px style="display: inline;" id = "add-user" onclick="var conf = confirm('Would you like to remove yourself from {{sf}} shared folder?'); if(conf){ document.getElementById('remove_collab_form{{account.account_id}}').submit()}">
+                                    <div onclick="window.location.href = 'shared_folder/{{sf.id}}/'">
+                                        <p style="display: inline;">{{sf}}</p>
+                                    </div>
+                                </span>
+                            </form>
+                            
+                        </div>
+                    {%endfor%}
+                </div>
+            </div>
         </div>
     </div>
-
-    <div class="modal fade" id="add_account" tabindex="-1" role="dialog" aria-labelledby="add_accountLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="add_accountLabel">Add an account!</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-              <form method = "post" action="{% url 'add account' %}">
-                {% csrf_token %}
-                {% for field in form %}
-                    <p>
-                        {{ field.label_tag }}<br>
-                        {{ field }}
-                        {% if field.help_text %}
-                            <small style="color: grey">{{ field.help_text }}</small>
-                        {% endif %}
-                        {% for error in field.errors %}
-                            <p style="color: red">{{ error }}</p>
-                        {% endfor %}
-                    </p>
-                {% endfor %}
-
-                <!-- {{ form }} -->
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Create account</button>
-                </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-
-
-    <div class="modal fade" id="add_tab" tabindex="-1" role="dialog" aria-labelledby="add_tabLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="add_tabLabel">Add a tab!</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-              <form method = "post" action="{% url 'add tab' %}">
-                {% csrf_token %}
-                <label for = "url">URL</label>
-                  <input type="url" id = "url" name = "url">
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Add tab</button>
-                </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-
-
-    <div class = "tabs">
-        <h2 style="display:inline">Open tabs:</h2><img id="plus-icon" data-toggle="modal" data-target="#add_tab" src="{% static 'icons/plus-square.svg' %}">
-        <div class = "row">
-            {%for tab in Tabs%}
-
-                <div id = "tab" class = "tab card col-lg-3"  >
-
-
-                     <div class="card-body"  style="display: inline;">
-                         <i class="far fa-window-close" onclick=" var conf = confirm('Do you want to close this tab?'); if(conf){ window.location.href = 'close_tab/{{tab.id}}'}" style="display: inline;"></i>
-                        <p onclick="window.open('{{tab.site.url}}')" style="display: inline;">{{tab.site}}</p>
-                      </div>
-
-                </div>
-            {%endfor%}
-        </div>
-    </div>
-
-    <div class = "bookmarks">
-        <h2>Bookmarks:</h2>
-        <div class = "row">
-            {%for bm in Bookmarks%}
-                <div id = "bookmark" class = "tab card col-lg-4"  onclick="window.open('{{bm.site.url}}')">
-                    <p >{{bm.site}}</p>
-                </div>
-            {%endfor%}
-        </div>
-    </div>
-    <div class = "notes">
-        <h2>Recent Notes:</h2>
-        <div class = "row">
-            {%for note in Notes%}
-                <div id = "note" class = "card col-lg-3"  onclick="window.location.href = '/opennote/{{note.id}}'">
-                        <p >{{note}}</p>
-                </div>
-            {%endfor%}
-        </div>
-    </div>
-<!--    <div class = "history">-->
-<!--        <h2>Recent Site history:</h2>-->
-<!--        {%for hist in History%}-->
-<!--                <div id = "history" class = "tab card col-lg-4"  onclick="window.open('{{hist.site.url}}')">-->
-<!--                        <h3 >{{hist.site.url}}</h3>-->
-<!--                </div>-->
-<!--        {%endfor%}-->
-<!--    </div>-->
-    <div class = "suggested sidenav">
-        <h2>Suggested Sites:</h2>
-        {%for site in Sites%}
-                <div id = "site" class = "site card col-lg-12" onclick="window.open('{{site.url}}'); ">
-                        <p>{{site.name}}</p>
-                </div>
-        {%endfor%}
-    </div>
-
-     <div class = "shared_folders">
-        <h2>Shared folders:</h2>
-        {%for sf in Shared_folders%}
-                <div id = "sf" class = "card col-lg-12"  onclick="window.location.href = '/'">
-                        <p>{{sf}}</p>
-                </div>
-            {%endfor%}
-    </div>
-
 </body>
 </html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flexr | Bookmark Folder</title>
+    {% load static %}
+    <style>
+        #plus-icon:hover{
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+    {% include "flexr_web/navbar.html" %}
+    <hr>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <div class="body">
+        <div class="main">
+            <div class="modal-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <p>
+                        {{ field.label_tag }}<br>
+                        {{ field }} 
+                    </p>
+
+                    {% endfor %}
+
+                <div class="modal-footer">
+                    <!--  -->
+
+            <!--                    <button type="button" class="btn btn-danger" onclick="delete_account()">Delete</button>-->
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                </div>
+                </form>
+            </div>
+Edit Folder <img id="plus-icon" data-toggle="modal" data-target="#edit_folder" style = "padding-bottom: 1%;" width = 20px src="{% static 'icons/plus.png' %}">
+
+<div class="modal fade" id="edit_folder" tabindex="-1" role="dialog" aria-labelledby="edit_folderLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="edit_noteLabel">Edit Folder!</h5>
+        <img type="button" data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
+        </button>
+      </div>
+      <div class="modal-body">
+            <form method = "POST" action="{% url 'edit_bookmark_folder' bookmark_folder.pk%}">
+                    {% csrf_token %}
+                    {% for field in formb %}
+                    <p>
+                        {{ field.label_tag }}<br>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <small style="color: grey">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <p style="color: red">{{ error }}</p>
+                        {% endfor %}
+                    </p>
+                    {% endfor %}
+                    <div class="modal-footer">
+                
+                <button type="submit" class="btn btn-primary">Confirm edit</button>
+            </div>
+            </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr>
+    <h1>Folder title: {{bookmark_folder.title}}</h1>
+    <!-- <h1>Folder owner: {{bookmark_folder.owner}}</h1> -->
+    <h3>Bookmarks:</h3>
+    {%for bookmark in Bookmarks%}
+    <p>Bookmark: <a href="{{bookmark.site.url}}">{{bookmark.site.url}}</a></p>
+    <p>Created Date: {{bookmark.created_date}}</p>
+    <p>Last Visited: {{bookmark.last_visited}}</p>
+    <button onclick="window.location.href = '/remove_from_folder/{{bookmark.id}}/{{bookmark_folder.pk}}/'">Remove From Folder</button>
+    <br>
+    {%endfor%}
+
+</div>
+</div>
+</body>
+</html>

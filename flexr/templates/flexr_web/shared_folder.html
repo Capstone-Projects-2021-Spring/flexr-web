@@ -3,14 +3,318 @@
 <head>
     <meta charset="UTF-8">
     <title>Flexr | Shared Folder</title>
+    {% load static %}
 </head>
 <body>
     {% include "flexr_web/navbar.html" %}
-    <h1>Folder title: {{shared_folder.title}}</h1>
-    <h1>Folder owner: {{shared_folder.owner</h1>
-    <h1>Collaborators: </h1>
-    {% for collaborator in collaborators %}
-        <p>{{collaborator}}</p>
-    {% endfor %}
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+    <div id = "head">
+        <h1 id = "title">{{shared_folder.title}} Shared Folder</h1> 
+        <img id="plus-icon" data-toggle="modal" data-target="#edit_folder" src="{% static 'icons/edit.png' %}" width="30px">
+    </div>
+    <div class="modal fade" id="edit_folder" tabindex="-1" role="dialog" aria-labelledby="edit_folderLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="edit_folderLabel">Edit your folder</h5>
+                <img type="button" data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
+                </button>
+            </div>
+            <div class="modal-body">
+                    <form method = "POST" action="{% url 'edit_shared_folder' shared_folder.pk%}">
+                            {% csrf_token %}
+                            {% for field in form %}
+                            <p>
+                                {{ field.label_tag }}<br>
+                                {{ field }}
+                                {% if field.help_text %}
+                                    <small style="color: grey">{{ field.help_text }}</small>
+                                {% endif %}
+                                {% for error in field.errors %}
+                                    <p style="color: red">{{ error }}</p>
+                                {% endfor %}
+                            </p>
+                            {% endfor %}
+                            <div class="modal-footer">
+                        
+                        <button type="submit" class="btn btn-primary">Confirm edit</button>
+                    </div>
+                    </form>
+            </div>
+            </div>
+        </div>
+    </div>
+    <div class = "suggested sidenav">
+     
+      <a class="navbar-brand" href="/"><img src="{% static 'flexr_logo_2.png' %}" width="100%"></a>
+      <h1>Folder info</h1>
+      <h3>    {{shared_folder.description}}</h3>
+      <h3>    {{shared_folder.owner}}</h3>
+      <h1>Collaborators: </h1><img id="plus-icon" data-toggle="modal" data-target="#edit_collabs" src="{% static 'icons/edit.png' %}" width="30px">
+      {% for collaborator in Collaborators %}
+          <h3>{{collaborator}}</h3>
+      {% endfor %}
+      
+
+    </div>
+    <div class="modal fade" id="edit_collabs" tabindex="-1" role="dialog" aria-labelledby="edit_collabsLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content" id = "edit_collabs_modal">
+            <div class="modal-header">
+                <h5 class="modal-title" id="edit_collabsLabel">Add a friend</h5>
+                <img type="button" data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
+                </button>
+            </div>
+            <div class="modal-body">
+                    <div class = "add_friend">
+                     
+                            <form method="post" action = "/shared_folder/{{shared_folder.id}}/add_collaborator/">
+                                <h4>Add collaborator by username and ID!</h4>
+                                {% csrf_token %}
+                                <span style="text-align:  center;">
+                                @<input type="text" placeholder="Username" name = "search_username" style="display: inline; width: 20%;">
+                                #<input type="text" placeholder="User id" name = "search_id" style="display: inline; width: 8%;"></input>
+                                </span>
+                                <button class = "btn btn-primary" type="submit" style="display: inline;">Add user as collaborator</button>
+                            </form>
+                        
+                        <hr>
+                        <div class = "row justify-content-center">
+                            <div class="col-md-5" style="border-right: 1px solid black;">
+                                <h4>Add friends as collaborators</h4>
+                                {% for account in Friends%}
+                                    <form  method="post" action = "/shared_folder/{{shared_folder.id}}/add_collaborator/" id = "add_friend_form{{account.account_id}}">
+                                        {% csrf_token %}
+                                        <input hidden name = "search_id" value = "{{account.account_id}}"></input>
+                                        <input hidden name = "search_username" value = "{{account.username}}"></input>
+                                        <p style="display: inline;">{{account.user.first_name}} {{account.user.last_name}} - {{account}}</p>
+                                        <img  src="{% static 'icons/add-user.png'%}"  width = 20px style="display: inline;" id = "add-user" onclick="document.getElementById('add_friend_form{{account.account_id}}').submit()">
+                                    </form>
+                                {% endfor %}
+                            </div>
+                            <div class="col-md-5">
+                                <h4>Current Collaborators</h4>
+                                {% for account in Collaborators%}
+
+                                    <form  method="post" action = "/shared_folder/{{shared_folder.id}}/remove_collaborator/" id = "remove_collab_form{{account.account_id}}">
+                                        {% csrf_token %}
+                                        <input hidden name = "search_id" value = "{{account.account_id}}"></input>
+                                        <input hidden name = "search_username" value = "{{account.username}}"></input>
+                                        <p style="display: inline;">{{account.user.first_name}} {{account.user.last_name}} - {{account}}</p>
+                                        <img  src="{% static 'icons/remove-user.png'%}"  width = 20px style="display: inline;" id = "add-user" onclick="document.getElementById('remove_collab_form{{account.account_id}}').submit()">
+                                    </form>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="add_tab_sf" tabindex="-1" role="dialog" aria-labelledby="add_tab_sfLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content" id = "edit_collabs_modal">
+            <div class="modal-header">
+                <h5 class="modal-title" id="add_tab_sfLabel">Add notes</h5>
+                <img type="button" data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
+                </button>
+            </div>
+            <div class="modal-body">
+                    <div class = "add_friend">
+                        <div class = "row justify-content-center">
+                            <div class="col-md-12">
+                                {% for tab in MyTabs%}
+                                    <form  method="post" action = "/shared_folder/{{shared_folder.id}}/add_tab/" id = "add_tab_form{{tab.id}}">
+                                        {% csrf_token %}
+                                        <input hidden name = "tab_id" value = "{{tab.id}}"></input>
+                                        <p style="display: inline;">{{tab}}</p>
+                                        <img  src="{% static 'icons/plus.png'%}"  width = 20px style="display: inline;" id = "add-user" onclick="document.getElementById('add_tab_form{{tab.id}}').submit()">
+                                    </form>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+            </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="add_note" tabindex="-1" role="dialog" aria-labelledby="add_noteLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content" id = "edit_collabs_modal">
+            <div class="modal-header">
+                <h5 class="modal-title" id="add_noteLabel">Add notes</h5>
+                <img type="button" data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
+                </button>
+            </div>
+            <div class="modal-body">
+                    <div class = "add_friend">
+                        <div class = "row justify-content-center">
+                            <div class="col-md-12">
+                                {% for note in MyNotes%}
+                                    <form  method="post" action = "/shared_folder/{{shared_folder.id}}/add_note/" id = "add_note_form{{note.id}}">
+                                        {% csrf_token %}
+                                        <input hidden name = "note_id" value = "{{note.id}}"></input>
+                                        <p style="display: inline;">{{note}}</p>
+                                        <img  src="{% static 'icons/plus.png'%}"  width = 20px style="display: inline;" id = "add-user" onclick="submit_note_form('{{note.id}}', '{{note.lock}}', '{{note.password}}')">
+                                        <script>
+                                            function submit_note_form(id, locked, password){
+                        
+                                                document.getElementById("add_note_form"+id).submit()
+                                            }
+                                        </script>
+                                    </form>
+                                    
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="add_bm" tabindex="-1" role="dialog" aria-labelledby="add_bmLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content" id = "edit_collabs_modal">
+            <div class="modal-header">
+                <h5 class="modal-title" id="add_bmLabel">Add notes</h5>
+                <img type="button" data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
+                </button>
+            </div>
+            <div class="modal-body">
+                    <div class = "add_friend">
+                        <div class = "row justify-content-center">
+                            <div class="col-md-12">
+                                {% for bm in MyBookmarks%}
+                                    <form  method="post" action = "/shared_folder/{{shared_folder.id}}/add_bookmark/" id = "add_bm_form{{bm.id}}">
+                                        {% csrf_token %}
+                                        <input hidden name = "bm_id" value = "{{bm.id}}"></input>
+                                        <p style="display: inline;">{{bm}}{{bm.id}}</p>
+                                        <img  src="{% static 'icons/plus.png'%}"  width = 20px style="display: inline;" id = "add-user" onclick="document.getElementById('add_bm_form{{bm.id}}').submit()">
+                                        </script>
+                                    </form>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            </div>
+        </div>
+    </div>
+    <div class="body">
+      <div class="bm-tabs row justify-content-center">
+        <div id = "tabs" class="card col-lg-4">
+            <div class = "card-header sticky-top">
+                <h2 style="display:inline">Open tabs</h2>
+                <img id="plus-icon" class="plus-icon" width = 20px; data-toggle="modal" data-target="#add_tab_sf" src="{% static 'icons/plus.png' %}">
+            </div>
+            <script>
+                $(document).ready(function(){
+                    $('.plus-icon').hover(function() {
+                    $(this).attr('src', "{% static 'icons/plus-circle.png' %}");
+                    }, function() {
+                    $(this).attr('src', "{% static 'icons/plus.png' %}");
+                    });
+                });
+            </script>
+            
+            <div class = "card-body row justify-content-center">
+                
+                {%for tab in Tabs%}
+
+                    <div id = "tab" class = "tab card col-lg-5 "  >
+                        <div class="card-body"  style="">                            
+                            <form  method="post" action = "/shared_folder/{{shared_folder.id}}/remove_tab/" id = "remove_tab_form{{tab.id}}">
+                                {% csrf_token %}
+                                <img  src="{% static 'icons/cancel.png'%}"  width = 15px style="display: inline;" class="close" onclick="document.getElementById('remove_tab_form{{tab.id}}').submit()">
+                                <input hidden name = "tab_id" value = "{{tab.id}}"></input>
+                                <p onclick="window.open('{{tab.site.url}}')" style="display: inline;">{{tab.site}}</p>
+                            </form>
+                        </div>
+
+                        <script>
+                            $(document).ready(function(){
+                                $('.close').hover(function() {
+                                $(this).attr('src', "{% static 'icons/cancel-circle.png' %}");
+                                }, function() {
+                                $(this).attr('src', "{% static 'icons/cancel.png' %}");
+                                });
+                            });
+                        </script>
+
+                    </div>
+                {%endfor%}
+            </div>
+        </div>
+        <div id = "bookmarks" class="col-lg-4">
+            <div class = "card-header sticky-top">
+                <h2 style="display: inline;">Bookmarks</h2> <img id="plus-icon" class="plus-icon" width = 20px; data-toggle="modal" data-target="#add_bm" src="{% static 'icons/plus.png' %}">
+
+            </div>
+            <div class = "card-body row justify-content-center">
+                {%for bm in Bookmarks%}
+                
+                    <div id = "bookmark" class = "tab card col-lg-5"  >
+                        <form  method="post" action = "/shared_folder/{{shared_folder.id}}/remove_bookmark/" id = "remove_bm_form{{bm.id}}">
+                            {% csrf_token %}
+                            <img  src="{% static 'icons/cancel.png'%}"  width = 15px style="display: inline;" class="close" onclick="document.getElementById('remove_bm_form{{bm.id}}').submit()">
+                            <input hidden name = "bm_id" value = "{{bm.id}}"></input>
+                            <p onclick="window.open('{{bm.site.url}}')"  style="display: inline;">{{bm.site}}</p>
+                        </form>
+                    </div>
+
+                {%endfor%}
+            </div>
+        </div>
+    </div>
+
+    <div class="bm-tabs row justify-content-center">
+        <div id = "tabs" class="card col-lg-4">
+            <div class = "card-header sticky-top">
+                <h2 style="display:inline">Notes</h2><img id="plus-icon" class="plus-icon" width = 20px; data-toggle="modal" data-target="#add_note" src="{% static 'icons/plus.png' %}">
+            </div>
+            <script>
+                $(document).ready(function(){
+                    $('.plus-icon').hover(function() {
+                    $(this).attr('src', "{% static 'icons/plus-circle.png' %}");
+                    }, function() {
+                    $(this).attr('src', "{% static 'icons/plus.png' %}");
+                    });
+                });
+            </script>
+            
+            <div class = "card-body row justify-content-center">
+                
+                {%for note in Notes%}
+
+                    <div id = "note" class = "note card col-lg-5 "  >
+                       <script>
+                            $(document).ready(function(){
+                                $('.close').hover(function() {
+                                $(this).attr('src', "{% static 'icons/cancel-circle.png' %}");
+                                }, function() {
+                                $(this).attr('src', "{% static 'icons/cancel.png' %}");
+                                });
+                            });
+                        </script>
+                        <div class="card-body" style="">
+                            
+                            <form  method="post" action = "/shared_folder/{{shared_folder.id}}/remove_note/" id = "remove_note_form{{note.id}}">
+                                {% csrf_token %}
+                                <img  src="{% static 'icons/cancel.png'%}"  width = 15px style="display: inline;" class="close" onclick="document.getElementById('remove_note_form{{note.id}}').submit()">
+                                <input hidden name = "note_id" value = "{{note.id}}"></input>
+                                <p style="display: inline;" onclick="window.location.href = '/opennote/{{note.id}}'">{{note}}</p>
+                                {%if note.lock%}
+                                <img style= "display: inline;" class="lock" src="{% static 'icons/lock.png' %}" width= 15px>
+                                {%endif%}
+                            </form>
+                        </div>
+                    </div>
+                {%endfor%}
+            </div>
+        </div>
+    </div>
 </body>
 </html>

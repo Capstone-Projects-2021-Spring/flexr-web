@@ -1,0 +1,111 @@
+body {
+    padding-top: 1%;
+    padding-left: 15%;
+    padding-right: 15%;
+    background-color: #e5f7fc !important;
+    overflow-x: hidden;
+}
+
+.container{
+    max-width: 100%;
+}
+
+#plus-icon:hover{
+    cursor: pointer;
+}
+.close{
+    margin-top: -1%;
+}
+
+#plus-icon{
+    margin-left: 10px;
+    padding-bottom: 10px;
+}
+
+#tabs, #bookmarks, #notes, #shared_folders{
+    background-color: #f7fdff !important;
+    box-shadow: 1px 5px 15px 1px #e5e8f3;
+    border-radius: 7px;
+    margin-bottom: 2%;
+    transition: all 1s ease;
+    padding: inherit !important;
+    border-bottom: 10px solid #f7fdff;
+}
+
+#title, #plus-icon{
+    display: inline;
+}
+
+#plus-icon:hover{
+    cursor: pointer;
+}
+
+
+#head{
+    text-align: center;
+    margin-bottom: 1%;
+}
+
+#tabs, #bookmarks, .header, #notes, #shared_folders{
+    width: 45%;
+}
+
+#tabs, #notes{
+    margin-right: 2%;
+    max-height: 27rem;
+    overflow: auto;
+}
+
+#bookmarks, #shared_folders{
+    max-height: 27rem;
+    overflow: auto;
+}
+
+.card-header{
+    /* position: sticky; */
+    background-color: #f7fdff !important;
+    z-index: 1;
+    /* top: -.5px; */
+    width: 100%;
+    margin-bottom: 10px;
+    height: 100%;
+    margin-top: -1%;
+}
+
+h2{
+    color: #001872;
+}
+
+
+#account, #tab, #note,  #history, #bookmark, #sf {
+    border-radius: 7px; 
+    text-align:center;
+    margin: 1%;
+}
+
+#account:hover, #tab:hover, #note:hover, #history:hover, #bookmark:hover, #sf:hover{
+    text-align:center;
+    box-shadow: 1px 2px 15px 1px #ccd3eb;
+    cursor: pointer;
+    position: relative; 
+    top: -2px;
+}
+
+
+#active_acc{
+    color: #0087C2;
+}
+
+.card{
+    /* box-shadow: 1px 1px 10px 1px #ccd3eb; */
+    border: 1px solid #e5f7fc ;
+    padding: 1%;
+    height: 6rem;
+    word-wrap: break-word;
+    text-overflow: ellipsis;
+}
+      
+.fa-window-close:hover{
+    cursor: pointer;
+    color: grey;
+}

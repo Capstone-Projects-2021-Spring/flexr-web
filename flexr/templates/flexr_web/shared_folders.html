@@ -8,16 +8,70 @@
         #plus-icon:hover{
             cursor: pointer;
         }
+        .folder:hover{
+            cursor: pointer;
+        }
+        #add_folder_icon:hover{
+            cursor: pointer;
 
+        }
+        #add_folder_icon{
+            cursor: pointer;
+            display: inline;
+        }
     </style>
 </head>
 <body>
     {% include "flexr_web/navbar.html" %}
-<h1>Shared Folders: </h1>
-        {% for folder in Folders %}
-            <h2>{{folder.title}}</h2>
-            <p>{{folder.description}}</p>
-        {% endfor %}
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <div class="body">
+        <div class = "main">
+            <h1 style="display: inline;">Shared Folders </h1><img style = "padding-bottom: 1%;" width = 20px id = "add_folder_icon" src="{% static 'icons/plus.png'%}" data-toggle="modal" data-target="#folder">
+            <div class = "row">
+                {% for folder in Folders %}
+                    <div class = "folder card col-md-3" style="height: auto;" onclick="window.location.href = '/shared_folder/{{folder.id}}'">
+                        <h2>{{folder.title}}</h2>
+                        <p>{{folder.description}}</p>
+                        <a href="{% url 'delete_shared_folder' folder.pk%}"><p>Delete Folder</p> </a>
+                        {% for collaborator in folder.collaborators.all %}
+                            <p>{{collaborator}}</p>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="modal fade" id="folder" tabindex="-1" role="dialog" aria-labelledby="folderLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="folderLabel">Create a shared folder</h5>
+                    <img type="button" data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="/add_shared_folder/">
+                        {% csrf_token %}
+                            {% for field in folder_form %}
+                                <p>
+                                    {{ field.label_tag }}<br>
+                                    {{ field }}
+                                    {% if field.help_text %}
+                                        <small style="color: grey">{{ field.help_text }}</small>
+                                    {% endif %}
+                                    {% for error in field.errors %}
+                                        <p style="color: red">{{ error }}</p>
+                                    {% endfor %}
+                                </p>
+                            {% endfor %}
 
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Create folder</button>
+                        </div>
+                    </form>
+                </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
