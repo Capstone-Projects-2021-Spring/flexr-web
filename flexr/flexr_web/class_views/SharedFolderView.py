@@ -188,8 +188,6 @@ class FoldersViewAPI(LoginRequiredMixin, DetailView):
         shared_folder = sharedFolder.objects.get(pk = kwargs["id"])
         shared_folder.title = data['title']
         shared_folder.description = data['description']
-        owner_id = data['owner']['account_id']
-        shared_folder.owner = Account.objects.get(account_id = owner_id)
         # TODO need to have this be a many to many field
         collaborators = data['collaborators']
         shared_folder.collaborators.clear()
