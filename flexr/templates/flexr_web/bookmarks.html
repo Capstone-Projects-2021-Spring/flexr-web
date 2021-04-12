@@ -88,7 +88,7 @@
                         <div id = "bookmark" class = "card col-lg-5"  >
                             <p onclick="window.open('{{bm.site.url}}')"  style="display: inline;">{{bm.site}}</p>
                             <span style="display: inline;">
-                                <img class="bm" onclick="window.location.href = '/delete_bookmark/{{bm.site.bookmarked}}'" src="{% static 'icons/bookmarked.png' %}" width= 15px>
+                                <img class="bm" onclick="window.location.href = '/delete_bookmark/{{bm.id}}'" src="{% static 'icons/bookmarked.png' %}" width= 15px>
                             </span>
                         </div>
                     {%endfor%}
