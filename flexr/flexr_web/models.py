@@ -415,19 +415,20 @@ class Friendship(models.Model):
 
     def save(self, *args, **kwargs):
         if(self.status == "Accepted" ):
-
+            
             self.accepted_date = timezone.now()
             super().save(*args, **kwargs)
-            try:
+            sent_mutual_friends = self.sent.mutual_friends.all()
+            if(self.received in sent_mutual_friends):
                 self.sent.mutual_friends.remove(self.received)
-            except:
-                pass
-            try:
+            
+            received_mutual_friends = self.received.mutual_friends.all()
+            if(self.sent  in sent_mutual_friends):
                 self.received.mutual_friends.remove(self.sent)
-            except:
-                pass
+
             sent_friends = self.sent.friends.exclude(account_id__in=self.received.friends.all()).exclude(
                 user=self.sent.user)
+
             print("sent friends", sent_friends)
             # self.received.mutual_friends.add(sent_friends)
             for friend in sent_friends:
@@ -445,10 +446,8 @@ class Friendship(models.Model):
             self.sent.friends.add(self.received)
             self.received.friends.add(self.sent)
 
-
             self.received.notifs.remove(self)
             self.sent.notifs.add(self)
-
 
             self.sent.pending_friends.remove(self.received)
             self.received.pending_friends.remove(self.sent)
@@ -466,6 +465,24 @@ class Friendship(models.Model):
 
         else:
             super().save(*args, **kwargs)
+            # friend 1 has friends 2, 3, 4, 5
+            # Friend 2 has friends 6 7 8 
+            # friend 3 has friends 6 7 8 9
+
+            # Friend 1 has friends 6 7 8 9 as mutual friends
+            # What happens when we remove the 1-2 friendship
+            # self.received.mutual_friends.clear()
+            # for friend in self.received.friends.all():
+            #     for fr in friend.friends.all():
+            #         self.received.mutual_friends.add(fr)
+            # self.received.mutual_friends.set(self.received.mutual_friends.distinct())
+
+            # self.sent.mutual_friends.clear()
+            # for friend in self.sent.friends.all():
+            #     for fr in friend.friends.all():
+            #         self.sent.mutual_friends.add(fr)
+            # self.sent.mutual_friends.set(self.sent.mutual_friends.distinct())
+
             self.received.notifs.remove(self)
             self.sent.pending_friends.remove(self.received)
             self.received.pending_friends.remove(self.sent)

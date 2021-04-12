@@ -64,7 +64,6 @@ class FriendView(LoginRequiredMixin, DetailView):
     def remove_friend(self, request, pk):
         current_account = request.user.accounts.get(account_id=request.session['account_id'])
         friend_account = Account.objects.get(account_id=pk)
-
         current_account.all_friends.remove(friend_account)
         friend_account.all_friends.remove(current_account)
         friendship = Friendship.objects.filter(sent=current_account, received=friend_account)
@@ -74,10 +73,10 @@ class FriendView(LoginRequiredMixin, DetailView):
                 request.session['errmessage'] = "Trouble finding friendship"
                 return redirect(request.session['prev_url'])
         friendship = friendship[0]
-        friendship.status = "Declined"
-        friendship.save()
         current_account.save()
         friend_account.save()
+        friendship.status = "Declined"
+        friendship.save()
         request.session['message'] = "Friend deleted"
         return redirect(request.session['prev_url'])
 

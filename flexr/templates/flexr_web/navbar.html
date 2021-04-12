@@ -167,7 +167,7 @@
         <div class="modal-body">
             <form method = "post" action="{% url 'add account' %}">
                 {% csrf_token %}
-                {% for field in form %}
+                {% for field in acc_form %}
                     <p>
                         {{ field.label_tag }}<br>
                         {{ field }}

@@ -24,7 +24,6 @@ class NoteView(LoginRequiredMixin, View):
         """
         Display a single note
         """
-
         # get current user and current account
         curr_user = self.request.user
         curr_account = curr_user.accounts.get(account_id=self.request.session['account_id'])
@@ -43,8 +42,7 @@ class NoteView(LoginRequiredMixin, View):
         form.fields['lock'].initial = obj.lock
         form.fields['password'].label = "Password:"
         form.fields['password'].initial = obj.password
-        form.fields['password'].attribute = "password"
-        print(form.fields['password'])
+        print("note password",obj.password)
 
         # request messages for debugging
         if ('message' in self.request.session):
@@ -82,7 +80,7 @@ class NoteView(LoginRequiredMixin, View):
         # get form object on the page
         form = EditNoteForm(request.POST)
         #print("Note edited")
-
+        print(form)
         # check if form is valid
         if form.is_valid():
             
@@ -96,9 +94,12 @@ class NoteView(LoginRequiredMixin, View):
             # grab note information from the form 
             tit = request.POST.get('title')
             cont = request.POST.get('content')
-            lo = request.POST.get('locked')
+            lo = request.POST.get('lock')
+            print("locked",lo)
             passw = request.POST.get('password')
             passw2 = request.POST.get('password2')
+            print("Note passw: ",passw)
+            print("Note passw2: ",passw2)
             if passw != note.password and passw != passw2:
                 request.session['note_unlocked'] = noteid
                 request.session['err_message'] = "Note not edited. Passwords do not match"
@@ -107,7 +108,6 @@ class NoteView(LoginRequiredMixin, View):
             # check whether note is password locked
             if lo == 'on':
                 lo = True
-
             else:
                 if (passw not in EMPTY_VALUES):
                     print("reached",passw)
@@ -120,7 +120,6 @@ class NoteView(LoginRequiredMixin, View):
             note.content = cont
             note.locked = lo
             note.password = passw
-
             note.save()
             request.session['note_unlocked'] = noteid
             request.session['message'] = "Note edited"

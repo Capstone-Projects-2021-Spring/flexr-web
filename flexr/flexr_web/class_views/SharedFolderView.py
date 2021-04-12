@@ -195,6 +195,23 @@ class SharedFolderView(LoginRequiredMixin, View):
         request.session['message'] = "Tab removed!"
         return redirect(request.session['prev_url'])
 
+    def add_bookmark(self, request, *args, **kwargs):
+        user_account = request.user.accounts.get(account_id=request.session['account_id'])
+        bm_id = request.POST.get('bm_id')
+        shared_folder = sharedFolder.objects.get(id = kwargs['id'])
+        bm = Bookmark.objects.get(id = bm_id)
+        shared_folder.bookmarks.add(bm)
+        request.session['message'] = "Bookmark added!"
+        return redirect(request.session['prev_url'])
+
+    def remove_bookmark(self, request, *args, **kwargs):
+        user_account = request.user.accounts.get(account_id=request.session['account_id'])
+        bm_id = request.POST.get('bm_id')
+        shared_folder = sharedFolder.objects.get(id = kwargs['id'])
+        bm = Bookmark.objects.get(id = bm_id)
+        shared_folder.bookmarks.remove(bm)
+        request.session['message'] = "Bookmark removed!"
+        return redirect(request.session['prev_url'])
 
 @method_decorator(csrf_exempt, name='dispatch')
 class FoldersViewAPI(LoginRequiredMixin, DetailView):

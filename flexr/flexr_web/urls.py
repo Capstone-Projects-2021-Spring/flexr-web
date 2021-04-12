@@ -73,6 +73,9 @@ urlpatterns = [
     path('shared_folder/<id>/remove_note/', SharedFolderView().remove_note, name = "remove note"),
     path('shared_folder/<id>/add_tab/', SharedFolderView().add_tab, name = "add tab"),
     path('shared_folder/<id>/remove_tab/', SharedFolderView().remove_tab, name = "remove tab"),
+    path('shared_folder/<id>/add_bookmark/', SharedFolderView().add_bookmark, name = "add bookmark"),
+    path('shared_folder/<id>/remove_bookmark/', SharedFolderView().remove_bookmark, name = "remove bookmark"),
+
 
     path('profile/', ProfileView.as_view(), name='profile'), #broken
     path('edit_account/', ProfileView().edit_account, name="edit account"),
