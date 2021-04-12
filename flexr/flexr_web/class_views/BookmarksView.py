@@ -194,9 +194,9 @@ class BookmarksViewAPI(LoginRequiredMixin, DetailView):
         if 'url' in data:
             site = Site.objects.get_or_create(account = curr_account, url = data['url'])[0]
             
-            Bookmark.create_bookmark(site, curr_account)
-
-        data = BookmarkSerializer(bookmark)
+            bm = Bookmark.create_bookmark(site, curr_account)
+            bookmark = Bookmark.objects.get(id = bm)
+            data = BookmarkSerializer(bookmark)
         
         return JsonResponse(data.data, safe=False)
 
