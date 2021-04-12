@@ -35,6 +35,7 @@ class AccountPreferencesAPIView(LoginRequiredMixin, DetailView):
         acc_pref = curr_acc.account_preferences
         request_data = json.loads(request.body)
         edit_home_url = request_data['home_page_url']
+        print("AccountPreferencesAPIView: ",edit_home_url)
         edit_home_site = curr_acc.sites.get_or_create(url = edit_home_url)
         acc_pref.home_page = edit_home_site[0]
         acc_pref.sync_enabled = request_data['sync_enabled']
@@ -43,6 +44,5 @@ class AccountPreferencesAPIView(LoginRequiredMixin, DetailView):
         acc_pref.popups_enabled = request_data['popups_enabled']
         acc_pref.is_dark_mode = request_data['is_dark_mode']
         acc_pref.save()
-
         data = AccountPreferencesSerializer(acc_pref)
         return JsonResponse(data.data, safe=False)
