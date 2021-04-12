@@ -11,7 +11,7 @@ window.onload = function () {
     }
     
     backButton.onclick = function() {
-        storage.removeItem('chromeTabs');
+        //storage.removeItem('chromeTabs');
         window.location.href = '/menu.html'
         
     }

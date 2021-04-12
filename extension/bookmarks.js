@@ -9,10 +9,7 @@ window.onload = function () {
     }
 
     localButton.onclick = function() {
-        var bookmarkTreeNodes = chrome.bookmarks.getTree(
-            function(bookmarkTreeNodes) {
-             bkg.console.log(bookmarkTreeNodes);
-            });
+        window.location.href = '/local_bookmarks.html'
     }
     
 
