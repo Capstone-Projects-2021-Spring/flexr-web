@@ -42,6 +42,8 @@ class ProfileView(LoginRequiredMixin, View):
 
         # get form object for preferences
         pref_form = PreferencesForm()
+        # if(acc_pref):
+        #    curr_account.account_preferences = Account_Preferences.objects.create()
 
         # set form data for home page if exists
         if curr_account.account_preferences.home_page is not None:

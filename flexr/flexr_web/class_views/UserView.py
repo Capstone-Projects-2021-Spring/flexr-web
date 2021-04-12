@@ -39,6 +39,10 @@ class UserAPIView(View):
 
             new_account = Account.objects.create(user=user, email=user.email, username = user.username)
             request.session['account_id'] = new_account.account_id
+            site = Site.objects.create(account=self, url="https://google.com")
+            site.save()
+            new_account.account_preferences = Account_Preferences.objects.create(home_page = site)
+            new_account.save()
 
             return JsonResponse({"success": f"User {username} created"})
 
