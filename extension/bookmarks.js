@@ -1,11 +1,20 @@
 window.onload = function () {
     let backButton = document.getElementById('backButton');
+    let localButton = document.getElementById('localButton');
     let bkg = chrome.extension.getBackgroundPage();
     let bookmarks = []
     
     backButton.onclick = function() {
         window.location.href = '/menu.html'
     }
+
+    localButton.onclick = function() {
+        var bookmarkTreeNodes = chrome.bookmarks.getTree(
+            function(bookmarkTreeNodes) {
+             bkg.console.log(bookmarkTreeNodes);
+            });
+    }
+    
 
     async function get_bookmarks(){
         bookmarks_response = await fetch("http://127.0.0.1:8000/api/bookmarks/");
@@ -18,8 +27,6 @@ window.onload = function () {
     function display_bookmarks(){
 
         for(i = 0; i < bookmarks.length; i++){
-            bkg.console.log(bookmarks[i].url);
-
             var parent = document.createElement('p');
             var a = document.createElement('a');
             var linkText = document.createTextNode(bookmarks[i].url);

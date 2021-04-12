@@ -3,20 +3,54 @@ window.onload = function () {
     let trackButton = document.getElementById('trackButton');
     let bkg = chrome.extension.getBackgroundPage();
     let tabs = []
+
+    storage = window.localStorage;
+
+    if(storage.getItem('chromeTabs') == null){
+        storage.setItem('chromeTabs', '[]')
+    }
     
     backButton.onclick = function() {
+        storage.removeItem('chromeTabs');
         window.location.href = '/menu.html'
+        
     }
 
     trackButton.onclick = function(){
         chrome.tabs.query({active: true, currentWindow: true}, function(T) {
             var activeTab = T[0];
-            
+            //bkg.console.log('test');
+            //bkg.console.log(storage.getItem('chromeTabs'));
 
+
+            var chromeTabs = []
+
+            if(storage.getItem('chromeTabs') == ''){
+                chromeTabs = []
+            }
+            else{
+                chromeTabs = JSON.parse(storage.getItem('chromeTabs'));
+            }
+
+            if(!(chromeTabs.includes(activeTab.id))){
+                chromeTabs.push(activeTab.id)
+                add_tab(activeTab.id, activeTab.url)
+            }
+
+
+            storage.setItem('chromeTabs', JSON.stringify(chromeTabs));
+
+            
+      
+            
             bkg.console.log(activeTab.url)
             bkg.console.log(activeTab.id)
+            bkg.console.log(chromeTabs)
+            bkg.console.log(storage.getItem('chromeTabs'));
        
          });
+
+         
     }
 
     async function get_tabs(){
@@ -44,6 +78,28 @@ window.onload = function () {
 
 
     }
+
+    async function add_tab(tabId, tabUrl){
+        var storage = window.localStorage;
+    
+        add_response = await fetch("http://127.0.0.1:8000/api/tabs/", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
+            body: JSON.stringify({url: tabUrl})
+    
+        })
+
+        tab = await add_response.json();
+
+        bkg.console.log(tab);
+
+        storage.setItem(tabId, tab.id)
+    
+    }
+    
 
     get_tabs();
 }

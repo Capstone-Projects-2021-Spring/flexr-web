@@ -6,7 +6,9 @@
         "activeTab", 
         "declarativeContent", 
         "storage",
+        "bookmarks",
         "tabs",
+        "webNavigation",
         "http://127.0.0.1:8000/",
         "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"],
     "background": {
