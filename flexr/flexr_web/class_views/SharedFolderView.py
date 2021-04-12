@@ -98,8 +98,6 @@ class SharedFolderView(LoginRequiredMixin, View):
             shared_folder.description = request.POST.get('description')
             tileo = form.cleaned_data['title']
             descrippy = form.cleaned_data['description']
-            collaboratoros = form.cleaned_data['collaborators']
-            shared_folder.collaborators.set(collaboratoros)
 
         shared_folder.save()
         context = {'form': form}
