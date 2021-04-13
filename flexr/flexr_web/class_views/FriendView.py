@@ -80,6 +80,15 @@ class FriendView(LoginRequiredMixin, DetailView):
         request.session['message'] = "Friend deleted"
         return redirect(request.session['prev_url'])
 
+    def mutual_friends(self, request, pk):
+        current_account = request.user.accounts.get(account_id=request.session['account_id'])
+        friend_account = Account.objects.get(account_id=pk)
+        my_friends = current_account.all_friends
+        friend_friends = friend_account.all_friends
+        mutual_friends = friend_friends & my_friends
+        current_account.mutual_friends.add(mutual_friends)
+        friend_account.mutual_friends.add(mutual_friends)
+        
 @method_decorator(csrf_exempt, name='dispatch')
 class FriendAPIView(LoginRequiredMixin, DetailView):
     def get(self, request):
