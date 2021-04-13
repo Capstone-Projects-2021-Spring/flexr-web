@@ -86,9 +86,9 @@ class FriendView(LoginRequiredMixin, DetailView):
         my_friends = current_account.all_friends
         friend_friends = friend_account.all_friends
         mutual_friends = friend_friends & my_friends
-        current_account.mutual_friends.add(mutual_friends)
-        friend_account.mutual_friends.add(mutual_friends)
-        
+        current_account.mutual_friends.add(list(set(mutual_friends)))
+        friend_account.mutual_friends.add(list(set(mutual_friends)))
+
 @method_decorator(csrf_exempt, name='dispatch')
 class FriendAPIView(LoginRequiredMixin, DetailView):
     def get(self, request):
