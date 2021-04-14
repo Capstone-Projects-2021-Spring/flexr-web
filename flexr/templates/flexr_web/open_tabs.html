@@ -30,7 +30,7 @@
                 {%for tab in Tabs%}
                     <div class = " tab card col-lg-3" >
                         <div class="card-body" >
-                            <img  class = "close" onclick=" var conf = confirm('Do you want to close this tab?'); if(conf){ window.location.href = 'close_tab/{{tab.id}}'}" src="{% static 'icons/cancel.png' %}" width= 15px>
+                            <img  class = "close" onclick=" var conf = confirm('Do you want to close this tab?'); if(conf){ window.location.href = '/close_tab/{{tab.id}}'}" src="{% static 'icons/cancel.png' %}" width= 15px>
                             <br>
                             <p onclick="window.open('{{tab.site.url}}')" style="display: inline;">{{tab.site}}</p>
                             <span style="display: inline;">

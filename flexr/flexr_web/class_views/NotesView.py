@@ -146,3 +146,41 @@ class NotesView(LoginRequiredMixin, View):
         else:
             print(request.session['prev_url'])
             return redirect('/notes/')
+
+    def search_note(self, request):
+        curr_user = request.user
+        curr_acc = curr_user.accounts.get(account_id = request.session['account_id'])
+        notes = curr_acc.notes.all()
+
+        
+        search = request.POST.get('search')
+
+        content_search = notes.filter(content__icontains=search)
+        title_search = notes.filter(title__icontains = search)
+
+        search_results = content_search | title_search
+        search_results = search_results.distinct()
+        print(search_results)
+        form = notef
+        fform = FilterNoteForm
+        if(search_results.count() > 0): 
+            request.session['message'] = "Notes filtered"
+        else:
+            request.session['err_message'] = "No notes found"
+
+        # request messages for debugging
+        if ('message' in request.session):
+            message = request.session['message']
+            del request.session['message']
+            messages.success(request, message)
+        elif ('err_message' in request.session):
+            message = request.session['err_message']
+            del request.session['err_message']
+            messages.error(request, message)
+        request.session['prev_url'] = '/notes/'
+
+        # display the page
+        return render(request, "flexr_web/notes.html", 
+        {"Notes": search_results, 
+        'form': form,
+        'fform': fform})

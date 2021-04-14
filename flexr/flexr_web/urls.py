@@ -38,6 +38,7 @@ urlpatterns = [
     #path('filter_history/', HistoryView().filter, name = "filter history"),
 
     path('notes/', NotesView.as_view(), name='notes'), #broken
+    path('search_notes/', NotesView().search_note, name='search_notes'), #broken
     path('create_note/', NotesView().create_note, name='create_note'),
     path('note/<int:pk>/', NoteView.as_view(), name='note-detail'),
     path('delete-note/<int:pk>/', NotesView().delete_note, name='delete_note'),

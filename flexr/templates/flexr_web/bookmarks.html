@@ -35,8 +35,8 @@
             </div>
             <div class="row">
                 <div class = "col-md-5">
-                    <h3>Bookmark Folders:</h3>
-                    <p style="display: inline;">Create a Bookmark Folder</p> <img style="display:inline;" id="plus-icon" data-toggle="modal" data-target="#add_bookmark_folder" src="{% static 'icons/plus-square.svg' %}">
+                    <h3>Bookmark Folders</h3>
+                    <p style="display: inline;">Create a Bookmark Folder</p> <img style="display:inline;" width="20px" id="plus-icon" data-toggle="modal" data-target="#add_bookmark_folder" src="{% static 'icons/plus.png' %}">
 
                     <div class="modal fade" id="add_bookmark_folder" tabindex="-1" role="dialog" aria-labelledby="add_bookmark_folder_Label" aria-hidden="true">
                         <div class="modal-dialog" role="document">
@@ -77,13 +77,15 @@
                         <h2>{{folder.title}}</h2>
                         <p>Created Date: {{folder.created_date}}</p>
                         <!-- <p><a href="{% url 'delete-bookmark-folder' folder.pk%}">Delete Folder</a></p> -->
-                        <a href="{% url 'delete-bookmark-folder' folder.pk%}"><p>Delete Folder</p> </a>
+                        <img class="close" onclick=" var conf = confirm('Do you want to delete this bookmark folder?'); if(conf){ window.location.href = '/delete_bookmark_folder/{{folder.id}}/'}" src="{% static 'icons/cancel.png' %}" width= 15px>
+
+                        <!-- <a href="{% url 'delete-bookmark-folder' folder.pk%}"><p>Delete Folder</p> </a> -->
                         <br>
                     </div>
                 {%endfor%}
                 <div class="col-md-5 row" >
                     <!-- <hr> -->
-                    <h3>All Bookmarks:</h3>
+                    <h3>All Bookmarks</h3>
                     {%for bm in Bookmarks%}
                         <div id = "bookmark" class = "card col-lg-5"  >
                             <p onclick="window.open('{{bm.site.url}}')"  style="display: inline;">{{bm.site}}</p>

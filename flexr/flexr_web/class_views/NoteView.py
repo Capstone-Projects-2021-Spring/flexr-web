@@ -29,7 +29,7 @@ class NoteView(LoginRequiredMixin, View):
         curr_account = curr_user.accounts.get(account_id=self.request.session['account_id'])
 
         # get requested note object and all accounts for user
-        obj = curr_account.notes.get(pk=kwargs['pk'])
+        obj = Note.objects.get(pk=kwargs['pk'])
         accounts = curr_user.accounts.all()
 
         # get form object and initialize it with data

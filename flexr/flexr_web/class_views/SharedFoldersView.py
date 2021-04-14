@@ -68,11 +68,11 @@ class SharedFoldersView(LoginRequiredMixin, View):
             title = form.cleaned_data['title']
             desc = form.cleaned_data['description']
             owner = request.user.accounts.get(account_id = request.session['account_id'])
-            collaborators =  form.cleaned_data['collaborators']
+
 
             # create shared folder object and set its attributes
             folder = sharedFolder.objects.create(title = title, description = desc, owner = owner)
-            folder.collaborators.set(collaborators)
+            folder.collaborators.add(owner)
             folder.save()
 
         # request message for debugging
