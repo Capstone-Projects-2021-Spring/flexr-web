@@ -8,7 +8,7 @@ window.onload = function () {
     }
 
     async function get_accounts(){
-        accounts_response = await fetch('http://18.221.147.115:8000/api/accounts/');
+        accounts_response = await fetch('http://127.0.0.1:8000/api/accounts/');
 
         accounts = await accounts_response.json();
 
@@ -16,7 +16,7 @@ window.onload = function () {
     }
 
     async function switch_account(accountid){
-        let switch_response = await fetch(`http://18.221.147.115:8000/api/account/${accountid}/switch/`);
+        let switch_response = await fetch(`http://127.0.0.1:8000/api/account/${accountid}/switch/`);
 
         if(switch_response.ok){
             bkg.console.log('switched to account with account id:' + accountid);

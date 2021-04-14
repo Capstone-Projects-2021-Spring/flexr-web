@@ -71,7 +71,7 @@ class UserAPIView(View):
                 data = UserSerializer(user)
                 return JsonResponse(data.data, safe=False)
 
-        return JsonResponse({"error": "Error logging in"})
+        return JsonResponse({"error": "Error logging in"}, status = 404)
         
 
     @method_decorator(csrf_exempt)

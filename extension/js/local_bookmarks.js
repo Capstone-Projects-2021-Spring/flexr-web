@@ -9,7 +9,7 @@ window.onload = function () {
 
     async function add_bookmark(bookmarkUrl){
         bkg.console.log(bookmarkUrl);
-        add_response = await fetch("http://18.221.147.115:8000/api/bookmarks/", {
+        add_response = await fetch("http://127.0.0.1:8000/api/bookmarks/", {
         method: 'POST',
         headers: {
             'Accept': 'application/json',

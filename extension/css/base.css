@@ -1,0 +1,48 @@
+body{
+    width: 350px;
+    height: 500px;
+    font-family: 'Ubuntu', sans-serif;
+    padding: 5%;
+    color: #00C4EE;
+}
+
+.icon{
+    margin-left: 2%;
+}
+
+/* for popup.html */
+.header{
+    text-align: center;
+}
+input{
+    margin-top: 5% !important;
+    margin-bottom: 5% !important;
+}
+#loginButton{
+    width: 100%;
+    margin-bottom: 5% !important;
+}
+.btn-primary{
+    background-color: #00C4EE !important;
+}
+.form{
+    font-size: larger;
+    color: white;
+    box-shadow: 1px 1px 5px 1px #00559F;
+    width: 80%;
+    background-color: white;
+    padding: 5%;
+    padding-left: 10%;
+    padding-right: 10%;
+    border-radius: 5px;
+    margin: 0 auto;
+    background-image: linear-gradient( #00C4EE,#0087C2, #00559F, #001872); 
+}
+
+a{
+    color: #00C4EE;
+}
+
+a:hover{
+    color: #00559F;
+}

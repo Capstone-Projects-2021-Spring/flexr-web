@@ -10,14 +10,21 @@
         "tabs",
         "webNavigation",
         "http://127.0.0.1:8000/",
-        "http://18.221.147.115:8000/",
-        "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"],
+        "http://127.0.0.1:8000/",
+        "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js",
+        "https://fonts.googleapis.com/css2?family=Ubuntu:wght@300&display=swap",
+        "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"],
     "background": {
         "scripts": ["background.js"],
         "persistent": false
     },
     "browser_action": {
         "default_popup": "popup.html"
+    },
+    "icons": {
+        "16": "logos/flexr_logo_wt_background.png",
+        "48": "logos/flexr_logo_wt_background.png",
+        "128": "logos/flexr_logo_wt_background.png"
     },
     "options_page": "options.html",
 

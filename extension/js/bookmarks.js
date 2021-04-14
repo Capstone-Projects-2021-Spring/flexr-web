@@ -14,7 +14,7 @@ window.onload = function () {
     
 
     async function get_bookmarks(){
-        bookmarks_response = await fetch("http://18.221.147.115:8000/api/bookmarks/");
+        bookmarks_response = await fetch("http://127.0.0.1:8000/api/bookmarks/");
 
         bookmarks = await bookmarks_response.json();
 
