@@ -198,12 +198,11 @@ class NoteViewAPI(LoginRequiredMixin, DetailView):
         # TODO: make this access and update properly
         note = curr_acc.notes.get(pk=kwargs['id'])
         request_data = json.loads(request.body)
-        note.edit_title = request_data['title']
-        note.edit_content = request_data['content']
-        note.edit_lock = request_data['lock']
-        note.edit_password = request_data['password']
+        note.title = request_data['title']
+        note.content = request_data['content']
+        note.lock = request_data['lock']
+        note.password = request_data['password']
         note.save()
-
         data = NoteSerializer(note)
         return JsonResponse(data.data, safe=False)
 
