@@ -43,7 +43,7 @@ class UserAPIView(View):
             site.save()
             new_account.account_preferences = Account_Preferences.objects.create(home_page = site)
             new_account.save()
-
+            print("UserAPIView: logout(): user", new_account, " Message: USER SIGNED UP")
             return JsonResponse({"success": f"User {username} created"})
 
             
@@ -69,8 +69,8 @@ class UserAPIView(View):
             if user:
                 login(request, user)
                 data = UserSerializer(user)
+                print("UserAPIView: login(): user", user, " Message: USER LOGGED IN")
                 return JsonResponse(data.data, safe=False)
-
         return JsonResponse({"error": "Error logging in"}, status = 404)
         
 
@@ -87,6 +87,7 @@ class UserAPIView(View):
         try:
             user = request.user
             logout(request)
+            print("UserAPIView: logout(): user", user, " Message: USER LOGGED OUT")
             return JsonResponse({"success": f"User {user} logged out"})
 
         except:

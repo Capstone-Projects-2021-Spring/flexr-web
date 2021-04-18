@@ -31,9 +31,9 @@ class SharedFoldersView(LoginRequiredMixin, View):
 
         # created a shared folder and populate its attributes
         folder_form = EditSharedFolder()
-        friends = curr_account.friends.all() 
-        print(friends)
-        
+        friends = curr_account.friends.all()
+        print("SharedFoldersView: get(): friends: ", friends)
+
         # request messages for debugging
         if ('message' in self.request.session):
             message = self.request.session['message']
@@ -86,7 +86,7 @@ class SharedFoldersView(LoginRequiredMixin, View):
         return redirect(request.session['prev_url'])
 
     def delete_shared_folder(self,request, *args, **kwargs):
-        print(sharedFolder.objects.get(pk=kwargs['pk']))
+        print("SharedFoldersView: delete_shared_folder(): shared_folder", sharedFolder.objects.get(pk=kwargs['pk']))
         my = sharedFolder.objects.get(pk=kwargs['pk'])
         my.delete()
         return redirect('/shared_folders/')
@@ -94,6 +94,6 @@ class SharedFoldersView(LoginRequiredMixin, View):
     def edit_shared_folder(self, request, *args, **kwargs):
         form = EditSharedFolder(request.POST)
         if form.is_valid():
-            print("\n\n\n\nit'svalid")
+            print("SharedFoldersView: edit_shared_folder: Message: form is valid")
 
         return redirect(request.session['prev_url'])

@@ -1,11 +1,23 @@
+import os
+import urllib
+from urllib.request import urlopen
+
+import requests
+from bs4 import BeautifulSoup
 from django.contrib.auth.models import User
+from django.core.files import File
+from django.core.files.temp import NamedTemporaryFile
 from django.core.validators import RegexValidator  # used for phone number and email checks in regex
 from django.db import models
 from datetime import datetime
+
 from django.utils import timezone
 from datetime import datetime, timedelta
+import favicon
 from django.db.models import Sum
 # Create your models here.
+from urllib3 import response
+
 
 class Account(models.Model):
     # user.accounts.all() this is how you get all accounts within the user
@@ -52,11 +64,18 @@ class Account(models.Model):
 
     def save(self,  *args, **kwargs):
         super().save(*args, **kwargs)  # Call the "real" save() method.
-
+        print("Model: Account: save(): self.account_preferences: ", self.account_preferences)
         if self.account_preferences is None: #new users
-            site = Site.objects.create(account=self, url="https://google.com")
-            site.save()
-            self.account_preferences = Account_Preferences.objects.create(home_page = site)
+            if(Site.objects.filter(account = self).count()>0):
+                acc_pref = Account_Preferences.objects.create(home_page=Site.objects.filter(account = self)[0])
+                acc_pref.save()
+                self.account_preferences = acc_pref
+            else:
+                site = Site.objects.create(account=self, url="https://google.com")
+                site.save()
+                self.account_preferences = Account_Preferences.objects.create(home_page=site)
+            print("NEW ACCOUNT: User "+self.user.username+"#"+str(self.user.id)+": created account: ", self)
+        super().save()
 
     def __str__(self):
         return str(self.username)+" #"+str(self.account_id)
@@ -77,16 +96,12 @@ class Account(models.Model):
                 max_freq = site.recent_frequency
             if site.number_of_visits > max_visits:
                 max_visits = site.number_of_visits
-        # print("Account.rank_sites: min_mindelta ",min_mindelta)
-        # print("Account.rank_sites: max_freq ",max_freq)
-        # print("Account.rank_sites: max_visits ",max_visits)
         for site in self.sites.all().iterator():
             secdelta = (timezone.now() - site.last_visit).days * 86400 # 1440 minutes in a day
-            print((min_secdelta+.1)/(secdelta+.1))
             site.site_ranking = ((min_secdelta+1)/(secdelta+1))*(20)+(site.recent_frequency/max_freq)*(65)+(site.number_of_visits/ max_visits)*(15)
             site.site_ranking =(site.recent_frequency / max_freq) * (65) + (site.number_of_visits / max_visits) * (15)
             site.save()
-            # print("Account.rank_sites: site.site_ranking: ",site, site.site_ranking)
+            print("Model: Account.rank_sites: site.site_ranking: ",site, site.site_ranking)
 
         for x in self.suggested_sites.all().iterator():
             self.suggested_sites.remove(x)
@@ -102,23 +117,7 @@ class Account(models.Model):
         # print(self.suggested_sites.all())
         self.save()
         # for
-        print("Account.rank_sites: suggested sites: ", self.suggested_sites.all())
-
-# TODO get rid of this class once it is turned into shared_folder
-class Team(models.Model):
-    team_name = models.CharField(verbose_name="Team name", max_length=50)
-    created_date = models.DateTimeField()
-    status = models.CharField(verbose_name="Status of team", max_length=50, choices=(("Active", "Active"),
-                                                                                     ("Inactive", "Inactive")))
-    # The type of team offers different levels
-    type_of_team = models.CharField(verbose_name="Type of team", max_length=50, choices=(
-                                                                            ("Parental guidance", "Parental guidance"),
-                                                                          ("Friends/Family", "Friends/Family"),
-                                                                          ("Work", "Work")))
-    members = models.ManyToManyField(Account) #map this to accounts
-
-    def __str__(self):
-        return str(self.team_name)
+        print("Model: Account.rank_sites(): suggested_sites: ", self.suggested_sites.all())
 
 class History(models.Model):
     site = models.ForeignKey("Site", on_delete=models.CASCADE, related_name="site_history")
@@ -142,7 +141,7 @@ class Site(models.Model):
     name = models.CharField(max_length=50)
     account = models.ForeignKey("Account", on_delete=models.CASCADE, related_name="sites") #this collection of sites is the history
     suggested_sites = models.ForeignKey("Account", on_delete=models.CASCADE, related_name="suggested_sites", blank=True, null = True)
-
+    favicon_img_url = models.URLField(blank= True, null=True)
     url = models.URLField(max_length=2500)
 
     first_visit = models.DateTimeField(default=timezone.now) # need to put a method for this
@@ -161,6 +160,7 @@ class Site(models.Model):
         self.last_visit = timezone.now()
         self.recent_frequency = self.calculate_frequency()
         self.save()
+        print("Model: Site: "+self+".visited()")
         # self.rank_site()
         # site_ranking = # update site ranking here
 
@@ -172,30 +172,36 @@ class Site(models.Model):
         freq = history.count()
         return freq
 
-    # def rank_site(self):
-    #     mindelta = (timezone.now() - self.last_visit).days * 1440 # 1440 minutes in a day
-    #     print("Site rank_site: mindelta: ",mindelta)
-
-
-    #TODO This needs to be implemented
-    #Pseudocode for rankSite, a method that returns a number between 0 and 100, where the lower return value is the greater site ranking
-    # def rankSite(self):
-    #     if (self.number_of_visits > self.recent_frequency):
-    #         return (self.recent_frequency/self.number_of_visits)*100
-    #     else:
-    #         return 0 #Should never get to this point, but if there are more reecent visits than total visits, this must be the highest ranked site
-
     def save(self, *args, **kwargs):
         # call super method to create Tab entry
         # print("URL: ", )
-        url1 = str(self.url).split('?')[0]
-        url2 = url1.split('/')
-        #print("URL: ", url1 )
-        try:
-            self.name = url2[2] + "/" + url2[3]
-        except:
-            self.name = url2[2]
+        if(self.name == None or self.name == "" or self.name == " "):
+            req = requests.get(self.url)
+            print("Site: save(): req.status_code: ", req.status_code)
+            if(req.status_code == 200):
+                soup = BeautifulSoup(req.text, 'html.parser')
+                # print(soup.find_all('title')[0])
+                for title in soup.find_all('title'):
+                    self.name = title.get_text()
+                    print("Model: Site.save(): self.name: ", title.get_text())
+                icons = favicon.get(self.url)
+                for i in icons:
+                    if (i.format == "ico"):
+                        self.favicon_img_url = i.url
+                        print("Model: Site.save(): self.favicon_img_url: ", i.url)
+            if (self.name == "" or self.name == " " or req.status_code != 200):
+                url1 = str(self.url).split('?')[0]
+                url2 = url1.split('/')
+                print("Model: Site.save(): url2: ", url2)
+                try:
+                    self.name = url2[2] + "/" + url2[3]
+                except:
+                    self.name = url2[2]
+
+
         super().save(*args, **kwargs)
+
+
 
     def __str__(self):
         return str(self.name)
@@ -243,7 +249,7 @@ class Tab(models.Model):
 
         if toSave:
             tab.save()
-            
+        print("Model: Tab.open_tab(): tab: ", tab)
         return tab
 
     @classmethod
@@ -252,8 +258,10 @@ class Tab(models.Model):
             # print("Models", tabID)
             tab = Tab.objects.filter(account = curr_account).get(id = tabID)
             tab.delete()
+            print("Model: Tab.close_tab(): tab: ", tab)
             return "successful"
         except Exception as e:
+            print("Model: Tab.close_tab(): tab: ERROR:", e)
             return e
 
     @classmethod
@@ -268,8 +276,10 @@ class Tab(models.Model):
             history = History.objects.create(account=curr_account, site=site, visit_datetime=tab.last_visited)
             history.save()
             site = Site.objects.filter(account = curr_account).get(url = tab.url)
+            print("Model: Tab.visit_tab(): tab: :", tab)
             return tab
         except Exception as e:
+            print("Model: Tab.visit_tab(): tab: ERROR:", e)
             return e
 
     def __str__(self):
@@ -281,7 +291,7 @@ class Tab(models.Model):
         account = Account.objects.filter(pk = self.account_id)[0]
         site =  Site.objects.filter(pk = self.site_id)[0]
         self.url = self.site.url
-        print("self.url", self.url)
+        print("Model: Tab.save(): self.url: ", self.url)
         super(Tab, self).save(*args, **kwargs)
         # create corresponding site object
 
@@ -307,7 +317,7 @@ class Bookmark(models.Model):
         bm = Bookmark.objects.create(account = curr_account, bookmark_name = site.name, site=site)
         bm.save()
         site.bookmarked = bm.id
-        print("Bookmark: create_bookmark", bm)
+        print("Model: Bookmark.create_bookmark(): bm: ", bm)
         site.save()
         return bm.id
         # except:
@@ -319,9 +329,8 @@ class Bookmark(models.Model):
         bookmark = Bookmark.objects.get(id = id)
         bookmark.site.bookmarked = 0
         bookmark.site.save()
+        print("Model: Bookmark.delete_bookmark(): bm: ", str(bookmark) + ": id: "+str(id))
         bookmark = Bookmark.objects.filter(pk=id).delete()
-        
-        print('bookmark deleted')
 
     def save(self, *args, **kwargs):
         # call super method to create Tab entry
@@ -387,9 +396,8 @@ class sharedFolder(models.Model):
 
     def save(self, *args, **kwargs):
         # call super method to create Tab entry
-        
         super().save(*args, **kwargs)
-        print(self.collaborators.all())
+        print("Model: sharedFolder.save(): self.collaborators: :", self.collaborators.all())
 
 class bookmarkFolder(models.Model):
     title = models.CharField(verbose_name="Bookmark Folder Title", max_length=100)
@@ -428,8 +436,7 @@ class Friendship(models.Model):
 
             sent_friends = self.sent.friends.exclude(account_id__in=self.received.friends.all()).exclude(
                 user=self.sent.user)
-
-            print("sent friends", sent_friends)
+            print("Model: friendship: save(): sent_friends", sent_friends)
             # self.received.mutual_friends.add(sent_friends)
             for friend in sent_friends:
                 self.received.mutual_friends.add(friend)
@@ -437,7 +444,7 @@ class Friendship(models.Model):
 
             received_friends = self.received.friends.exclude(account_id__in=self.sent.friends.all()).exclude(
                 user=self.received.user)
-            print("received friends", received_friends)
+            print("Model: friendship: save(): received_friends", received_friends)
             # self.sent.mutual_friends.add(received_friends)
             for friend in received_friends:
                 self.sent.mutual_friends.add(friend)

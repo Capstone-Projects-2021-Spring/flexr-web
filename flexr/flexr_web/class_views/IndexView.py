@@ -25,9 +25,9 @@ class IndexView(LoginRequiredMixin, View):
 
         # try to get current account
         try:
-            print("IndexView curr_user")
+            print("IndexView: get(): curr_user: ", curr_user)
             curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
-            print("IndexView: Account Successfully Switched: "+ str(curr_account))
+            print("IndexView: get(): MESSAGE: Account Successfully Switched: "+ str(curr_account))
             curr_account.rank_sites()
         # if no current account found, set current account to
         # first account for the current user
@@ -35,7 +35,7 @@ class IndexView(LoginRequiredMixin, View):
             curr_account = curr_user.accounts.all()[0]
             request.session['account_id'] = curr_account.account_id
             curr_account.rank_sites()
-            print("IndexView: Account initialized:" )
+            print("IndexView: get: Message: Account initialized")
 
         # grab all models for the current user
         # and the current account
@@ -48,8 +48,6 @@ class IndexView(LoginRequiredMixin, View):
         folders = curr_account.collab_shared_folders.all()[:6]
         suggested_sites = curr_account.suggested_sites.order_by('-site_ranking')
         # suggested_sites = curr_account.suggested_sites()
-
-        print(curr_user)
 
         # request messages for debugging
         if ('message' in request.session):
@@ -67,7 +65,7 @@ class IndexView(LoginRequiredMixin, View):
         request.session['prev_url'] = "/"
         # display the page
         filtered = False
-        print(notes)
+        print("IndexView: get(): notes: ", notes)
         return render(request, "flexr_web/index.html",
                       {
                        # "Accounts": accounts,
@@ -87,7 +85,7 @@ class IndexView(LoginRequiredMixin, View):
         search = request.POST.get('search')
         tabs = curr_account.tabs.all()
         tabs = tabs.filter(site__url__icontains=search)
-        print(tabs)
+        print("IndexView: post(): tabs: ", tabs)
         history = curr_account.history.all()
         sites = curr_account.sites.all()
         bookmarks = curr_account.bookmarks.all()

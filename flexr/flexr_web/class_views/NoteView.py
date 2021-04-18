@@ -42,7 +42,6 @@ class NoteView(LoginRequiredMixin, View):
         form.fields['lock'].initial = obj.lock
         form.fields['password'].label = "Password:"
         form.fields['password'].initial = obj.password
-        print("note password",obj.password)
 
         # request messages for debugging
         if ('message' in self.request.session):
@@ -79,27 +78,21 @@ class NoteView(LoginRequiredMixin, View):
 
         # get form object on the page
         form = EditNoteForm(request.POST)
-        #print("Note edited")
-        print(form)
         # check if form is valid
         if form.is_valid():
             
             # get current account
             acc = request.user.accounts.get(account_id = request.session['account_id'])
             noteid = kwargs['pk']
-            print(noteid)
-            print(acc.notes.all())
             note = acc.notes.get(id = noteid)
-            print(note)
+            print("NotesView: edit_note(): note: ", note)
             # grab note information from the form 
             tit = request.POST.get('title')
             cont = request.POST.get('content')
             lo = request.POST.get('lock')
-            print("locked",lo)
+            print("NotesView: edit_note(): locked: ", lo)
             passw = request.POST.get('password')
             passw2 = request.POST.get('password2')
-            print("Note passw: ",passw)
-            print("Note passw2: ",passw2)
             if passw != note.password and passw != passw2:
                 request.session['note_unlocked'] = noteid
                 request.session['err_message'] = "Note not edited. Passwords do not match"
@@ -110,7 +103,6 @@ class NoteView(LoginRequiredMixin, View):
                 lo = True
             else:
                 if (passw not in EMPTY_VALUES):
-                    print("reached",passw)
                     request.session['note_unlocked'] = noteid
                     request.session['err_message'] = "Note not edited. Please put a password on locked note"
                     return redirect(request.session['prev_url'])
@@ -125,9 +117,8 @@ class NoteView(LoginRequiredMixin, View):
             request.session['message'] = "Note edited"
 
         else:
-            request.session['note_unlocked'] = noteid
+            request.session['note_unlocked'] = kwargs['pk']
             request.session['err_message'] = "Note not edited. Please put a password on locked note"
-            #print(form.errors)
 
         return redirect(request.session['prev_url'])
 

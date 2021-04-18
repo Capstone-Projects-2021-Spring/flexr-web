@@ -19,7 +19,7 @@ class SiteAPIView(LoginRequiredMixin, View):
 
     def get(self, request):
         curr_account = request.user.accounts.get(account_id = request.session['account_id'])
-        print(request.GET.get("url"))
+        print("SiteAPIView: get(): request.GET.get('url')", request.GET.get("url"))
         site = curr_account.sites.get(url = request.GET.get('url') )
         data = SiteSerializer(site)
         return JsonResponse(data.data, safe=False)

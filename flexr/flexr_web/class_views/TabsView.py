@@ -124,7 +124,7 @@ class TabsView(LoginRequiredMixin, View):
         search = request.POST.get('search')
         tabs = curr_account.tabs.all()
         tabs = tabs.filter(site__url__icontains=search)
-        print(tabs)
+        print("TabsView: post(): tabs: ", tabs)
         history = curr_account.history.all()
         sites = curr_account.sites.all()
         bookmarks = curr_account.bookmarks.all()
@@ -212,13 +212,13 @@ class TabAPIView(View):
 
         # try:
             # try to close requested tab
-        print(kwargs['id'])
+        print("TabsAPIView: delete(): tab_id: ", kwargs['id'])
         tab = Tab.close_tab(tabID=kwargs['id'], curr_account=curr_account)
 
         if isinstance(tab, Exception):
             return JsonResponse({ "error": str(tab), "traceback": traceback.extract_tb(tab.__traceback__).format() }, status=500)
         
-        print("TabAPI: Delete: close tab return", tab)
+        print("TabAPIView: delete(): close tab return: ", tab)
         return JsonResponse({"success": "tab closed"})
         # except:
         #     return JsonResponse({"error": "Could not close tab"}, status = 400)

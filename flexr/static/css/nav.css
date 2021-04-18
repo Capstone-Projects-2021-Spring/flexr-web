@@ -202,7 +202,8 @@ h2{
     background-image: linear-gradient( #00C4EE,#0087C2, #00559F
     , #001872);
     padding-top: 20px;
-    box-shadow: inset  0 0 10px #001872;
+    /*box-shadow: inset  0 0 10px #001872;*/
+    box-shadow: 1px 3px 15px 1px  #00559F;
 }   
 
 /* The sidebar menu */
@@ -223,7 +224,8 @@ h2{
     /* background-color: #0087C2; */
     background-image: linear-gradient(#00C4EE,#0087C2, #00559F);
     padding-top: 20px;
-    box-shadow: inset  0 0 10px #001872;
+   /* box-shadow: inset  0 0 10px #001872;*/
+   box-shadow: 1px 5px 15px 1px #e5e8f3;
 }   
 
 .sidenav2{
@@ -243,7 +245,8 @@ h2{
     /* background-color: #0087C2; */
     background-image: linear-gradient(#00C4EE,#0087C2, #00559F);
     padding-top: 20px;
-    box-shadow: inset  0 0 10px #001872;
+    /*box-shadow: inset  0 0 10px #001872;*/
+   box-shadow: 1px 5px 15px 1px #e5e8f3;
 }
 
 #acc{
@@ -270,3 +273,8 @@ h2{
     cursor: pointer;
     color: grey;
 }
+
+.btn-primary{
+
+}
+

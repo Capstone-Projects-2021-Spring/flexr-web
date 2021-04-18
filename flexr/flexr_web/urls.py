@@ -19,7 +19,7 @@ from .class_views.BookmarkFolderView import BookmarkFolderView, BookmarkFoldersV
 from .class_views.SharedFoldersView import SharedFoldersView
 from .class_views.TabsView import TabsView, TabAPIView
 from .class_views.UserView import UserAPIView
-from .class_views.FriendView import FriendView, FriendAPIView
+from .class_views.FriendView import FriendViewWeb, FriendAPIView
 from .class_views.SiteView import SiteAPIView
 from .class_views.NoteView import NoteViewAPI
 from .class_views.SharedFolderView import FoldersViewAPI
@@ -83,12 +83,12 @@ urlpatterns = [
     path('edit_preferences/', ProfileView().edit_account_preferences, name = "edit account preferences"),
 
     
-    path('friends/', FriendView.as_view(), name = "friends"),
-    path('add_friend/', FriendView().add_friend, name = "add friend"),
-    path('deny_friend/<int:pk>', FriendView().deny_friend, name = "deny friend"),
-    path('accept_friend/<int:pk>', FriendView().accept_friend, name="accept friend"),
-    path('remove_friend/<int:pk>', FriendView().remove_friend, name="remove friend"),
-    path('remove_notif/<int:pk>', FriendView().remove_notif, name="remove notif"),
+    path('friends/', FriendViewWeb.as_view(), name ="friends"),
+    path('add_friend/', FriendViewWeb().add_friend, name ="add friend"),
+    path('deny_friend/<int:pk>', FriendViewWeb().deny_friend, name ="deny friend"),
+    path('accept_friend/<int:pk>', FriendViewWeb().accept_friend, name="accept friend"),
+    path('remove_friend/<int:pk>', FriendViewWeb().remove_friend, name="remove friend"),
+    path('remove_notif/<int:pk>', FriendViewWeb().remove_notif, name="remove notif"),
 
     #API Endpoints
 

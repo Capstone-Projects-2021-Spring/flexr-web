@@ -30,28 +30,22 @@ class ProfileView(LoginRequiredMixin, View):
         
         # get all accounts for the user and
         # account preferrences for the users
-        print(curr_user)
+        print("ProfileView: get(): curr_user: ", curr_user)
         curr_account = curr_user.accounts.get(account_id=self.request.session['account_id'])
-        print(curr_account)
+        print("ProfileView: get(): curr_account: ", curr_account)
 
         accounts = curr_user.accounts.all()
         acc_pref = curr_account.account_preferences
-
-        # site = curr_account.sites.all()[0]
-        # acc_pref.home_page = site
+        if(acc_pref == None):
+            print("ProfileView: get(): Message: acc_pref was NONE!!!!")
+            curr_account.save()
 
         # get form object for preferences
         pref_form = PreferencesForm()
-        # if(acc_pref is None):
-        #     site = Site.objects.get(account=curr_account, url="https://google.com")
-        #     curr_account.account_preferences = Account_Preferences.objects.create(home_page = site)
-        #     curr_account.save()
 
         # set form data for home page if exists
         if curr_account.account_preferences.home_page is not None:
             pref_form.fields['home_page'].initial = curr_account.account_preferences.home_page
-
-        
         else:
             # otherwise try to set to first site found for the user
             try:
@@ -83,7 +77,6 @@ class ProfileView(LoginRequiredMixin, View):
         account_form.fields['email'].initial = curr_account.email
         account_form.fields['phone_number'].initial = curr_account.phone_number
         account_form.fields['type_of_account'].initial = curr_account.type_of_account
-        print("hello")
 
         # request messages for debugging
         if ('message' in self.request.session):
@@ -98,23 +91,24 @@ class ProfileView(LoginRequiredMixin, View):
         # display the profile page
         friends = curr_account.all_friends.all()
         friend_requests = curr_account.to_friend.all().filter(status="Pending")
-        print("friend requests", friend_requests)
+
+        print("ProfileView: get(): friend_requests: ", friend_requests)
         pending_friends = curr_account.all_pending_friends.all()
-        print(pending_friends)
+        print("ProfileView: get(): pending_friends: ", pending_friends)
 
         # This needs to exclude all of the people you've already sent request to
 
-        accounts_not_curr_user = Account.objects # this needs to be filter on account preferences searchable
-        all_accounts = Account.objects.exclude(account_id__in = friends).exclude(user = curr_user) 
+        # accounts_not_curr_user = Account.objects # this needs to be filter on account preferences searchable
+        friend_search_accounts = Account.objects.exclude(account_id__in = friends).exclude(user = curr_user)
 
         mutual_friends = curr_account.mutual_friends.all()
         # all_accounts = accounts
-        print(all_accounts)
+        print("ProfileView: get(): friend_search_accounts: ", friend_search_accounts)
         request.session['prev_url'] = '/profile/'
         return render(self.request, "flexr_web/profile.html", {"Accounts": accounts,
                                                                "Preferences": acc_pref, "pref_form": pref_form,
                                                                "account_form": account_form, "Friends": friends,
-                                                               "AllAccounts": all_accounts,
+                                                               "AllAccounts": friend_search_accounts,
                                                                "mutual_friends": mutual_friends,
                                                                "friend_requests": friend_requests})
 

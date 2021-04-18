@@ -46,8 +46,8 @@ class SharedFolderView(LoginRequiredMixin, View):
         form.fields["description"].initial = shared_folder.description
         friends = current_acc.friends.all() 
         collabs = shared_folder.collaborators.all()
-        print(friends)
-        print(collabs)
+        print("SharedFolderView: get(): friends", friends)
+        print("SharedFolderView: get(): collabs", collabs)
         collab_set = friends | collabs
         collab_set = collab_set.distinct()
 
@@ -87,7 +87,6 @@ class SharedFolderView(LoginRequiredMixin, View):
     def edit_shared_folder(self, request, *args, **kwargs):
         current_acc = request.user.accounts.get(account_id=request.session['account_id'])
         shared_folder = current_acc.shared_folders.get(id=kwargs['pk'])
-        print(request.POST.get("new_title"))
         # shared_folder.title = request.POST.get("new_title")
         # shared_folder.title = request.POST.get("new_description")
         form = EditSharedFolder(request.POST)
@@ -117,7 +116,7 @@ class SharedFolderView(LoginRequiredMixin, View):
         shared_folder = sharedFolder.objects.get(id = kwargs['id'])
         print("SharedFolderView: add_collaborator(): collab_id: ", collab_id)
         collab_acc_username = request.POST.get('search_username')
-        print("SharedFolderView: add_collaborator(): collab_acc_username:", collab_acc_username)
+        print("SharedFolderView: add_collaborator(): collab_acc_username: ", collab_acc_username)
         try:
             collab_account = Account.objects.get(account_id=collab_id, username = collab_acc_username)
             shared_folder.collaborators.add(collab_account)
@@ -133,7 +132,7 @@ class SharedFolderView(LoginRequiredMixin, View):
         shared_folder = sharedFolder.objects.get(id = kwargs['id'])
         print("SharedFolderView: remove_collaborator(): collab_id: ", collab_id)
         collab_acc_username = request.POST.get('search_username')
-        print("SharedFolderView: remove_collaborator(): collab_acc_username:", collab_acc_username)
+        print("SharedFolderView: remove_collaborator(): collab_acc_username: ", collab_acc_username)
         try:
             collab_account = Account.objects.get(account_id=collab_id, username = collab_acc_username)
             shared_folder.collaborators.remove(collab_account)

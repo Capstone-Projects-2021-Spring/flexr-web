@@ -14,26 +14,26 @@ from ..forms import *
 from ..serializers import AccountSerializer, FriendshipSerializer
 
 
-class FriendView(LoginRequiredMixin, DetailView):
+class FriendViewWeb(LoginRequiredMixin, DetailView):
 
     def get(self, request):
         curr_account = request.user.accounts.get(account_id=request.session['account_id'])
         friends = curr_account.friends.all()
-        print(friends)
+        print("FriendViewWeb: get(): friends: ", friends)
         request.session['prev_url'] = '/friends/'
         return render(request, "flexr_web/friends.html", {"Friends": friends})
 
     def add_friend(self, request):
         user_account = request.user.accounts.get(account_id=request.session['account_id'])
         friend_acc_id = request.POST.get('search_id')
-        print("FriendView: add_friend(): friend_acc_id: ", friend_acc_id)
+        print("FriendViewWeb: add_friend(): friend_acc_id: ", friend_acc_id)
         friend_acc_username = request.POST.get('search_username')
-        print("FriendView: add_friend(): friend_acc_username:", friend_acc_username)
-        print("FriendView: add_friend : friend_acc_id:",friend_acc_id)
+        print("FriendViewWeb: add_friend(): friend_acc_username: ", friend_acc_username)
+        print("FriendViewWeb: add_friend : friend_acc_id: ",friend_acc_id)
         try:
             friend_account = Account.objects.get(account_id=friend_acc_id, username = friend_acc_username)
             friend_request = Friendship.objects.get_or_create(sent=user_account, received=friend_account)
-            print(friend_request)
+            print("FriendViewWeb: add_friend : friend_request: ",friend_request)
             request.session['message'] = "Friend request sent"
             return redirect(request.session['prev_url'])
         except:
@@ -120,7 +120,7 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
         friendships_recieved = curr_account.to_friend.all()
         friendships = friendships_sent | friendships_recieved
         friendship = friendships.get(id = kwargs['id'])
-        print(friendship)
+        print("FriendViewAPI: accept() : friendship: ",friendship)
         friendship.status = "Accepted"
         friendship.save()
         data = FriendshipSerializer(friendships)
@@ -131,8 +131,8 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
         friendships_sent = curr_account.from_friend.all()
-        friendships_recieved = curr_account.to_friend.all()
-        friendships = friendships_sent | friendships_recieved
+        friendships_received = curr_account.to_friend.all()
+        friendships = friendships_sent | friendships_received
         friendship = friendships.get(id = kwargs['id'])
         friendship.status = "Declined"
         friendship.save()
@@ -151,6 +151,3 @@ class FriendAPIView(LoginRequiredMixin, DetailView):
             return JsonResponse(data.data, safe=False)
         except:
             return JsonResponse({"error": "Account not found."}, status = 404)
-        
-        
-        

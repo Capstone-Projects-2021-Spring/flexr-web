@@ -113,7 +113,6 @@ class NotesView(LoginRequiredMixin, View):
 
             else:
                 if (passw not in EMPTY_VALUES):
-                    print("reached",passw)
                     request.session['err_message'] = "Note not created. Please put a password on locked note"
                     return redirect(request.session['prev_url'])
                 lo = False
@@ -124,7 +123,6 @@ class NotesView(LoginRequiredMixin, View):
 
         else:
             request.session['err_message'] = "Note not created. Please put a password on locked note"
-            #print(form.errors)
 
         return redirect(request.session['prev_url'])
 
@@ -144,7 +142,6 @@ class NotesView(LoginRequiredMixin, View):
         if(request.session['prev_url'] != '/opennote/'+str(kwargs['pk'])+'/'):
             return redirect(request.session['prev_url'])
         else:
-            print(request.session['prev_url'])
             return redirect('/notes/')
 
     def search_note(self, request):
@@ -154,13 +151,13 @@ class NotesView(LoginRequiredMixin, View):
 
         
         search = request.POST.get('search')
-
+        print("NotesView: search_note: search: ", search)
         content_search = notes.filter(content__icontains=search)
         title_search = notes.filter(title__icontains = search)
 
         search_results = content_search | title_search
         search_results = search_results.distinct()
-        print(search_results)
+        print("NotesView: search_note: search_results: ", search_results)
         form = notef
         fform = FilterNoteForm
         if(search_results.count() > 0): 

@@ -214,15 +214,14 @@ class BookmarksViewAPI(LoginRequiredMixin, DetailView):
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
 
         data = json.loads(request.body)
-
+        result = Bookmark.objects.get(pk=kwargs["id"])
         if 'url' in data:
             site = Site.objects.get_or_create(account = curr_account, url = data['url'])[0]
-            data['site_id'] = site.id
-
-        result = Bookmark.objects.filter(pk = kwargs["id"]).update(**data)
-
-        data = BookmarkSerializer(bookmark)
-        
+            result.url = data['url']
+            result.site = site
+        result.bookmark_name = data['bookmark_name']
+        result.save()
+        data = BookmarkSerializer(result)
         return JsonResponse(data.data, safe=False)
 
     def get(self, request, *args, **kwargs):
