@@ -160,7 +160,7 @@ class Site(models.Model):
         self.last_visit = timezone.now()
         self.recent_frequency = self.calculate_frequency()
         self.save()
-        print("Model: Site: "+self+".visited()")
+        print("Model: Site: ",self,".visited()")
         # self.rank_site()
         # site_ranking = # update site ranking here
 
