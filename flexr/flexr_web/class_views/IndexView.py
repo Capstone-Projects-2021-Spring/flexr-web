@@ -42,7 +42,7 @@ class IndexView(LoginRequiredMixin, View):
         accounts = curr_user.accounts.all()
         history = curr_account.history.all()
         sites = curr_account.sites.all()
-        tabs = curr_account.tabs.all()[:6]
+        tabs = curr_account.tabs.order_by('-last_visited')[:6]
         bookmarks = curr_account.bookmarks.all()[:6]
         notes = curr_account.notes.all()[:6]
         folders = curr_account.collab_shared_folders.all()[:6]
