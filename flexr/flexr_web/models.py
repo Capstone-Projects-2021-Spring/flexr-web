@@ -101,7 +101,7 @@ class Account(models.Model):
             site.site_ranking = ((min_secdelta+1)/(secdelta+1))*(20)+(site.recent_frequency/max_freq)*(65)+(site.number_of_visits/ max_visits)*(15)
             site.site_ranking =(site.recent_frequency / max_freq) * (65) + (site.number_of_visits / max_visits) * (15)
             site.save()
-            print("Model: Account.rank_sites: site.site_ranking: ",site, site.site_ranking)
+            # print("Model: Account.rank_sites: site.site_ranking: ",site, site.site_ranking)
 
         for x in self.suggested_sites.all().iterator():
             self.suggested_sites.remove(x)
