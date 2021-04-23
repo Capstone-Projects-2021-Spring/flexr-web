@@ -11,6 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 import json
 import pytz
+import traceback
 
 from ..models import *
 from ..forms import *
@@ -29,25 +30,29 @@ class UserAPIView(View):
                 JSONRequest with success and user data or error message
         """
 
-        if request.method == 'POST':
-            data = request.POST.dict()
-            email = data['email']
-            username = data['username']
-            password = data['password']
+        try:
+            if request.method == 'POST':
+                data = request.POST.dict()
+                email = data['email']
+                username = data['username']
+                password = data['password']
 
-            user = User.objects.create_user(username, email, password)
+                user = User.objects.create_user(username, email, password)
 
-            new_account = Account.objects.create(user=user, email=user.email, username = user.username)
-            request.session['account_id'] = new_account.account_id
-            site = Site.objects.create(account=new_account, url="https://google.com")
-            site.save()
-            new_account.account_preferences = Account_Preferences.objects.create(home_page = site)
-            new_account.save()
-            print("UserAPIView: logout(): user", new_account, " Message: USER SIGNED UP")
-            return JsonResponse({"success": f"User {username} created"})
+                new_account = Account.objects.create(user=user, email=user.email, username = user.username)
+                request.session['account_id'] = new_account.account_id
+                site = Site.objects.create(account=new_account, url="https://google.com")
+                site.save()
+                new_account.account_preferences = Account_Preferences.objects.create(home_page = site)
+                new_account.save()
+                print("UserAPIView: logout(): user", new_account, " Message: USER SIGNED UP")
+                return JsonResponse({"success": f"User {username} created"})
 
-            
-        return JsonResponse({"error": f"Error creating user"})
+                
+            return JsonResponse({"error": f"Error creating user"})
+
+        except Exception as e:
+            return JsonResponse({ "error": str(e), "traceback": traceback.extract_tb(e.__traceback__).format() }, status=500) 
         
 
     @method_decorator(csrf_exempt)
@@ -59,19 +64,23 @@ class UserAPIView(View):
             :return:
                 JSONRequest with success or error message
         """
-        if request.method == 'POST':
-            data = request.POST.dict()
-            username = data['username']
-            password = data['password']
+        try:
+            if request.method == 'POST':
+                data = request.POST.dict()
+                username = data['username']
+                password = data['password']
 
-            user = authenticate(username=username, password=password)
+                user = authenticate(username=username, password=password)
 
-            if user:
-                login(request, user)
-                data = UserSerializer(user)
-                print("UserAPIView: login(): user", user, " Message: USER LOGGED IN")
-                return JsonResponse(data.data, safe=False)
-        return JsonResponse({"error": "Error logging in"}, status = 404)
+                if user:
+                    login(request, user)
+                    data = UserSerializer(user)
+                    print("UserAPIView: login(): user", user, " Message: USER LOGGED IN")
+                    return JsonResponse(data.data, safe=False)
+            return JsonResponse({"error": "Error logging in"}, status = 404)
+            
+        except Exception as e:
+            return JsonResponse({ "error": str(e), "traceback": traceback.extract_tb(e.__traceback__).format() }, status=500) 
         
 
     @method_decorator(csrf_exempt)
@@ -90,8 +99,8 @@ class UserAPIView(View):
             print("UserAPIView: logout(): user", user, " Message: USER LOGGED OUT")
             return JsonResponse({"success": f"User {user} logged out"})
 
-        except:
-            return JsonResponse({"error": "Error logging out"})
+        except Exception as e:
+            return JsonResponse({ "error": str(e), "traceback": traceback.extract_tb(e.__traceback__).format() }, status=500) 
 
     @method_decorator(csrf_exempt)
     def check_status(self, request, *args, **kwargs):
@@ -102,11 +111,16 @@ class UserAPIView(View):
             :return:
                 JSONRequest with a logged in or logged out message
         """
-        if request.method == 'GET':
-            #print(request.session.__dict__)
 
-            status = request.user.is_authenticated
+        try:
+            if request.method == 'GET':
+                #print(request.session.__dict__)
 
-            return JsonResponse(status, safe=False)
+                status = request.user.is_authenticated
 
-        return JsonResponse({"error": "error checking status"})
+                return JsonResponse(status, safe=False)
+
+            return JsonResponse({"error": "error checking status"})
+        
+        except Exception as e:
+            return JsonResponse({ "error": str(e), "traceback": traceback.extract_tb(e.__traceback__).format() }, status=500) 
