@@ -77,10 +77,6 @@
                                     {%endif%}
                                 </span>
                             </div>
-                            <script>
-                               
-                            </script>
-
                         </div>
                     {%endfor%}
                 </div>
@@ -100,7 +96,7 @@
                                 {{bm.sitee.favicon_img_url}}
                             {%if bm.site.favicon_img_url != None%}
                                 <img class = "icon" src="{{ bm.site.favicon_img_url }}" width="15px">
-                        {%endif%}{{bm.site}}</p>
+                            {%endif%}{{bm.site}}</p>
                                 <img class="bm icon" onclick="window.location.href = '/delete_bookmark/{{bm.site.bookmarked}}'" src="{% static 'icons/bookmarked.png' %}" width= 15px>
                             </span>
                         </div>

@@ -79,14 +79,14 @@
     
     <div class="col">
       <div class = " sidenav2">
-        <!-- <a class="navbar-brand" href="/"><img src="{% static 'flexr_logo_2.png' %}" width="100%"></a> -->
+        <!-- <a class="navbar-brand" href="/"><img src="{% static 'flexr_light.png' %}" width="100%"></a> -->
         <div onclick="window.location.href = '/profile'" style="cursor: pointer;">
           {%if curr_acc.notifs.all|length > 0%}
               <img src="{% static 'flexr_logo_notif.png' %}" width="15%" style="display: inline;  padding-bottom: 5%;">
               <h1 style="font-size: xx-large; display: inline;" >{{user.first_name}} {{user.last_name}}</h1>
           {%else%}
               <img src="{% static 'flexr_logo.png' %}" width="15%" style="display: inline;  padding-bottom: 5%;">
-              <h1 style="font-size: xx-large; display: inline;" >{{user.first_name}} {{user.last_name}}</h1>
+              <h1 style="font-size: xx-large; display: inline;">{{user.first_name}} {{user.last_name}}</h1>
           {%endif%}
         </div>
         <br>
@@ -111,7 +111,7 @@
               {% if user.is_superuser %}
               <hr>
                     <div id = "acc" class = "col-lg-10" >
-                      <h2 onclick="window.location.href = '/admin'" >Admin</h2>
+                      <h2 id = "sites-head" onclick="window.location.href = '/admin'" >Admin</h2>
                     </div>
                       <hr>
               {% endif %}
@@ -147,7 +147,7 @@
       </div>
     <div class = "suggested sidenav">
      
-      <a class="navbar-brand" href="/"><img src="{% static 'flexr_logo_2.png' %}" width="100%"></a>
+      <a class="navbar-brand" href="/"><img src="{% static 'flexr_light.png' %}" width="100%"></a>
       <h2 id = "sites-head">Suggested Sites</h2>
       <div id = "sites_nav">
         {%for site in Suggested_Sites%}
