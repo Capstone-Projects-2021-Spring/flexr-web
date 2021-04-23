@@ -413,3 +413,54 @@ class AccountAPITestCase(TestCase):
         acc_count = Account.objects.all().count()
 
         self.assertEqual(acc_count, 1)
+
+class TabAPITestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        c = Client()
+        curr_user = User.objects.create_user('foo', 'myemail@test.com', 'bar')
+        curr_user.save()
+        cls.now = datetime.datetime.now(tz=timezone.utc)
+        acc = Account.objects.create(user = curr_user, email = "test@me.com", type_of_account = "Business")
+        site = Site.objects.create(account = acc, url = "https://www.google.com/")
+        tab = Tab.objects.create(account = acc, site = site, status = "Open", 
+            created_date = cls.now, last_visited = cls.now)
+
+
+    def test_get_tab(self):
+        c = Client()
+        c.login(username='foo', password='bar')
+        c.get(path='/api/account/1/switch/') # force account switch
+        result = c.get(path ="/api/tab/1/")
+        data = json.loads(result.content)
+        
+        # remove timezone and then append 'Z' to match format
+        # hack to remove warning
+        data_expected = {
+            'id': 1,
+            'account': 1, 
+            'site': 2,
+            'url': "https://www.google.com/",
+            'created_date': self.now.isoformat()[:-6] + 'Z', 
+            'last_visited': self.now.isoformat()[:-6] + 'Z', 
+            'status': 'Open'
+        }
+
+        self.assertEqual(data, data_expected)
+
+    def test_delete_tab(self):
+        c = Client()
+        c.login(username='foo', password='bar')
+        c.get(path='/api/account/1/switch/') # force account switch
+        c.delete(path = "/api/tab/1/")
+        tab_count = Tab.objects.all().count()
+        self.assertEqual(tab_count, 0)
+
+    def test_open_tab(self):
+        c = Client()
+        c.login(username='foo', password='bar')
+        c.get(path='/api/account/1/switch/') # force account switch
+        c.post("/api/tabs/", data={"url": "https://www.facebook.com"}, 
+        content_type='application/json')
+        tab_count = Tab.objects.all().count()
+        self.assertEqual(tab_count, 2)
