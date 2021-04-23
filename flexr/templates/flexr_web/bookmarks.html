@@ -77,7 +77,17 @@
                         <h2>{{folder.title}}</h2>
                         <p>Created Date: {{folder.created_date}}</p>
                         <!-- <p><a href="{% url 'delete-bookmark-folder' folder.pk%}">Delete Folder</a></p> -->
-                        <img class="close" onclick=" var conf = confirm('Do you want to delete this bookmark folder?'); if(conf){ window.location.href = '/delete_bookmark_folder/{{folder.id}}/'}" src="{% static 'icons/cancel.png' %}" width= 15px>
+                        <!-- <img class="close" onclick=" var conf = confirm('Do you want to delete this bookmark folder?'); if(conf){ window.location.href = '/delete_bookmark_folder/{{folder.id}}/'}" src="{% static 'icons/cancel.png' %}" width= 15px> -->
+                        <a href="{% url 'delete-bookmark-folder' folder.id%}" class="confirmation"> <img class="close" src="{% static 'icons/cancel.png' %}" width= 15px></a>
+                        <script type="text/javascript">
+                            var elems = document.getElementsByClassName('confirmation');
+                            var confirmIt = function (e) {
+                                if (!confirm('Do you want to delete this bookmark folder?')) e.preventDefault();
+                            };
+                            for (var i = 0, l = elems.length; i < l; i++) {
+                                elems[i].addEventListener('click', confirmIt, false);
+                            }
+                        </script>
 
                         <!-- <a href="{% url 'delete-bookmark-folder' folder.pk%}"><p>Delete Folder</p> </a> -->
                         <br>
