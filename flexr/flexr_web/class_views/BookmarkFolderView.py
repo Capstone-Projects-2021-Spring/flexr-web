@@ -162,23 +162,39 @@ class BookmarkFolderView(LoginRequiredMixin, View):
         """
 
         form = EditBookmarkForm(request.POST)
-        form.fields['bookmarks'].queryset = current_acc.bookmarks.all()
-        form.fields["title"].initial = bookmark_folder.title
-        form.fields["bookmarks"].initial = bookmark_folder.bookmarks.all()
+        # form.fields['bookmarks'].queryset = current_acc.bookmarks.all()
+        # form.fields["title"].initial = bookmark_folder.title
+        # form.fields["bookmarks"].initial = bookmark_folder.bookmarks.all()
         # check if form is valid
         if form.is_valid():
 
-            
-            title = request.POST.get('title')
-
             bookmarkos = form.cleaned_data['bookmarks']
 
-            bookmark_folder.title = title
+            # titleos = form.cleaned_data['title']
+
+            bookmark_folder.title = request.POST.get("new_title")
+            bookmark_folder.title = request.POST.get("new_description")
+            bookmark_folder.title = request.POST.get('title')
             bookmark_folder.bookmarks.set(bookmarkos)
-
-
-            request.session['message'] = "Bookmark edited"
+            tileo = form.cleaned_data['title']
+            descrippy = form.cleaned_data['bookmarks']
+        bookmark_folder.save()
         return redirect(request.session['prev_url'])
+        # if form.is_valid():
+
+            
+        #     # titleos = form.cleaned_data['title']
+
+        #     bookmarkos = form.cleaned_data['bookmarks']
+
+        #     # bookmark_folder.title = request.POST.get("new_title")
+        #     bookmark_folder.title = request.POST.get('title')
+        #     bookmark_folder.bookmarks.set(bookmarkos)
+            
+        #     tileo = form.cleaned_data['title']
+
+        #     request.session['message'] = "Bookmark edited"
+        # return redirect(request.session['prev_url'])
 
     def delete_bookmark_folder_web(self, request, *args, **kwargs):
         current_acc = request.user.accounts.get(account_id = request.session['account_id'])
