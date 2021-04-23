@@ -86,7 +86,7 @@ class BookmarkFolderView(LoginRequiredMixin, View):
         # request message for debugging
         request.session['message'] = "Bookmark Filtered"
 
-        request.session['prev_url'] = '/bookmark_folder/'+str(kwargs['pk'])+'/'
+        request.session['redirect_url'] = '/bookmark_folder/'+str(kwargs['pk'])+'/'
         # Gerald: using redirect doesn't work here?
         return render(request, "flexr_web/bookmark_folder.html",
          {"Bookmarks": bookmarks, 
@@ -118,7 +118,7 @@ class BookmarkFolderView(LoginRequiredMixin, View):
         # we may want to add a field to each object that says "shared"
 
         # return render(request, "flexr_web/shared_folder.html", {"SharedFolder": shared_folder, "Collaborators": collaborators, "Tabs": tabs, "Bookmarks": bookmarks, "Notes": notes})
-        request.session['prev_url'] = '/bookmark_folder/' + str(kwargs['pk'])
+        request.session['redirect_url'] = '/bookmark_folder/' + str(kwargs['pk'])
         # display the page
         return render(request, "flexr_web/bookmark_folder.html",
          {"bookmark_folder": bookmark_folder, 
@@ -153,7 +153,7 @@ class BookmarkFolderView(LoginRequiredMixin, View):
             #print(form.errors)
 
         # return to shared folders page
-        return redirect(request.session['prev_url'])
+        return redirect(request.session['redirect_url'])
           
     def edit_bookmark_folder(self, request, *args, **kwargs):
         current_acc = request.user.accounts.get(account_id=request.session['account_id'])
@@ -180,21 +180,8 @@ class BookmarkFolderView(LoginRequiredMixin, View):
             descrippy = form.cleaned_data['bookmarks']
         bookmark_folder.save()
         return redirect(request.session['prev_url'])
-        # if form.is_valid():
-
-            
-        #     # titleos = form.cleaned_data['title']
-
-        #     bookmarkos = form.cleaned_data['bookmarks']
-
-        #     # bookmark_folder.title = request.POST.get("new_title")
-        #     bookmark_folder.title = request.POST.get('title')
-        #     bookmark_folder.bookmarks.set(bookmarkos)
-            
-        #     tileo = form.cleaned_data['title']
-
-        #     request.session['message'] = "Bookmark edited"
-        # return redirect(request.session['prev_url'])
+            request.session['message'] = "Bookmark edited"
+        return redirect(request.session['redirect_url'])
 
     def delete_bookmark_folder_web(self, request, *args, **kwargs):
         current_acc = request.user.accounts.get(account_id = request.session['account_id'])
@@ -215,7 +202,7 @@ class BookmarkFolderView(LoginRequiredMixin, View):
         # print('deleting')
         bookmarks.set(bookmarks.filter(~Q(pk = kwargs["pk"])))
         # bookmarks.exclude(pk = kwargs["pk"]).update()
-        return redirect(request.session['prev_url'])
+        return redirect(request.session['redirect_url'])
 
 @method_decorator(csrf_exempt, name='dispatch')
 class BookmarkFoldersViewAPI(LoginRequiredMixin, DetailView):

@@ -43,7 +43,7 @@ class SharedFoldersView(LoginRequiredMixin, View):
             message = self.request.session['err_message']
             del self.request.session['err_message']
             messages.error(self.request, message)
-        request.session['prev_url'] = '/shared_folders/'
+        request.session['redirect_url'] = '/shared_folders/'
         # display the page
         return render(self.request, "flexr_web/shared_folders.html", 
         {"Folders": folders, 
@@ -83,7 +83,7 @@ class SharedFoldersView(LoginRequiredMixin, View):
             #print(form.errors)
 
         # return to shared folders page
-        return redirect(request.session['prev_url'])
+        return redirect(request.session['redirect_url'])
 
     def delete_shared_folder(self,request, *args, **kwargs):
         print("SharedFoldersView: delete_shared_folder(): shared_folder", sharedFolder.objects.get(pk=kwargs['pk']))
@@ -96,4 +96,4 @@ class SharedFoldersView(LoginRequiredMixin, View):
         if form.is_valid():
             print("SharedFoldersView: edit_shared_folder: Message: form is valid")
 
-        return redirect(request.session['prev_url'])
+        return redirect(request.session['redirect_url'])

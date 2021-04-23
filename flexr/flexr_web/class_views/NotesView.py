@@ -43,13 +43,14 @@ class NotesView(LoginRequiredMixin, View):
             message = self.request.session['err_message']
             del self.request.session['err_message']
             messages.error(self.request, message)
-        request.session['prev_url'] = '/notes/'
+        request.session['redirect_url'] = '/notes/'
 
         # display the page
         return render(self.request, "flexr_web/notes.html", 
         {"Notes": notes, 
         "Accounts": accounts, 
         'form': form,
+        "searched":False,
         'fform': fform})
 
 
@@ -80,11 +81,11 @@ class NotesView(LoginRequiredMixin, View):
 
         # request message for debugging
         # request.session['message'] = "History Filtered"
-
         return render(self.request, "flexr_web/notes.html", 
         {"Notes": notes, 
         "Accounts": accounts, 
         'form': form,
+        'searched':True,
         'fform': fform})
 
     def create_note(self, request, *args, **kwargs):
@@ -114,7 +115,7 @@ class NotesView(LoginRequiredMixin, View):
             else:
                 if (passw not in EMPTY_VALUES):
                     request.session['err_message'] = "Note not created. Please put a password on locked note"
-                    return redirect(request.session['prev_url'])
+                    return redirect(request.session['redirect_url'])
                 lo = False
 
             newnote = Note.objects.create(account=acc, title=tit, content=cont, lock=lo, password=passw)
@@ -124,7 +125,7 @@ class NotesView(LoginRequiredMixin, View):
         else:
             request.session['err_message'] = "Note not created. Please put a password on locked note"
 
-        return redirect(request.session['prev_url'])
+        return redirect(request.session['redirect_url'])
 
 
     def delete_note(self,request, *args, **kwargs):
@@ -139,8 +140,8 @@ class NotesView(LoginRequiredMixin, View):
         obj.delete()
 
         # return to notes page
-        if(request.session['prev_url'] != '/opennote/'+str(kwargs['pk'])+'/'):
-            return redirect(request.session['prev_url'])
+        if(request.session['redirect_url'] != '/opennote/'+str(kwargs['pk'])+'/'):
+            return redirect(request.session['redirect_url'])
         else:
             return redirect('/notes/')
 
@@ -174,7 +175,7 @@ class NotesView(LoginRequiredMixin, View):
             message = request.session['err_message']
             del request.session['err_message']
             messages.error(request, message)
-        request.session['prev_url'] = '/notes/'
+        request.session['redirect_url'] = '/notes/'
 
         # display the page
         return render(request, "flexr_web/notes.html", 

@@ -30,10 +30,10 @@
 <body>
   <div class="container-fluid" id="navDiv">
 
-  <nav class="navbar navbar-expand-lg bg-transparent">
+  <nav class="navbar  navbar-expand-lg  bg-transparent">
     
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
+      <span class="navbar-toggler-icon"> <i title="" class="fa fa-bars"></i></span>
     </button>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -58,42 +58,6 @@
           <li class="nav-item ">
           <a class="nav-link" href="/shared_folders">Shared Folders</a>
         </li>
-
-          <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            {%if curr_acc.notifs.all|length > 0%}
-              <img src="{% static 'icons/user-notification.png'%}"} width="40" height="40">
-              {%else%}
-              <img src="{% static 'icons/user.png'%}"} width="40" height="40" >
-              {%endif%}
-          </a>
-          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
-            <a class="dropdown-item" href="/profile">Profile</a>
-            <hr>
-              {% if user.is_superuser %}
-                      <a class="dropdown-item" href="/admin">Admin</a>
-                      <hr>
-              {% endif %}
-              {%if curr_acc.notifs.all|length > 0%}
-                {% for notif in curr_acc.notifs.all%}
-                    <b><p>Friend Requests</p></b>
-                    {% if notif.status == "Pending" %}
-                        <p style="display: inline;">{{notif.sent.user.first_name}} {{notif.sent.user.last_name}} {{notif.sent}}</p><br>
-                        <button type="button" style="width: 35%; display: inline;" class="btn btn-danger" onclick="window.location.href = '/deny_friend/{{notif.id}}'">Deny</button>
-                        <button type="button" style="width: 35%; display: inline;" class="btn btn-success" onclick="window.location.href = '/accept_friend/{{notif.id}}'">Accept</button>
-                        <br>
-                        <hr>
-                    {%elif notif.status == "Accepted"%}
-                        <p style="display: inline;">{{notif.received}} accepted your friend request</p>
-                        <button type="button" style="width: 35%; display: inline;" class="btn btn-primary" onclick="window.location.href = '/remove_notif/{{notif.id}}'">Okay</button>
-                        <br>
-                        <hr>
-                    {% endif %}
-                {% endfor %}
-              {%endif%}
-            <a class="dropdown-item" href='/accounts/logout'>Log out</a>
-          </div>
-        </li>
       </ul>
     </div>
   </nav>
@@ -115,22 +79,25 @@
     
     <div class="col">
       <div class = " sidenav2">
-        <!-- <a class="navbar-brand" href="/"><img src="{% static 'flexr_logo_2.png' %}" width="100%"></a> -->
-        <span onclick="window.location.href = '/profile'" style="cursor: pointer;">
-        <img src="{% static 'flexr_logo.png' %}" width="15%" style="display: inline;  padding-bottom: 5%;"><h1 style="font-size: xx-large; display: inline;" >{{user.first_name}} {{user.last_name}}</h1>
-        </span>
+        <!-- <a class="navbar-brand" href="/"><img src="{% static 'flexr_light.png' %}" width="100%"></a> -->
+        <div onclick="window.location.href = '/profile'" style="cursor: pointer;">
+          {%if curr_acc.notifs.all|length > 0%}
+              <img src="{% static 'flexr_logo_notif.png' %}" width="15%" style="display: inline;  padding-bottom: 5%;">
+              <h1 style="font-size: xx-large; display: inline;" >{{user.first_name}} {{user.last_name}}</h1>
+          {%else%}
+              <img src="{% static 'flexr_logo.png' %}" width="15%" style="display: inline;  padding-bottom: 5%;">
+              <h1 style="font-size: xx-large; display: inline;">{{user.first_name}} {{user.last_name}}</h1>
+          {%endif%}
+        </div>
+        <br>
+        <div id = "acc" class = "col-lg-10" >
+            <h2 id = "sites-head" onclick="window.location.href = '/profile'" >Profile</h2>
+        </div>
+        <hr>
         <!-- <div style="border: 10px solid white; margin-top: -1.5%; margin-bottom: 5%;"></div> -->
-      
-        <h2 id = "sites-head">Accounts</h2><img class="plus-icon" id="plus-icon" width="20px" data-toggle="modal" data-target="#add_account" src = "{% static 'icons/plus.png' %}" >
-        <script>
-            $(document).ready(function(){
-                $('.plus-icon').hover(function() {
-                $(this).attr('src', "{% static 'icons/plus-circle.png' %}");
-                }, function() {
-                $(this).attr('src', "{% static 'icons/plus.png' %}");
-                });
-            });
-        </script>
+        <br>
+        <h2 id = "sites-head">Accounts</h2><img class="plus-icon icon" id="plus-icon" width="20px" data-toggle="modal" data-target="#add_account" src = "{% static 'icons/plus_white.png' %}" >
+       
           {%for acc in Accounts%}          
               <div id = "acc" class = "col-lg-10" >
                   {%if acc.account_id == curr_acc.account_id%}
@@ -140,18 +107,55 @@
                   {%endif%}
               </div>
           {%endfor%}
+          <hr>
+              {% if user.is_superuser %}
+              <hr>
+                    <div id = "acc" class = "col-lg-10" >
+                      <h2 id = "sites-head" onclick="window.location.href = '/admin'" >Admin</h2>
+                    </div>
+                      <hr>
+              {% endif %}
+              {%if curr_acc.notifs.all|length > 0%}
+              <hr>
+              <h2 id = "sites-head">Friend Requests</h2>
+                {% for notif in curr_acc.notifs.all%}
+                    {% if notif.status == "Pending" %}
+                      <div id = "acc" class = "col-lg-10" >
+                        <p style="display: inline;">{{notif.sent.user.first_name}} {{notif.sent.user.last_name}} {{notif.sent}}</p><br>
+                      </div>
+                        <button type="button" style="width: 35%; display: inline;" class="btn btn-danger2" onclick="window.location.href = '/deny_friend/{{notif.id}}'">Deny</button>
+                        <button type="button" style="width: 35%; display: inline;" class="btn btn-success2" onclick="window.location.href = '/accept_friend/{{notif.id}}'">Accept</button>
+                        <br>
+                    {%elif notif.status == "Accepted"%}
+                        <br>
+                        <div id = "acc" class = "col-lg-10" >
+                        <p style="display: inline;">{{notif.received}} accepted your friend request</p><br>
+                      </div>
+                        <button type="button" style="width: 35%; display: inline;" class="btn btn-primary" onclick="window.location.href = '/remove_notif/{{notif.id}}'">Okay</button>
+                        <br>
+                    {% endif %}
+                {% endfor %}
+                <br>
+                <hr>
+                <br>
+              {%endif%}
           <!-- <div style="border: 10px solid white; margin-top: -1.5%; margin-bottom: 5%;"></div> -->
+         
           <h3 id = "acc" class = "col-lg-10" onclick = "window.location.href ='/accounts/logout'">Log out</h3>
+          <br>
+          <br>
       </div>
     <div class = "suggested sidenav">
      
-      <a class="navbar-brand" href="/"><img src="{% static 'flexr_logo_2.png' %}" width="100%"></a>
+      <a class="navbar-brand" href="/"><img src="{% static 'flexr_light.png' %}" width="100%"></a>
       <h2 id = "sites-head">Suggested Sites</h2>
-      {%for site in Suggested_Sites%}
-              <div id = "site" class = "site card col-lg-12" onclick="window.open('{{site.url}}'); ">
-                      <p>{{site.name}}</p>
-              </div>
-      {%endfor%}
+      <div id = "sites_nav">
+        {%for site in Suggested_Sites%}
+                <div id = "acc" class = "col-lg-10" onclick="window.open('{{site.url}}'); ">
+                        <p>{{site.name}}</p>
+                </div>
+        {%endfor%}
+     </div>
     </div>
   </div>
     
@@ -161,7 +165,7 @@
         <div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title" id="add_accountLabel">Add an account!</h5>
-            <img type="button" data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
+            <img type="button" class = "icon close" data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
             </button>
         </div>
         <div class="modal-body">
@@ -195,7 +199,7 @@
           <div class="modal-content">
           <div class="modal-header">
               <h5 class="modal-title" id="add_tabLabel">Add a tab!</h5>
-              <img type="button" data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
+              <img type="button" data-dismiss="modal" class = "icon close" src = "{% static 'icons/cancel.png' %}" width=20px>
               </button>
           </div>
           <div class="modal-body">

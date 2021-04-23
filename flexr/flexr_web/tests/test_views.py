@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.test import Client
-from flexr_web.views import *
-from flexr_web.models import *
+from ..views import *
+from ..models import *
 from django.utils import timezone
 
 import datetime
@@ -254,3 +254,37 @@ class HistoryTestCase(TestCase):
         data_expected = 0
 
         self.assertEquals(data, data_expected)
+
+def AccountPreferencesTestCase(TestCase):
+    def setUp(self):
+        test_user = User.objects.create(first_name="Al", last_name="Annon", username="annon1234",
+                                        email="anon@gmail.com", password = "password")
+        test_user.save()
+        test_acc = Account.objects.create(user=test_user, email=test_user.email, phone_number="5704600704",
+                                          type_of_account="Business")
+        test_acc.save()
+        test_site = Site.objects.create(account=test_acc, url="https://www.google.com")
+        test_site.save()
+        test_account_preferences = Account_Preferences.objects.create(name="Annon Pref1", home_page=test_site)
+        test_account_preferences.save()
+
+    def test_account_preferences_created(self):
+        # test_acc = Account.objects.get(email="anon@gmail.com")
+        account_preferences_count = Account_Preferences.objects.all().count()
+        self.assertEqual(account_preferences_count, 2, "Account Preferences count is 1")
+
+    def test_account_preferences_edit(self):
+        c = Client()
+        c.login(username='annon1234', password='password')
+        payload = {
+            'datetime_from': datetime.datetime(year=2020, month=4, day=20, tzinfo=pytz.UTC),
+            'datetime_to': datetime.datetime(year=2020, month=4, day=21, tzinfo=pytz.UTC),
+        }
+        test_site = Site.objects.get(url = "https://www.google.com")
+        result = c.get(path="/api/account_preferences/")
+        data = json.loads(result.content)
+        data_expected = [
+            {'home_page': test_site, 'home_page_url': test_site.url}
+        ]
+
+        self.assertEqual(data, data_expected, "Account Preferences works")

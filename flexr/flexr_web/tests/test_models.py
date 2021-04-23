@@ -1,5 +1,7 @@
-from django.test import TestCase
-from flexr_web.models import *
+from django.contrib.auth.models import User
+from django.test import TestCase, Client
+from ..models import *
+from ..views import *
 # Create your tests here.
 
 class UserTestCase(TestCase):
@@ -213,3 +215,89 @@ class AccountPreferencesTestCase(TestCase):
         test_account_preferences.save()
         account_preferences_count = Account_Preferences.objects.all().count()
         self.assertEqual(account_preferences_count, 2, "Account Preferences count is 1")
+
+class FriendsTest(TestCase):
+
+    def setUp(self):
+        test_user1 = User.objects.create(first_name="Al2", last_name="Annon2", username="annon1",
+                                        email="anon@gmail.com", password = "password")
+        test_user1.save()
+
+        test_acc1 = Account.objects.create(user=test_user1, username = test_user1.username, email=test_user1.email, phone_number="5704600704",
+                                          type_of_account="Business")
+        test_acc1.save()
+        curr_user = authenticate(username='annon1', password='password')
+
+        test_user2 = User.objects.create(first_name="Al", last_name="Annon", username="annon2",
+                                         email="anon@gmail.com")
+        test_user2.save()
+        test_acc2 = Account.objects.create(user=test_user2, email=test_user2.email,username = test_user2.username, phone_number="5704600704",
+                                           type_of_account="Business")
+        test_acc2.save()
+
+        test_user3 = User.objects.create(first_name="Al", last_name="Annon", username="annon3",
+                                         email="anon@gmail.com")
+        test_user3.save()
+        test_acc3 = Account.objects.create(user=test_user3, email=test_user3.email,username = test_user3.username, phone_number="5704600704",
+                                           type_of_account="Business")
+        test_acc3.save()
+
+        test_user4 = User.objects.create(first_name="Al", last_name="Annon", username="annon4",
+                                         email="anon@gmail.com")
+        test_user4.save()
+
+        test_acc4 = Account.objects.create(user=test_user4, email=test_user4.email,username = test_user4.username, phone_number="5704600704",
+                                           type_of_account="Business")
+        test_acc4.save()
+
+        test_user5 = User.objects.create(first_name="Al", last_name="Annon", username="annon5",
+                                         email="anon@gmail.com")
+        test_user5.save()
+        test_acc5 = Account.objects.create(user=test_user5, email=test_user5.email,username = test_user5.username, phone_number="5704600704",
+                                           type_of_account="Business")
+        test_acc5.save()
+
+        test_user6 = User.objects.create(first_name="Al", last_name="Annon", username="annon6",
+                                         email="anon@gmail.com")
+        test_user6.save()
+        test_acc6 = Account.objects.create(user=test_user6, email=test_user6.email, username = test_user6.username,phone_number="5704600704",
+                                           type_of_account="Business")
+        test_acc6.save()
+
+    def test_sending_friend_request(self):
+        c = Client()
+        c.login(username='annon1', password='password')
+        c.get(path='/switch_account/1')  # force account switch
+        result = c.get(path="/api/tab/1")
+
+        self.assertEqual(True, True, "Account Preferences count is 1")
+
+    def test_create_friendship(self):
+        accounts = []
+        for x in Account.objects.all():
+            accounts.append(x)
+        print("accounts",accounts)
+        friendship1 = Friendship.objects.create(sent = accounts[0], received = accounts[1]) # 1-2
+        friendship2 = Friendship.objects.create(sent = accounts[0], received = accounts[5])
+
+        friendship3 = Friendship.objects.create(sent = accounts[1], received = accounts[3])
+        friendship4 = Friendship.objects.create(sent = accounts[1], received = accounts[2])
+        friendship10 = Friendship.objects.create(sent=accounts[1], received=accounts[4])
+
+        friendship5 = Friendship.objects.create(sent = accounts[2], received = accounts[4])
+
+        friendship6 = Friendship.objects.create(sent = accounts[3], received = accounts[5])
+        friendship7 = Friendship.objects.create(sent = accounts[3], received = accounts[4])
+
+        for x in Friendship.objects.all():
+            x.status = "Accepted"
+            x.save()
+
+        print("friends")
+        for x in Account.objects.all():
+            print(x.account_id, " = ", x.friends.all())
+
+        print("mutual friends")
+        for x in Account.objects.all():
+            print(x.account_id, " = ", x.mutual_friends.all())
+

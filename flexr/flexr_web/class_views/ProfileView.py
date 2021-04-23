@@ -26,12 +26,12 @@ class ProfileView(LoginRequiredMixin, View):
         """
 
         # get current user and current account
-        curr_user = self.request.user
+        curr_user = request.user
         
         # get all accounts for the user and
         # account preferrences for the users
         print("ProfileView: get(): curr_user: ", curr_user)
-        curr_account = curr_user.accounts.get(account_id=self.request.session['account_id'])
+        curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
         print("ProfileView: get(): curr_account: ", curr_account)
 
         accounts = curr_user.accounts.all()
@@ -79,14 +79,14 @@ class ProfileView(LoginRequiredMixin, View):
         account_form.fields['type_of_account'].initial = curr_account.type_of_account
 
         # request messages for debugging
-        if ('message' in self.request.session):
-            message = self.request.session['message']
-            del self.request.session['message']
-            messages.success(self.request, message)
-        elif ('err_message' in self.request.session):
-            message = self.request.session['err_message']
-            del self.request.session['err_message']
-            messages.error(self.request, message)
+        if ('message' in request.session):
+            message = request.session['message']
+            del request.session['message']
+            messages.success(request, message)
+        elif ('err_message' in request.session):
+            message = request.session['err_message']
+            del request.session['err_message']
+            messages.error(request, message)
 
         # display the profile page
         friends = curr_account.all_friends.all()
@@ -104,8 +104,8 @@ class ProfileView(LoginRequiredMixin, View):
         mutual_friends = curr_account.mutual_friends.all()
         # all_accounts = accounts
         print("ProfileView: get(): friend_search_accounts: ", friend_search_accounts)
-        request.session['prev_url'] = '/profile/'
-        return render(self.request, "flexr_web/profile.html", {"Accounts": accounts,
+        request.session['redirect_url'] = '/profile/'
+        return render(request, "flexr_web/profile.html", {"Accounts": accounts,
                                                                "Preferences": acc_pref, "pref_form": pref_form,
                                                                "account_form": account_form, "Friends": friends,
                                                                "AllAccounts": friend_search_accounts,
@@ -146,7 +146,7 @@ class ProfileView(LoginRequiredMixin, View):
             request.session['message'] = "Account Edited"
 
             # return to profile page
-            return redirect(request.session['prev_url'])
+            return redirect(request.session['redirect_url'])
 
 
 
@@ -189,4 +189,4 @@ class ProfileView(LoginRequiredMixin, View):
         request.session['message'] = "Account Preferences Saved"
 
         # return to profile page
-        return redirect(request.session['prev_url'])
+        return redirect(request.session['redirect_url'])
