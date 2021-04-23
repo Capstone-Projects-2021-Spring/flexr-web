@@ -304,3 +304,112 @@ class UserAPITestCase(TestCase):
         data = json.loads(result.content)
         self.assertEquals(data, True)
 
+class AccountAPITestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.curr_user = User.objects.create_user('foo', 'myemail@test.com', 'bar')
+        cls.curr_user.save()
+        cls.now = datetime.datetime.now(tz=timezone.utc)
+
+        cls.acc = Account.objects.create(user = cls.curr_user, email = "test@me.com",
+         type_of_account = "Business", date_joined=cls.now)
+
+
+    def test_get_account(self):
+        c = Client()
+        c.login(username='foo', password='bar')
+        result = c.get(path ="/api/account/1/")
+        data = json.loads(result.content)
+
+        # remove timezone and then append 'Z' to match format
+        # hack to remove warning
+        data_expected = {
+            'account_id': 1, 
+            'user': 
+                {'id': 1, 
+                'username': 'foo', 
+                'first_name': '', 
+                'last_name': '', 
+                'email': 'myemail@test.com'}, 
+            'username': '', 
+            'email': 'test@me.com', 
+            'phone_number': '', 
+            'mutual_friends': [], 
+            'date_joined': self.now.isoformat()[:-6] + 'Z', 
+            'type_of_account': 'Business', 
+            'account_preferences': 1
+            }
+
+ 
+        # check that all fields are equal
+        # simply checking equality on models only checks primary keys
+        self.assertEqual(data, data_expected)
+
+
+    def test_switch_account(self):
+        c = Client()
+        c.login(username='foo', password='bar')
+
+        Account.objects.create(user = self.curr_user, email = "email@site.com", 
+        type_of_account = "Personal")
+
+        result = c.get(path='/api/account/2/switch/')
+        data = json.loads(result.content)
+        data_expected = {"status": "account switched"}
+        
+
+        self.assertEqual(data, data_expected)
+
+
+    def test_add_account(self):
+        c = Client()
+        c.login(username='foo', password='bar')
+
+        payload = {
+        'email': "email@site.com" ,
+        'type_of_account': "Personal"
+        }
+
+        result = c.post(path="/api/accounts/", data=payload, content_type='application/json')
+        
+        acc_count = Account.objects.all().count()
+        acc = Account.objects.all()[1]
+
+        self.assertEqual(acc_count, 2)
+        self.assertEqual(acc.email, "email@site.com")
+        self.assertEqual(acc.type_of_account, "Personal")
+
+
+    def test_edit_account(self):
+        c = Client()
+        c.login(username='foo', password='bar')
+        payload = json.dumps({
+        "username": "foo",
+        "email": "email@site.com" ,
+        "phone_number": "",
+        "type_of_account": "Personal"
+        })
+
+        c.put(path="/api/account/1/", data=payload)
+
+        acc = Account.objects.get(pk = 1)
+
+        self.assertEqual(acc.email, "email@site.com")
+        self.assertEqual(acc.type_of_account, "Personal")
+
+    def test_delete_account(self):
+        c = Client()
+        c.login(username='foo', password='bar')
+
+        Account.objects.create(user = self.curr_user, email = "other@me.com",
+         type_of_account = "Personal", date_joined=self.now)
+
+        acc_count = Account.objects.all().count()
+        self.assertEqual(acc_count, 2)
+
+        c.get(path='/api/account/1/switch/')
+        c.delete('/api/account/1/')
+
+        acc_count = Account.objects.all().count()
+
+        self.assertEqual(acc_count, 1)
