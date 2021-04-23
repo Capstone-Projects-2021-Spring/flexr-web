@@ -33,7 +33,7 @@ class SharedFolderView(LoginRequiredMixin, View):
 
         # grab attributes for the shared folder
         owner = shared_folder.owner
-        #CHANGE THIS TO NOT USE THE SHARED FOLDERS COLLABORATORS, this was written this way for testing the view method
+        
         collaborators = shared_folder.collaborators.all()
         #print(collaborators)
         tabs = shared_folder.tabs.all()
@@ -41,6 +41,7 @@ class SharedFolderView(LoginRequiredMixin, View):
         bookmarks = shared_folder.bookmarks.all()
         notes = shared_folder.notes.all()
 
+        # Edit shared folder form
         form = EditSharedFolder()
         form.fields["title"].initial = shared_folder.title
         form.fields["description"].initial = shared_folder.description
@@ -48,7 +49,8 @@ class SharedFolderView(LoginRequiredMixin, View):
         collabs = shared_folder.collaborators.all()
         print("SharedFolderView: get(): friends", friends)
         print("SharedFolderView: get(): collabs", collabs)
-        collab_set = friends | collabs
+        # Collab_set is the set of collaborators
+        collab_set = friends | collabs # this is how we merge two querysets
         collab_set = collab_set.distinct()
 
         # if a tab, bookmark, note is in the shared folder. Then the way we have the api's set up the user that doesn't own the object will now not be able to view, edit, or delete the object
@@ -56,7 +58,9 @@ class SharedFolderView(LoginRequiredMixin, View):
 
         # return render(request, "flexr_web/shared_folder.html", {"SharedFolder": shared_folder, "Collaborators": collaborators, "Tabs": tabs, "Bookmarks": bookmarks, "Notes": notes})
         friends_not_collab = current_acc.friends.exclude(account_id__in = collabs)
-        request.session['prev_url'] = '/shared_folder/'+str(kwargs['pk'])+'/'
+
+        request.session['redirect_url'] = '/shared_folder/'+str(kwargs['pk'])+'/' #set session key for redirect
+
         # request messages for debugging
         if ('message' in self.request.session):
             message = self.request.session['message']
@@ -90,6 +94,7 @@ class SharedFolderView(LoginRequiredMixin, View):
         # shared_folder.title = request.POST.get("new_title")
         # shared_folder.title = request.POST.get("new_description")
         form = EditSharedFolder(request.POST)
+        # Process form for editing shared folder
         if form.is_valid():
             shared_folder.title = request.POST.get("new_title")
             shared_folder.title = request.POST.get("new_description")
@@ -101,7 +106,7 @@ class SharedFolderView(LoginRequiredMixin, View):
         shared_folder.save()
         context = {'form': form}
         # return render('shared_folder/' + str(shared_folder.pk))
-        return redirect(request.session['prev_url'])
+        return redirect(request.session['redirect_url'])
         # return render(request, "flexr_web/shared_folder.html",
         #  {"shared_folder": obj,
         #   "Collaborators": collaborators,
@@ -121,10 +126,10 @@ class SharedFolderView(LoginRequiredMixin, View):
             collab_account = Account.objects.get(account_id=collab_id, username = collab_acc_username)
             shared_folder.collaborators.add(collab_account)
             request.session['message'] = "User added as collaborator"
-            return redirect(request.session['prev_url'])
+            return redirect(request.session['redirect_url'])
         except:
             request.session['err_message'] = "User could not be added as collaborator"
-            return redirect(request.session['prev_url'])
+            return redirect(request.session['redirect_url'])
 
     def remove_collaborator(self, request, *args, **kwargs):
         user_account = request.user.accounts.get(account_id=request.session['account_id'])
@@ -141,17 +146,17 @@ class SharedFolderView(LoginRequiredMixin, View):
                     shared_folder.owner = shared_folder.collaborators.all()[0]
                     shared_folder.save()
                     request.session['message'] = "User removed as collaborator and ownership was transferred"
-                    return redirect(request.session['prev_url'])
+                    return redirect(request.session['redirect_url'])
                 else:
                     request.session['message'] = "Shared folder deleted."
                     shared_folder.delete()
                     return redirect('/shared_folders/')
             else:
                 request.session['message'] = "User removed as collaborator"
-                return redirect(request.session['prev_url'])
+                return redirect(request.session['redirect_url'])
         except:
             request.session['err_message'] = "User could not be removed as collaborator"
-            return redirect(request.session['prev_url'])
+            return redirect(request.session['redirect_url'])
 
     def add_note(self, request, *args, **kwargs):
         user_account = request.user.accounts.get(account_id=request.session['account_id'])
@@ -160,7 +165,7 @@ class SharedFolderView(LoginRequiredMixin, View):
         note = Note.objects.get(id = note_id)
         shared_folder.notes.add(note)
         request.session['message'] = "Note added!"
-        return redirect(request.session['prev_url'])
+        return redirect(request.session['redirect_url'])
 
     def remove_note(self, request, *args, **kwargs):
         user_account = request.user.accounts.get(account_id=request.session['account_id'])
@@ -169,7 +174,7 @@ class SharedFolderView(LoginRequiredMixin, View):
         note = Note.objects.get(id = note_id)
         shared_folder.notes.remove(note)
         request.session['message'] = "Note removed!"
-        return redirect(request.session['prev_url'])
+        return redirect(request.session['redirect_url'])
 
     def add_tab(self, request, *args, **kwargs):
         user_account = request.user.accounts.get(account_id=request.session['account_id'])
@@ -178,7 +183,7 @@ class SharedFolderView(LoginRequiredMixin, View):
         tab = Tab.objects.get(id = tab_id)
         shared_folder.tabs.add(tab)
         request.session['message'] = "Tab added!"
-        return redirect(request.session['prev_url'])
+        return redirect(request.session['redirect_url'])
 
     def remove_tab(self, request, *args, **kwargs):
         user_account = request.user.accounts.get(account_id=request.session['account_id'])
@@ -187,7 +192,7 @@ class SharedFolderView(LoginRequiredMixin, View):
         tab = Tab.objects.get(id = tab_id)
         shared_folder.tabs.remove(tab)
         request.session['message'] = "Tab removed!"
-        return redirect(request.session['prev_url'])
+        return redirect(request.session['redirect_url'])
 
     def add_bookmark(self, request, *args, **kwargs):
         user_account = request.user.accounts.get(account_id=request.session['account_id'])
@@ -196,7 +201,7 @@ class SharedFolderView(LoginRequiredMixin, View):
         bm = Bookmark.objects.get(id = bm_id)
         shared_folder.bookmarks.add(bm)
         request.session['message'] = "Bookmark added!"
-        return redirect(request.session['prev_url'])
+        return redirect(request.session['redirect_url'])
 
     def remove_bookmark(self, request, *args, **kwargs):
         user_account = request.user.accounts.get(account_id=request.session['account_id'])
@@ -205,7 +210,7 @@ class SharedFolderView(LoginRequiredMixin, View):
         bm = Bookmark.objects.get(id = bm_id)
         shared_folder.bookmarks.remove(bm)
         request.session['message'] = "Bookmark removed!"
-        return redirect(request.session['prev_url'])
+        return redirect(request.session['redirect_url'])
 
 @method_decorator(csrf_exempt, name='dispatch')
 class FoldersViewAPI(LoginRequiredMixin, DetailView):

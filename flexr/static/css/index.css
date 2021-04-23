@@ -2,7 +2,7 @@ body {
     padding-top: 1.05%;
     padding-left: 15%;
     padding-right: 15%;
-    background-color: #e5f7fc !important;
+    background-color: #ffffff !important;
     overflow-x: hidden;
 }
 
@@ -23,13 +23,15 @@ body {
 }
 
 #tabs, #bookmarks, #notes, #shared_folders{
-    background-color: #f7fdff !important;
-    box-shadow: 1px 5px 15px 1px #e5e8f3;
+    margin-top: 2%;
+    background-color: #ffffff !important;
+    /* box-shadow: 1px 5px 15px 1px #e5e8f3; */
+    box-shadow: 1px 2px 10px  #e5f5fd;
     border-radius: 7px;
     margin-bottom: 2%;
     transition: all 1s ease;
     padding: inherit !important;
-    border-bottom: 10px solid #f7fdff;
+    /* border-bottom: 10px solid #f7fdff; */
 }
 
 #title, #plus-icon{
@@ -62,8 +64,8 @@ body {
 }
 
 .card-header{
+    background-color: #ffffff !important;
     /* position: sticky; */
-    background-color: #f7fdff !important;
     z-index: 1;
     /* top: -.5px; */
     width: 100%;
@@ -80,18 +82,21 @@ h2{
 #account, #tab, #note,  #history, #bookmark, #sf {
     border-radius: 7px; 
     text-align:center;
+    box-shadow: 1px 2px 10px  hsl(198, 100%, 89%);
     margin: 1%;
 }
 
 #account:hover, #tab:hover, #note:hover, #history:hover, #bookmark:hover, #sf:hover{
     text-align:center;
-    box-shadow: 1px 2px 15px 1px #ccd3eb;
+    box-shadow: 1px 2px 10px  hsl(199, 100%, 75%);
     cursor: pointer;
     position: relative; 
     top: -2px;
 }
 
-
+.close:hover{
+    zoom: 1.2;
+}
 #active_acc{
     color: #0087C2;
 }

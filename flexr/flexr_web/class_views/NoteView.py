@@ -63,7 +63,7 @@ class NoteView(LoginRequiredMixin, View):
                 locked = False
             del self.request.session['note_unlocked']
 
-        request.session['prev_url'] = '/opennote/'+ str(kwargs['pk'])+'/'
+        request.session['redirect_url'] = '/opennote/'+ str(kwargs['pk'])+'/'
         # display note on the page
         return render(self.request, "flexr_web/note.html", 
         {"object": obj, 
@@ -96,7 +96,7 @@ class NoteView(LoginRequiredMixin, View):
             if passw != note.password and passw != passw2:
                 request.session['note_unlocked'] = noteid
                 request.session['err_message'] = "Note not edited. Passwords do not match"
-                return redirect(request.session['prev_url'])
+                return redirect(request.session['redirect_url'])
 
             # check whether note is password locked
             if lo == 'on':
@@ -105,7 +105,7 @@ class NoteView(LoginRequiredMixin, View):
                 if (passw not in EMPTY_VALUES):
                     request.session['note_unlocked'] = noteid
                     request.session['err_message'] = "Note not edited. Please put a password on locked note"
-                    return redirect(request.session['prev_url'])
+                    return redirect(request.session['redirect_url'])
                 lo = False
 
             note.title = tit
@@ -120,7 +120,7 @@ class NoteView(LoginRequiredMixin, View):
             request.session['note_unlocked'] = kwargs['pk']
             request.session['err_message'] = "Note not edited. Please put a password on locked note"
 
-        return redirect(request.session['prev_url'])
+        return redirect(request.session['redirect_url'])
 
     def unlock_note(self, request, *args, **kwargs):
         """
@@ -143,7 +143,7 @@ class NoteView(LoginRequiredMixin, View):
             request.session['err_message'] = "Wrong password"
 
         # display requested note after unlock attempt
-        return redirect(request.session['prev_url'])
+        return redirect(request.session['redirect_url'])
 
 
 @method_decorator(csrf_exempt, name='dispatch')

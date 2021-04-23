@@ -40,6 +40,8 @@ class AccountPreferencesAPIView(LoginRequiredMixin, DetailView):
             print("AccountPreferencesAPIView: get(): acc_pref was NONE!!!!")
             curr_acc.save()
         request_data = json.loads(request.body)
+
+        # Edit account pref attributes
         edit_home_url = request_data['home_page_url']
         print("AccountPreferencesAPIView: put(): edit_home_url: ",edit_home_url)
         if(curr_acc.sites.filter(url = edit_home_url).count() > 0):

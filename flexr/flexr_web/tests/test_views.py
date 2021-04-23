@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.test import Client
-from flexr_web.views import *
-from flexr_web.models import *
+from ..views import *
+from ..models import *
 from django.utils import timezone
 
 import datetime

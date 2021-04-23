@@ -20,7 +20,7 @@ class FriendViewWeb(LoginRequiredMixin, DetailView):
         curr_account = request.user.accounts.get(account_id=request.session['account_id'])
         friends = curr_account.friends.all()
         print("FriendViewWeb: get(): friends: ", friends)
-        request.session['prev_url'] = '/friends/'
+        request.session['redirect_url'] = '/friends/'
         return render(request, "flexr_web/friends.html", {"Friends": friends})
 
     def add_friend(self, request):
@@ -35,31 +35,31 @@ class FriendViewWeb(LoginRequiredMixin, DetailView):
             friend_request = Friendship.objects.get_or_create(sent=user_account, received=friend_account)
             print("FriendViewWeb: add_friend : friend_request: ",friend_request)
             request.session['message'] = "Friend request sent"
-            return redirect(request.session['prev_url'])
+            return redirect(request.session['redirect_url'])
         except:
             request.session['err_message'] = "Friend not found"
-            return redirect(request.session['prev_url'])
+            return redirect(request.session['redirect_url'])
 
     def deny_friend(self, request, pk):
         friend_request = Friendship.objects.get(id=pk)
         friend_request.status = "Declined"
         friend_request.save()
         request.session['message'] = "Friend request denied"
-        return redirect(request.session['prev_url'])
+        return redirect(request.session['redirect_url'])
 
     def accept_friend(self, request, pk):
         friend_request = Friendship.objects.get(id=pk)
         friend_request.status = "Accepted"
         friend_request.save()
         request.session['message'] = "Friend request accepted"
-        return redirect(request.session['prev_url'])
+        return redirect(request.session['redirect_url'])
 
     def remove_notif(self, request, pk):
         curr_account = request.user.accounts.get(account_id=request.session['account_id'])
         notif = curr_account.notifs.get(id=pk)
         curr_account.notifs.remove(notif)
         curr_account.save()
-        return redirect(request.session['prev_url'])
+        return redirect(request.session['redirect_url'])
 
     def remove_friend(self, request, pk):
         current_account = request.user.accounts.get(account_id=request.session['account_id'])
@@ -71,14 +71,14 @@ class FriendViewWeb(LoginRequiredMixin, DetailView):
             friendship = Friendship.objects.filter(sent=friend_account, received=current_account)
             if (friendship.count() == 0):
                 request.session['errmessage'] = "Trouble finding friendship"
-                return redirect(request.session['prev_url'])
+                return redirect(request.session['redirect_url'])
         friendship = friendship[0]
         current_account.save()
         friend_account.save()
         friendship.status = "Declined"
         friendship.save()
         request.session['message'] = "Friend deleted"
-        return redirect(request.session['prev_url'])
+        return redirect(request.session['redirect_url'])
 
 @method_decorator(csrf_exempt, name='dispatch')
 class FriendAPIView(LoginRequiredMixin, DetailView):

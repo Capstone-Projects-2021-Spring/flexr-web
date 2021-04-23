@@ -44,7 +44,7 @@ class TabsView(LoginRequiredMixin, View):
             message = self.request.session['err_message']
             del self.request.session['err_message']
             messages.error(self.request, message)
-        request.session['prev_url'] = '/open_tabs/'
+        request.session['redirect_url'] = '/open_tabs/'
         # display the page
         return render(self.request, "flexr_web/open_tabs.html", 
         {"Tabs":tabs, 
@@ -70,7 +70,7 @@ class TabsView(LoginRequiredMixin, View):
         request.session['message'] = "Tab added"
 
         # return to index page
-        return redirect(request.session['prev_url'])
+        return redirect(request.session['redirect_url'])
 
     
 
@@ -95,7 +95,7 @@ class TabsView(LoginRequiredMixin, View):
             request.session['err_message'] = "Tab could not be closed"
 
         # TODO we should set up django sesions to know where to redirect a user based on previous page
-        return redirect(request.session['prev_url'])
+        return redirect(request.session['redirect_url'])
 
 
     def open_tab(self, request, *args, **kwargs):
@@ -116,7 +116,7 @@ class TabsView(LoginRequiredMixin, View):
         except:
             request.session['err_message'] = "Tab could not be opened"
             
-        return redirect(request.session['prev_url'])
+        return redirect(request.session['redirect_url'])
 
     def post(self, request):
         curr_user = request.user
@@ -131,7 +131,7 @@ class TabsView(LoginRequiredMixin, View):
         notes = curr_account.notes.all()
         folders = curr_account.shared_folders.all()
         suggested_sites = curr_account.suggested_sites.order_by('-site_ranking')
-        request.session['prev_url'] = "/"
+        request.session['redirect_url'] = "/"
         # display the page
         form = AccountForm
         filtered = True

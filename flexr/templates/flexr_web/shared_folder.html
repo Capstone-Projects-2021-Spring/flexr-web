@@ -17,7 +17,7 @@
             <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="edit_folderLabel">Edit your folder</h5>
-                <img type="button" data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
+                <img type="button" data-dismiss="modal" class = "icon close" src = "{% static 'icons/cancel.png' %}" width=20px>
                 </button>
             </div>
             <div class="modal-body">
@@ -47,10 +47,9 @@
     <div class = "suggested sidenav">
      
       <a class="navbar-brand" href="/"><img src="{% static 'flexr_logo_2.png' %}" width="100%"></a>
-      <h1>Folder info</h1>
-      <h3>    {{shared_folder.description}}</h3>
-      <h3>    {{shared_folder.owner}}</h3>
-      <h1>Collaborators: </h1><img id="plus-icon" data-toggle="modal" data-target="#edit_collabs" src="{% static 'icons/edit.png' %}" width="30px">
+      <h2 style="color: white;">Folder info</h2>
+      <h3>Owner: <br>{{shared_folder.owner}}</h3>
+      <h2 style="color: white; display: inline;">Collaborators</h2><img id="plus-icon" class = "icon" data-toggle="modal" data-target="#edit_collabs" src="{% static 'icons/edit.png' %}" width="20px">
       {% for collaborator in Collaborators %}
           <h3>{{collaborator}}</h3>
       {% endfor %}
@@ -62,7 +61,7 @@
             <div class="modal-content" id = "edit_collabs_modal">
             <div class="modal-header">
                 <h5 class="modal-title" id="edit_collabsLabel">Add a friend</h5>
-                <img type="button" data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
+                <img type="button" data-dismiss="modal" class = "icon close" src = "{% static 'icons/cancel.png' %}" width=20px>
                 </button>
             </div>
             <div class="modal-body">
@@ -88,7 +87,7 @@
                                         <input hidden name = "search_id" value = "{{account.account_id}}"></input>
                                         <input hidden name = "search_username" value = "{{account.username}}"></input>
                                         <p style="display: inline;">{{account.user.first_name}} {{account.user.last_name}} - {{account}}</p>
-                                        <img  src="{% static 'icons/add-user.png'%}"  width = 20px style="display: inline;" id = "add-user" onclick="document.getElementById('add_friend_form{{account.account_id}}').submit()">
+                                        <img  class = "icon" src="{% static 'icons/add-user.png'%}"  width = 20px style="display: inline;" id = "add-user" onclick="document.getElementById('add_friend_form{{account.account_id}}').submit()">
                                     </form>
                                 {% endfor %}
                             </div>
@@ -101,7 +100,7 @@
                                         <input hidden name = "search_id" value = "{{account.account_id}}"></input>
                                         <input hidden name = "search_username" value = "{{account.username}}"></input>
                                         <p style="display: inline;">{{account.user.first_name}} {{account.user.last_name}} - {{account}}</p>
-                                        <img  src="{% static 'icons/remove-user.png'%}"  width = 20px style="display: inline;" id = "add-user" onclick="document.getElementById('remove_collab_form{{account.account_id}}').submit()">
+                                        <img class = "icon" src="{% static 'icons/remove-user.png'%}"  width = 20px style="display: inline;" id = "add-user" onclick="document.getElementById('remove_collab_form{{account.account_id}}').submit()">
                                     </form>
                                 {% endfor %}
                             </div>
@@ -129,7 +128,7 @@
                                         {% csrf_token %}
                                         <input hidden name = "tab_id" value = "{{tab.id}}"></input>
                                         <p style="display: inline;">{{tab}}</p>
-                                        <img  src="{% static 'icons/plus.png'%}"  width = 20px style="display: inline;" id = "add-user" onclick="document.getElementById('add_tab_form{{tab.id}}').submit()">
+                                        <img class = "icon" src="{% static 'icons/plus.png'%}"  width = 20px style="display: inline;" id = "add-user" onclick="document.getElementById('add_tab_form{{tab.id}}').submit()">
                                     </form>
                                 {% endfor %}
                             </div>
@@ -156,7 +155,7 @@
                                         {% csrf_token %}
                                         <input hidden name = "note_id" value = "{{note.id}}"></input>
                                         <p style="display: inline;">{{note}}</p>
-                                        <img  src="{% static 'icons/plus.png'%}"  width = 20px style="display: inline;" id = "add-user" onclick="submit_note_form('{{note.id}}', '{{note.lock}}', '{{note.password}}')">
+                                        <img  class = "icon" src="{% static 'icons/plus.png'%}"  width = 20px style="display: inline;" id = "add-user" onclick="submit_note_form('{{note.id}}', '{{note.lock}}', '{{note.password}}')">
                                         <script>
                                             function submit_note_form(id, locked, password){
                         
@@ -179,7 +178,7 @@
             <div class="modal-content" id = "edit_collabs_modal">
             <div class="modal-header">
                 <h5 class="modal-title" id="add_bmLabel">Add notes</h5>
-                <img type="button" data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
+                <img type="button" class = "icon" data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
                 </button>
             </div>
             <div class="modal-body">
@@ -191,7 +190,7 @@
                                         {% csrf_token %}
                                         <input hidden name = "bm_id" value = "{{bm.id}}"></input>
                                         <p style="display: inline;">{{bm}}{{bm.id}}</p>
-                                        <img  src="{% static 'icons/plus.png'%}"  width = 20px style="display: inline;" id = "add-user" onclick="document.getElementById('add_bm_form{{bm.id}}').submit()">
+                                        <img  class = "icon" src="{% static 'icons/plus.png'%}"  width = 20px style="display: inline;" id = "add-user" onclick="document.getElementById('add_bm_form{{bm.id}}').submit()">
                                         </script>
                                     </form>
                                 {% endfor %}
@@ -208,16 +207,10 @@
         <div id = "tabs" class="card col-lg-4">
             <div class = "card-header sticky-top">
                 <h2 style="display:inline">Open tabs</h2>
-                <img id="plus-icon" class="plus-icon" width = 20px; data-toggle="modal" data-target="#add_tab_sf" src="{% static 'icons/plus.png' %}">
+                <img id="plus-icon" class="plus-icon icon" width = 20px; data-toggle="modal" data-target="#add_tab_sf" src="{% static 'icons/plus.png' %}">
             </div>
             <script>
-                $(document).ready(function(){
-                    $('.plus-icon').hover(function() {
-                    $(this).attr('src', "{% static 'icons/plus-circle.png' %}");
-                    }, function() {
-                    $(this).attr('src', "{% static 'icons/plus.png' %}");
-                    });
-                });
+
             </script>
             
             <div class = "card-body row justify-content-center">
@@ -228,20 +221,13 @@
                         <div class="card-body"  style="">                            
                             <form  method="post" action = "/shared_folder/{{shared_folder.id}}/remove_tab/" id = "remove_tab_form{{tab.id}}">
                                 {% csrf_token %}
-                                <img  src="{% static 'icons/cancel.png'%}"  width = 15px style="display: inline;" class="close" onclick="document.getElementById('remove_tab_form{{tab.id}}').submit()">
+                                <img  class = "icon" src="{% static 'icons/cancel.png'%}"  width = 15px style="display: inline;" class="close" onclick="document.getElementById('remove_tab_form{{tab.id}}').submit()">
                                 <input hidden name = "tab_id" value = "{{tab.id}}"></input>
                                 <p onclick="window.open('{{tab.site.url}}')" style="display: inline;">{{tab.site}}</p>
                             </form>
                         </div>
 
                         <script>
-                            $(document).ready(function(){
-                                $('.close').hover(function() {
-                                $(this).attr('src', "{% static 'icons/cancel-circle.png' %}");
-                                }, function() {
-                                $(this).attr('src', "{% static 'icons/cancel.png' %}");
-                                });
-                            });
                         </script>
 
                     </div>
@@ -259,7 +245,7 @@
                     <div id = "bookmark" class = "tab card col-lg-5"  >
                         <form  method="post" action = "/shared_folder/{{shared_folder.id}}/remove_bookmark/" id = "remove_bm_form{{bm.id}}">
                             {% csrf_token %}
-                            <img  src="{% static 'icons/cancel.png'%}"  width = 15px style="display: inline;" class="close" onclick="document.getElementById('remove_bm_form{{bm.id}}').submit()">
+                            <img  class = "icon" src="{% static 'icons/cancel.png'%}"  width = 15px style="display: inline;" class="close" onclick="document.getElementById('remove_bm_form{{bm.id}}').submit()">
                             <input hidden name = "bm_id" value = "{{bm.id}}"></input>
                             <p onclick="window.open('{{bm.site.url}}')"  style="display: inline;">{{bm.site}}</p>
                         </form>
@@ -276,13 +262,6 @@
                 <h2 style="display:inline">Notes</h2><img id="plus-icon" class="plus-icon" width = 20px; data-toggle="modal" data-target="#add_note" src="{% static 'icons/plus.png' %}">
             </div>
             <script>
-                $(document).ready(function(){
-                    $('.plus-icon').hover(function() {
-                    $(this).attr('src', "{% static 'icons/plus-circle.png' %}");
-                    }, function() {
-                    $(this).attr('src', "{% static 'icons/plus.png' %}");
-                    });
-                });
             </script>
             
             <div class = "card-body row justify-content-center">
@@ -290,15 +269,7 @@
                 {%for note in Notes%}
 
                     <div id = "note" class = "note card col-lg-5 "  >
-                       <script>
-                            $(document).ready(function(){
-                                $('.close').hover(function() {
-                                $(this).attr('src', "{% static 'icons/cancel-circle.png' %}");
-                                }, function() {
-                                $(this).attr('src', "{% static 'icons/cancel.png' %}");
-                                });
-                            });
-                        </script>
+
                         <div class="card-body" style="">
                             
                             <form  method="post" action = "/shared_folder/{{shared_folder.id}}/remove_note/" id = "remove_note_form{{note.id}}">
@@ -307,7 +278,7 @@
                                 <input hidden name = "note_id" value = "{{note.id}}"></input>
                                 <p style="display: inline;" onclick="window.location.href = '/opennote/{{note.id}}'">{{note}}</p>
                                 {%if note.lock%}
-                                <img style= "display: inline;" class="lock" src="{% static 'icons/lock.png' %}" width= 15px>
+                                <img class = "icon" style= "display: inline;" class="lock" src="{% static 'icons/lock.png' %}" width= 15px>
                                 {%endif%}
                             </form>
                         </div>

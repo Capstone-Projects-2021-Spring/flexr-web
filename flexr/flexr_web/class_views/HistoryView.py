@@ -49,7 +49,7 @@ class HistoryView(LoginRequiredMixin, View):
             del request.session['err_message']
             messages.error(request, message)
 
-        request.session['prev_url'] = '/browsing_history/'
+        request.session['redirect_url'] = '/browsing_history/'
         # display the page
         return render(request, "flexr_web/browsing_history.html",
          {"History": history, 
@@ -143,7 +143,7 @@ class HistoryView(LoginRequiredMixin, View):
         request.session['message'] = "History Deleted"
 
         # return to history page
-        return redirect(request.session['prev_url'])
+        return redirect(request.session['redirect_url'])
         
 @method_decorator(csrf_exempt, name='dispatch')
 class HistoryViewAPI(LoginRequiredMixin, DetailView):

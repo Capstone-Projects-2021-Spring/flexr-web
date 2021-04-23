@@ -64,7 +64,7 @@ class Account(models.Model):
 
     def save(self,  *args, **kwargs):
         super().save(*args, **kwargs)  # Call the "real" save() method.
-        print("Model: Account: save(): self.account_preferences: ", self.account_preferences)
+        print(self , ": Model: Account: save(): self.account_preferences: ", self.account_preferences)
         if self.account_preferences is None: #new users
             if(Site.objects.filter(account = self).count()>0):
                 acc_pref = Account_Preferences.objects.create(home_page=Site.objects.filter(account = self)[0])
@@ -87,7 +87,7 @@ class Account(models.Model):
         max_visits = 1
         for site in self.sites.all().iterator():
             secdelta = (timezone.now() - site.last_visit).days * 86400 # 1440 minutes in a day
-            # this may be unnessesary
+            # calculates frequency in the last week
             site.recent_frequency = site.calculate_frequency()
             site.save()
             if secdelta < min_secdelta:
@@ -96,6 +96,8 @@ class Account(models.Model):
                 max_freq = site.recent_frequency
             if site.number_of_visits > max_visits:
                 max_visits = site.number_of_visits
+
+        # TODO: This needs to be optimized!
         for site in self.sites.all().iterator():
             secdelta = (timezone.now() - site.last_visit).days * 86400 # 1440 minutes in a day
             site.site_ranking = ((min_secdelta+1)/(secdelta+1))*(20)+(site.recent_frequency/max_freq)*(65)+(site.number_of_visits/ max_visits)*(15)
@@ -187,7 +189,9 @@ class Site(models.Model):
                 icons = favicon.get(self.url)
                 for i in icons:
                     if (i.format == "ico"):
-                        self.favicon_img_url = i.url
+                        req = requests.get(i.url)
+                        if(req.status_code != 404 or req.status_code != 403):
+                            self.favicon_img_url = i.url
                         print("Model: Site.save(): self.favicon_img_url: ", i.url)
             if (self.name == "" or self.name == " " or req.status_code != 200):
                 url1 = str(self.url).split('?')[0]
@@ -426,29 +430,20 @@ class Friendship(models.Model):
             
             self.accepted_date = timezone.now()
             super().save(*args, **kwargs)
-            sent_mutual_friends = self.sent.mutual_friends.all()
-            if(self.received in sent_mutual_friends):
-                self.sent.mutual_friends.remove(self.received)
-            
-            received_mutual_friends = self.received.mutual_friends.all()
-            if(self.sent  in sent_mutual_friends):
-                self.received.mutual_friends.remove(self.sent)
 
-            sent_friends = self.sent.friends.exclude(account_id__in=self.received.friends.all()).exclude(
-                user=self.sent.user)
-            print("Model: friendship: save(): sent_friends", sent_friends)
-            # self.received.mutual_friends.add(sent_friends)
-            for friend in sent_friends:
-                self.received.mutual_friends.add(friend)
-                friend.mutual_friends.add(self.sent)
+            # for friend in self.received.friends.all():
+            #     if(self.sent.mutual_friends.filter(account_id = friend.account_id).count() == 0):
+            #         self.sent.mutual_friends.add(friend)
+            #         friend.mutual_friends.add(self.sent)
+            #
+            # for friend in self.sent.friends.all():
+            #     if (self.received.mutual_friends.filter(account_id = friend.account_id).count() == 0):
+            #         self.received.mutual_friends.add(friend)
+            #         friend.mutual_friends.add(self.received)
 
-            received_friends = self.received.friends.exclude(account_id__in=self.sent.friends.all()).exclude(
-                user=self.received.user)
-            print("Model: friendship: save(): received_friends", received_friends)
-            # self.sent.mutual_friends.add(received_friends)
-            for friend in received_friends:
-                self.sent.mutual_friends.add(friend)
-                friend.mutual_friends.add(self.received)
+            # for friend in self.received.friends.all():
+            #
+            # for friend in self.sent.friends.all():
 
             self.sent.friends.add(self.received)
             self.received.friends.add(self.sent)
@@ -472,24 +467,6 @@ class Friendship(models.Model):
 
         else:
             super().save(*args, **kwargs)
-            # friend 1 has friends 2, 3, 4, 5
-            # Friend 2 has friends 6 7 8 
-            # friend 3 has friends 6 7 8 9
-
-            # Friend 1 has friends 6 7 8 9 as mutual friends
-            # What happens when we remove the 1-2 friendship
-            # self.received.mutual_friends.clear()
-            # for friend in self.received.friends.all():
-            #     for fr in friend.friends.all():
-            #         self.received.mutual_friends.add(fr)
-            # self.received.mutual_friends.set(self.received.mutual_friends.distinct())
-
-            # self.sent.mutual_friends.clear()
-            # for friend in self.sent.friends.all():
-            #     for fr in friend.friends.all():
-            #         self.sent.mutual_friends.add(fr)
-            # self.sent.mutual_friends.set(self.sent.mutual_friends.distinct())
-
             self.received.notifs.remove(self)
             self.sent.pending_friends.remove(self.received)
             self.received.pending_friends.remove(self.sent)

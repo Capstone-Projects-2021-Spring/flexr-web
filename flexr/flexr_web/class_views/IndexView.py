@@ -37,6 +37,8 @@ class IndexView(LoginRequiredMixin, View):
             curr_account.rank_sites()
             print("IndexView: get: Message: Account initialized")
 
+        for x in curr_account.sites.all():
+            print(x.favicon_img_url)
         # grab all models for the current user
         # and the current account
         accounts = curr_user.accounts.all()
@@ -62,7 +64,7 @@ class IndexView(LoginRequiredMixin, View):
 
         # get account form object
         form = AccountForm
-        request.session['prev_url'] = "/"
+        request.session['redirect_url'] = "/"
         # display the page
         filtered = False
         print("IndexView: get(): notes: ", notes)
@@ -92,7 +94,7 @@ class IndexView(LoginRequiredMixin, View):
         notes = curr_account.notes.all()
         folders = curr_account.shared_folders.all()
         suggested_sites = curr_account.suggested_sites.order_by('-site_ranking')
-        request.session['prev_url'] = "/"
+        request.session['redirect_url'] = "/"
         # display the page
         form = AccountForm
         filtered = True
