@@ -301,5 +301,3 @@ class FriendsTest(TestCase):
         for x in Account.objects.all():
             print(x.account_id, " = ", x.mutual_friends.all())
 
-
-

@@ -186,13 +186,16 @@ class Site(models.Model):
                 for title in soup.find_all('title'):
                     self.name = title.get_text()
                     print("Model: Site.save(): self.name: ", title.get_text())
-                icons = favicon.get(self.url)
-                for i in icons:
-                    if (i.format == "ico"):
-                        req = requests.get(i.url)
-                        if(req.status_code != 404 or req.status_code != 403):
-                            self.favicon_img_url = i.url
-                        print("Model: Site.save(): self.favicon_img_url: ", i.url)
+                try:
+                    icons = favicon.get(self.url)
+                    for i in icons:
+                        if (i.format == "ico"):
+                            req = requests.get(i.url)
+                            if(req.status_code == 200):
+                                self.favicon_img_url = i.url
+                            print("Model: Site.save(): self.favicon_img_url: ", i.url)
+                except:
+                    pass
             if (self.name == "" or self.name == " " or req.status_code != 200):
                 url1 = str(self.url).split('?')[0]
                 url2 = url1.split('/')
