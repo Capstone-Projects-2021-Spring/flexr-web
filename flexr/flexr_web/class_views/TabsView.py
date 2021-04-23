@@ -157,38 +157,46 @@ class TabAPIView(View):
 
 
     def get_tab(self, request, *args, **kwargs):
-        curr_user = request.user
-        current_account = curr_user.accounts.get(account_id = request.session['account_id'])
+        try:
+            curr_user = request.user
+            current_account = curr_user.accounts.get(account_id = request.session['account_id'])
 
-        tab = current_account.tabs.get(id = kwargs['id'])
+            tab = current_account.tabs.get(id = kwargs['id'])
 
-        data = TabSerializer(tab)
-        return JsonResponse(data.data, safe=False)
+            data = TabSerializer(tab)
+            return JsonResponse(data.data, safe=False)
+
+        except Exception as e:
+            return JsonResponse({ "error": str(e), "traceback": traceback.extract_tb(e.__traceback__).format() }, status=500) 
 
     def get_all_tabs(self, request, *args, **kwargs):
-        curr_user = request.user
-        current_account = curr_user.accounts.get(account_id = request.session['account_id'])
+        try:
+            curr_user = request.user
+            current_account = curr_user.accounts.get(account_id = request.session['account_id'])
 
-        tabs = current_account.tabs.all()
+            tabs = current_account.tabs.all()
 
-        data = TabSerializer(tabs, many = True)
-        return JsonResponse(data.data, safe=False)
+            data = TabSerializer(tabs, many = True)
+            return JsonResponse(data.data, safe=False)
+
+        except Exception as e:
+            return JsonResponse({ "error": str(e), "traceback": traceback.extract_tb(e.__traceback__).format() }, status=500) 
 
     @method_decorator(csrf_exempt)
     def post(self, request, *args, **kwargs):
         """
         Add a tab to the current account
         """
-
-        # get the current user and current account
-        curr_user = request.user
-        curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
-
-        # get site url
-        data = json.loads(request.body)
-        site_url = data["url"]
-
         try:
+            # get the current user and current account
+            curr_user = request.user
+            curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
+
+            # get site url
+            data = json.loads(request.body)
+            site_url = data["url"]
+
+    
             tab = Tab.open_tab(site_url=site_url, curr_account=curr_account)
 
             if isinstance(tab, Exception):
@@ -205,23 +213,24 @@ class TabAPIView(View):
         """
         Close a tab for the current account
         """
+        try:
+            # get the current user and current account
+            curr_user = request.user
+            curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
 
-        # get the current user and current account
-        curr_user = request.user
-        curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
+            # try:
+                # try to close requested tab
+            print("TabsAPIView: delete(): tab_id: ", kwargs['id'])
+            tab = Tab.close_tab(tabID=kwargs['id'], curr_account=curr_account)
 
-        # try:
-            # try to close requested tab
-        print("TabsAPIView: delete(): tab_id: ", kwargs['id'])
-        tab = Tab.close_tab(tabID=kwargs['id'], curr_account=curr_account)
+            if isinstance(tab, Exception):
+                return JsonResponse({ "error": str(tab), "traceback": traceback.extract_tb(tab.__traceback__).format() }, status=500)
+            
+            print("TabAPIView: delete(): close tab return: ", tab)
+            return JsonResponse({"success": "tab closed"})
 
-        if isinstance(tab, Exception):
-            return JsonResponse({ "error": str(tab), "traceback": traceback.extract_tb(tab.__traceback__).format() }, status=500)
-        
-        print("TabAPIView: delete(): close tab return: ", tab)
-        return JsonResponse({"success": "tab closed"})
-        # except:
-        #     return JsonResponse({"error": "Could not close tab"}, status = 400)
+        except Exception as e:
+            return JsonResponse({ "error": str(e), "traceback": traceback.extract_tb(e.__traceback__).format() }, status=500)
 
     # @method_decorator(csrf_exempt)
     # def edit_tab(self, request, *args, **kwargs):
@@ -245,14 +254,18 @@ class TabAPIView(View):
         Gerald: This seems to do the same thing as self.add_tab
         but I keep it just incase
         """
+        try:
 
-        curr_user = request.user
-        curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
+            curr_user = request.user
+            curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
 
-        tab = Tab.visit_tab(tabID=kwargs['id'], curr_account=curr_account)
+            tab = Tab.visit_tab(tabID=kwargs['id'], curr_account=curr_account)
 
-        if isinstance(tab, Exception):
-            return JsonResponse({ "error": str(tab), "traceback": traceback.extract_tb(tab.__traceback__).format() }, status=500)
-            
-        data = TabSerializer(tab)
-        return JsonResponse(data.data, safe=False)
+            if isinstance(tab, Exception):
+                return JsonResponse({ "error": str(tab), "traceback": traceback.extract_tb(tab.__traceback__).format() }, status=500)
+                
+            data = TabSerializer(tab)
+            return JsonResponse(data.data, safe=False)
+
+        except Exception as e:
+            return JsonResponse({ "error": str(e), "traceback": traceback.extract_tb(e.__traceback__).format() }, status=500)
