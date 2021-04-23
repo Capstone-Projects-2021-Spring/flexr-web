@@ -29,7 +29,7 @@ class SiteAPIView(LoginRequiredMixin, View):
         curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
 
         url = request.POST.get('url')
-        site = Site.objects.get_or_create(account = curr_account, url = url)
+        site, created = Site.objects.get_or_create(account = curr_account, url = url)
         site.save()
 
         data = SiteSerializer(site)
