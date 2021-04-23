@@ -69,23 +69,19 @@ class HistoryAPITestCase(TestCase):
 
         self.assertEqual(data, data_expected)
 
-    # Gerald: not working
     def test_post_history_delete(self):
-       
-        return  # skip testing
-
         c = Client()
         c.login(username='foo', password='bar')
         c.get(path='/api/account/1/switch/')
 
         payload = {'DELETE': [1,3]}
 
-        c.post(path ="/api/history/", data=payload, extra=payload)
+        c.post(path ="/api/history/", data=payload, content_type='application/json')
 
         data = History.objects.all().count()
         data_expected = 1
 
-        #self.assertEqual(data, data_expected)
+        self.assertEqual(data, data_expected)
 
     def test_delete_history_range(self):
         c = Client()
@@ -167,11 +163,8 @@ class BookmarkAPITestCase(TestCase):
 
         self.assertEquals(3, data_expected)
 
-    # Gerald: next two tests fail
-    # problem lies with beautifulsoup I think
-    def test_add_bookmark(self):
 
-        return # skip test
+    def test_add_bookmark(self):
         c = Client()
         c.login(username='foo', password='bar')
         c.get(path='/api/account/1/switch/')
@@ -179,7 +172,7 @@ class BookmarkAPITestCase(TestCase):
         #site = Site.objects.create(account = self.acc, url = 'https://www.twitter.com')
 
         payload = json.dumps({
-            'url': 'https://www.twitter.com',
+            'url': 'https://stackoverflow.com/',
         })
 
         c.post(path='/api/bookmarks/', data=payload, content_type='application/json')
@@ -190,13 +183,11 @@ class BookmarkAPITestCase(TestCase):
 
 
         self.assertEqual(bookmark_count, 4)
-        self.assertEqual(bookmark.site_id, 4)
+        self.assertEqual(bookmark.site_id, 5)
     
 
 
     def test_edit_bookmark(self):
-
-        return # skip test
         c = Client()
         c.login(username='foo', password='bar')
         c.get(path='/api/account/1/switch/')
@@ -206,7 +197,7 @@ class BookmarkAPITestCase(TestCase):
         payload = json.dumps({
             'bookmark_name': 'bookmark',
             #'site_id': site.id,
-            'url': 'https://www.twitter.com'
+            'url': 'https://stackoverflow.com/'
             
         })
 
@@ -217,7 +208,7 @@ class BookmarkAPITestCase(TestCase):
         #print(bookmark.site.url)
 
         self.assertEquals(bookmark.bookmark_name, 'bookmark')
-        self.assertEquals(bookmark.site_id, 4)
+        self.assertEquals(bookmark.site_id, 5)
 
 
 
