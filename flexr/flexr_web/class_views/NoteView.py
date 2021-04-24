@@ -155,8 +155,12 @@ class NoteViewAPI(LoginRequiredMixin, DetailView):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
         data = json.loads(request.body)
+        name = data["name"]
+        content = data["content"]
+        lock = data["lock"]
+        password = data["password"]
         # TODO: make this work
-        note = Note.objects.create(account=curr_account, **data)
+        note = Note.objects.create(account=curr_account, name=name, content=content, lock=lock, password=password)
         data = NoteSerializer(note)
         return JsonResponse(data.data, safe=False)
 
