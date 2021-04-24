@@ -178,24 +178,27 @@ class Site(models.Model):
         # call super method to create Tab entry
         # print("URL: ", )
         if(self.name == None or self.name == "" or self.name == " "):
-            req = requests.get(self.url)
-            print("Site: save(): req.status_code: ", req.status_code)
-            if(req.status_code == 200):
-                soup = BeautifulSoup(req.text, 'html.parser')
-                # print(soup.find_all('title')[0])
-                for title in soup.find_all('title'):
-                    self.name = title.get_text()
-                    print("Model: Site.save(): self.name: ", title.get_text())
-                try:
-                    icons = favicon.get(self.url)
-                    for i in icons:
-                        if (i.format == "ico"):
-                            req = requests.get(i.url)
-                            if(req.status_code == 200):
-                                self.favicon_img_url = i.url
-                            print("Model: Site.save(): self.favicon_img_url: ", i.url)
-                except:
-                    pass
+            try:
+                req = requests.get(self.url)
+                print("Site: save(): req.status_code: ", req.status_code)
+                if(req.status_code == 200):
+                    soup = BeautifulSoup(req.text, 'html.parser')
+                    # print(soup.find_all('title')[0])
+                    for title in soup.find_all('title'):
+                        self.name = title.get_text()
+                        print("Model: Site.save(): self.name: ", title.get_text())
+                    try:
+                        icons = favicon.get(self.url)
+                        for i in icons:
+                            if (i.format == "ico"):
+                                req = requests.get(i.url)
+                                if(req.status_code == 200):
+                                    self.favicon_img_url = i.url
+                                print("Model: Site.save(): self.favicon_img_url: ", i.url)
+                    except:
+                        pass
+            except:
+                pass
             if (self.name == "" or self.name == " " or req.status_code != 200):
                 url1 = str(self.url).split('?')[0]
                 url2 = url1.split('/')
