@@ -122,8 +122,30 @@
     </div>
 </div>
 <hr>
-<div class="col-md-5 row" >
-    <!-- <hr> -->
+<div id = "bookmarks" class="col-lg-4">
+    <div class = "card-header sticky-top">
+        <h2 style="display: inline;">Bookmarks</h2> <img id="plus-icon" class="plus-icon" width = 20px; data-toggle="modal" data-target="#add_bm" src="{% static 'icons/plus.png' %}">
+
+    </div>
+    <div class = "card-body row justify-content-center" >
+        {%for bm in Bookmarks%}
+        
+            <div id = "bookmark" class = "tab card col-lg-5"  >
+                <form  method="post" action = "/remove_from_folder/{{bookmark.id}}/{{bookmark_folder.pk}}/">
+                    {% csrf_token %}
+                    <!-- <img  class = "icon" src="{% static 'icons/cancel.png'%}"  width = 15px style="display: inline;" class="close" onclick="document.getElementById('remove_bm_form{{bm.id}}').submit()"> -->
+                    <span style="display: inline;">
+                        <img class="bm" onclick="window.location.href = '/remove_from_folder/{{bm.id}}/{{bookmark_folder.pk}}/'" src="{% static 'icons/cancel.png' %}" width= 15px>
+                    </span>
+                    <input hidden name = "bm_id" value = "{{bm.id}}"></input>
+                    <p onclick="window.open('{{bm.site.url}}')"  style="display: inline;">{{bm.site}}</p>
+                </form>
+            </div>
+
+        {%endfor%}
+    </div>
+</div>
+<!-- <div class="col-md-5 row" >
     <h3>Bookmarks</h3>
     {%for bm in Bookmarks%}
         <div id = "bookmark" class = "card col-lg-10" style="height: auto;" >
@@ -133,7 +155,7 @@
             </span>
         </div>
     {%endfor%}
-</div>
+</div> -->
     <!-- <h1>Folder title: {{bookmark_folder.title}}</h1> -->
     <!-- <h1>Folder owner: {{bookmark_folder.owner}}</h1> -->
     <!-- <h3>Bookmarks:</h3>

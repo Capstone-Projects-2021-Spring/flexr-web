@@ -180,7 +180,7 @@ class BookmarkFolderView(LoginRequiredMixin, View):
             descrippy = form.cleaned_data['bookmarks']
         bookmark_folder.save()
         return redirect(request.session['prev_url'])
-            request.session['message'] = "Bookmark edited"
+        request.session['message'] = "Bookmark edited"
         return redirect(request.session['redirect_url'])
 
     def delete_bookmark_folder_web(self, request, *args, **kwargs):
