@@ -107,7 +107,6 @@
                   {%endif%}
               </div>
           {%endfor%}
-          <hr>
               {% if user.is_superuser %}
               <hr>
                     <div id = "acc" class = "col-lg-10" >
@@ -147,7 +146,7 @@
       </div>
     <div class = "suggested sidenav">
      
-      <a class="navbar-brand" href="/"><img src="{% static 'flexr_light.png' %}" width="100%"></a>
+      <a class="navbar-brand" href="/"><img src="{% static 'flexr_light.png' %}" width="70%" style="padding-bottom: 8%;"></a>
       <h2 id = "sites-head">Suggested Sites</h2>
       <div id = "sites_nav">
         {%for site in Suggested_Sites%}
@@ -183,7 +182,6 @@
                         {% endfor %}
                     </p>
                 {% endfor %}
-                <!-- {{ form }} -->
                 <div class="modal-footer">
                     
                     <button type="submit" class="btn btn-primary">Create account</button>
@@ -216,5 +214,37 @@
       </div>
   </div>
 
+  <div class="modal fade" id="add_note" tabindex="-1" role="dialog" aria-labelledby="add_noteLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="add_noteLabel">Add a note!</h5>
+            <img type="button" data-dismiss="modal" class = "icon close" src = "{% static 'icons/cancel.png' %}" width=20px>
+            </button>
+        </div>
+        <div class="modal-body">
+                <form method = "POST" action="{% url 'create_note' %}">
+                    {% csrf_token %}
+                        {% for field in note_form %}
+                        <p>
+                            {{ field.label_tag }}<br>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <small style="color: grey">{{ field.help_text }}</small>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <p style="color: red">{{ error }}</p>
+                            {% endfor %}
+                        </p>
+                        {% endfor %}
+                        <div class="modal-footer">
+                    
+                    <button type="submit" class="btn btn-primary">Create note</button>
+                </div>
+                </form>
+        </div>
+        </div>
+    </div>
+    </div>
 </body>
 </html>

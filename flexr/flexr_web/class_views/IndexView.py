@@ -10,7 +10,8 @@ from ..forms import *
 # TODO: Gerald add the other functionality
 # TODO: Gerald refractor out common code like request messages
 # TODO: Gerald connect class based views to their html page
-# TODO: Gerald fix broken view tests 
+# TODO: Gerald fix broken view tests
+
 class IndexView(LoginRequiredMixin, View):
     """
     View class for the index/home page
@@ -51,6 +52,8 @@ class IndexView(LoginRequiredMixin, View):
         suggested_sites = curr_account.suggested_sites.order_by('-site_ranking')
         # suggested_sites = curr_account.suggested_sites()
 
+
+
         # request messages for debugging
         if ('message' in request.session):
             message = request.session['message']
@@ -68,7 +71,8 @@ class IndexView(LoginRequiredMixin, View):
         # display the page
         filtered = False
         print("IndexView: get(): notes: ", notes)
-        return render(request, "flexr_web/index.html",
+
+        response =  render(request, "flexr_web/index.html",
                       {
                        # "Accounts": accounts,
                       "filtered": filtered,
@@ -79,7 +83,16 @@ class IndexView(LoginRequiredMixin, View):
                        "History": history, 
                        "Bookmarks": bookmarks, 
                        "Folders":folders,
-                       "form": form})
+                       "form": form,
+                        "first_visit":request.COOKIES.get('first_visit'+str(curr_user.id)),
+                        })
+
+        if request.COOKIES.get('first_visit'+str(curr_user.id)) is None:
+            response.set_cookie(key="first_visit"+str(curr_user.id),
+                                value=True)  # if no cookie is stored (i.e. no previous visit), set first_visit to true
+        else:
+            response.set_cookie(key="first_visit"+str(curr_user.id), value=False)  # if a cookie is stored, set first_visit to false
+        return response
 
     def post(self, request):
         curr_user = request.user

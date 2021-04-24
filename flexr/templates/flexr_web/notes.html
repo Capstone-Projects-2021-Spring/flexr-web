@@ -32,11 +32,10 @@
                                 <p>
                                     <label style = "display: inline;"for="id_search">Search:</label><br>
                                     <input style = "width: 50%; display: inline;" type="text" name="search" class="form-control" id="id_search">
+                                    <button style = "display:inline;" type="submit" class="btn btn-primary">Search</button>
                                </p>
    
-                               
-
-                            <button style = "display:inline;" type="submit" class="btn btn-primary">Search</button>
+                          
                         </span>
                       </form>
                     </div>
@@ -72,38 +71,7 @@
                 {%endfor%}
             </div>
 
-            <div class="modal fade" id="add_note" tabindex="-1" role="dialog" aria-labelledby="add_noteLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="add_noteLabel">Add a note!</h5>
-                    <img type="button" data-dismiss="modal" class = "icon close" src = "{% static 'icons/cancel.png' %}" width=20px>
-                    </button>
-                </div>
-                <div class="modal-body">
-                        <form method = "POST" action="{% url 'create_note' %}">
-                            {% csrf_token %}
-                                {% for field in form %}
-                                <p>
-                                    {{ field.label_tag }}<br>
-                                    {{ field }}
-                                    {% if field.help_text %}
-                                        <small style="color: grey">{{ field.help_text }}</small>
-                                    {% endif %}
-                                    {% for error in field.errors %}
-                                        <p style="color: red">{{ error }}</p>
-                                    {% endfor %}
-                                </p>
-                                {% endfor %}
-                                <div class="modal-footer">
-                            
-                            <button type="submit" class="btn btn-primary">Create note</button>
-                        </div>
-                        </form>
-                </div>
-                </div>
-            </div>
-            </div>
+           
         </div>
     </div>
 </body>

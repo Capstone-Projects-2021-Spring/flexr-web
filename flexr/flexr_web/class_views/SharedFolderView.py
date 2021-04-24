@@ -274,6 +274,8 @@ class FoldersViewAPI(LoginRequiredMixin, DetailView):
         for acc in collaborators:
             account = Account.objects.get(account_id = acc['account_id'])
             shared_folder.collaborators.add(account)
+            
+        shared_folder.collaborators.add(accounto)
         shared_folder.save()
         data = SharedFolderSerializer(shared_folder)
         return JsonResponse(data.data, safe=False)

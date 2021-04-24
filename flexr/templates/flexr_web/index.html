@@ -42,11 +42,13 @@
     
     <div class = "body">
 
-        
+        {% if first_visit == None%}
+            <h1 style="margin-top: 1%; text-align:center;">Welcome to Flexr {{user.first_name}}!</h1>
+        {%endif%}
         <div class="bm-tabs row justify-content-center">
             <div id = "tabs" class="card col-lg-4">
                 <div class = "card-header sticky-top">
-                    <h2 style="display:inline">Open tabs</h2>
+                    <h2 style="display:inline">Recent tabs</h2>
                     <img id="plus-icon" class="plus-icon icon" width = 20px; data-toggle="modal" data-target="#add_tab" src="{% static 'icons/plus.png' %}"> 
                 </div>
                 <script>
@@ -83,7 +85,7 @@
             </div>
             <div id = "bookmarks" class="col-lg-4">
                 <div class = "card-header sticky-top">
-                    <h2>Bookmarks</h2>
+                    <h2>Recent bookmarks</h2>
                 </div>
                 <div class = "card-body row justify-content-center">
                     {%for bm in Bookmarks%}
@@ -109,7 +111,7 @@
         <div class="bm-tabs row justify-content-center">
             <div id = "tabs" class="card col-lg-4">
                 <div class = "card-header sticky-top">
-                    <h2 style="display:inline">Notes</h2>
+                    <h2 style="display:inline">Recent notes</h2><img style="display:inline;" id="plus-icon" width = 20px data-toggle="modal" data-target="#add_note" src="{% static 'icons/plus.png' %}" class = "icon">
                 </div>
                 <script>
                     
@@ -144,7 +146,7 @@
             </div>
             <div id = "bookmarks" class="col-lg-4">
                 <div class = "card-header sticky-top">
-                    <h2>Shared Folders</h2>
+                    <h2>Recent shared folders</h2>
                 </div>
                 <div class = "card-body row justify-content-center" style="position: relative;">
                     {%for sf in Folders%}

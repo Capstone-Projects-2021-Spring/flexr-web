@@ -140,7 +140,7 @@
             </div>
             <hr>
 
-            <h3>Account Preferences:</h3>
+            <h3>App Settings</h3>
             <form method = "post" action="{% url 'edit account preferences' %}">
                 {% csrf_token %}
                 {% for field in pref_form %}

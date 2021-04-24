@@ -31,7 +31,7 @@ class NotesView(LoginRequiredMixin, View):
         notes = curr_account.notes.all()
 
         # get note form object on the page
-        form = notef
+        form = CreateNoteForm
         fform = FilterNoteForm
 
         # request messages for debugging
@@ -59,31 +59,41 @@ class NotesView(LoginRequiredMixin, View):
         Filter the account's history by datetime range
         """
 
-        # get current user and current account
         curr_user = request.user
-        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+        curr_acc = curr_user.accounts.get(account_id = request.session['account_id'])
+        notes = curr_acc.notes.all()
 
-        # get all user's accounts
-        accounts = curr_user.accounts.all()
+        
+        search = request.POST.get('search')
+        print("NotesView: search_note: search: ", search)
+        content_search = notes.filter(content__icontains=search)
+        title_search = notes.filter(title__icontains = search)
 
-        # get form object on page
+        search_results = content_search | title_search
+        search_results = search_results.distinct()
+        print("NotesView: search_note: search_results: ", search_results)
         form = notef
         fform = FilterNoteForm
-        # grab date and time information from POST form
-        search = request.POST['search']
-        
-        # grab all history objects
-        notes = curr_account.notes.all()
+        if(search_results.count() > 0): 
+            request.session['message'] = "Notes filtered"
+        else:
+            request.session['err_message'] = "No notes found"
 
-        # filter based on site if given
-        if search:
-            notes = notes.filter(title__icontains=search)
+        # request messages for debugging
+        if ('message' in request.session):
+            message = request.session['message']
+            del request.session['message']
+            messages.success(request, message)
+        elif ('err_message' in request.session):
+            message = request.session['err_message']
+            del request.session['err_message']
+            messages.error(request, message)
+        request.session['redirect_url'] = '/notes/'
 
         # request message for debugging
         # request.session['message'] = "History Filtered"
         return render(self.request, "flexr_web/notes.html", 
-        {"Notes": notes, 
-        "Accounts": accounts, 
+        {"Notes": search_results, 
         'form': form,
         'searched':True,
         'fform': fform})

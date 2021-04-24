@@ -69,6 +69,7 @@ class ProfileView(LoginRequiredMixin, View):
         pref_form.fields['cookies_enabled'].initial = curr_account.account_preferences.cookies_enabled
         pref_form.fields['popups_enabled'].initial = curr_account.account_preferences.popups_enabled
         pref_form.fields['is_dark_mode'].initial = curr_account.account_preferences.is_dark_mode
+        pref_form.fields['is_dark_mode'].label = "Dark mode"
 
         # get form object and
         # populate it with account information

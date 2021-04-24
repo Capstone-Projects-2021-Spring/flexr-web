@@ -179,7 +179,6 @@ class BookmarkFolderView(LoginRequiredMixin, View):
             tileo = form.cleaned_data['title']
             descrippy = form.cleaned_data['bookmarks']
         bookmark_folder.save()
-        return redirect(request.session['prev_url'])
         request.session['message'] = "Bookmark edited"
         return redirect(request.session['redirect_url'])
 
