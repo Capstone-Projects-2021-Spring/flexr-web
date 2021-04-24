@@ -18,7 +18,22 @@
     <div class="body">
         <div class="main">
             <div class="modal-body">
-                <form method="post">
+                <div class="suggested sidenav">
+                    <a class="navbar-brand" href="/"><img src="{% static 'flexr_logo_2.png' %}" width="100%"></a>
+                    <h3>Filter Bookmarks</h3>
+                    <form method="post">
+                        {% csrf_token %}
+                        {% for field in form %}
+                        <p style="display: inline;" >
+                            {{ field.label_tag }}
+                            {{ field }} 
+                        </p><br>
+    
+                        {% endfor %}
+                        <button type="submit" class="btn btn-primary">Filter</button>
+                    </form>
+                </div>
+                <!-- <form method="post">
                     {% csrf_token %}
                     {% for field in form %}
                     <p>
@@ -32,11 +47,10 @@
                     <!--  -->
 
             <!--                    <button type="button" class="btn btn-danger" onclick="delete_account()">Delete</button>-->
-                    <button type="submit" class="btn btn-primary">Filter</button>
+                    <!-- <button type="submit" class="btn btn-primary">Filter</button>
                 </div>
                 </form>
             </div>
-Edit Folder <img id="plus-icon" class = "icon" data-toggle="modal" data-target="#edit_folder" style = "padding-bottom: 1%;" width = 20px src="{% static 'icons/plus.png' %}">
 
 <div class="modal fade" id="edit_folder" tabindex="-1" role="dialog" aria-labelledby="edit_folderLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
@@ -69,19 +83,67 @@ Edit Folder <img id="plus-icon" class = "icon" data-toggle="modal" data-target="
       </div>
     </div>
   </div>
+</div> -->
+<link rel="stylesheet" href="{% static 'css/index.css' %}">
+<div id = "head">
+    <h1 id = "title">{{bookmark_folder.title}} Bookmark Folder</h1> 
+    <img id="plus-icon" data-toggle="modal" data-target="#edit_folder" src="{% static 'icons/edit.png' %}" width="30px">
 </div>
-
+<div class="modal fade" id="edit_folder" tabindex="-1" role="dialog" aria-labelledby="edit_folderLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="edit_folderLabel">Edit your folder</h5>
+            <img type="button" data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
+            </button>
+        </div>
+        <div class="modal-body">
+                <form method = "POST" action="{% url 'edit_bookmark_folder' bookmark_folder.pk%}">
+                        {% csrf_token %}
+                        {% for field in formb %}
+                        <p>
+                            {{ field.label_tag }}<br>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <small style="color: grey">{{ field.help_text }}</small>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <p style="color: red">{{ error }}</p>
+                            {% endfor %}
+                        </p>
+                        {% endfor %}
+                        <div class="modal-footer">
+                    
+                    <button type="submit" class="btn btn-primary">Confirm edit</button>
+                </div>
+                </form>
+        </div>
+        </div>
+    </div>
+</div>
 <hr>
-    <h1>Folder title: {{bookmark_folder.title}}</h1>
+<div class="col-md-5 row" >
+    <!-- <hr> -->
+    <h3>Bookmarks</h3>
+    {%for bm in Bookmarks%}
+        <div id = "bookmark" class = "card col-lg-10" style="height: auto;" >
+            <p onclick="window.open('{{bm.site.url}}')"  style="display: inline;">{{bm.site}}</p>
+            <span style="display: inline;">
+                <img class="bm" onclick="window.location.href = '/remove_from_folder/{{bm.id}}/{{bookmark_folder.pk}}/'" src="{% static 'icons/cancel.png' %}" width= 15px>
+            </span>
+        </div>
+    {%endfor%}
+</div>
+    <!-- <h1>Folder title: {{bookmark_folder.title}}</h1> -->
     <!-- <h1>Folder owner: {{bookmark_folder.owner}}</h1> -->
-    <h3>Bookmarks:</h3>
+    <!-- <h3>Bookmarks:</h3>
     {%for bookmark in Bookmarks%}
     <p>Bookmark: <a href="{{bookmark.site.url}}">{{bookmark.site.url}}</a></p>
     <p>Created Date: {{bookmark.created_date}}</p>
     <p>Last Visited: {{bookmark.last_visited}}</p>
     <button onclick="window.location.href = '/remove_from_folder/{{bookmark.id}}/{{bookmark_folder.pk}}/'">Remove From Folder</button>
     <br>
-    {%endfor%}
+    {%endfor%} -->
 
 </div>
 </div>

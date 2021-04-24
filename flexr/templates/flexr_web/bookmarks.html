@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Flexr | Open Tabs</title>
+    <title>Flexr | Bookmarks</title>
     {% load static %}
     <style>
         #plus-icon:hover{
@@ -89,7 +89,7 @@
                     <!-- <hr> -->
                     <h3>All Bookmarks</h3>
                     {%for bm in Bookmarks%}
-                        <div id = "bookmark" class = "card col-lg-5"  >
+                        <div id = "bookmark" class = "card col-lg-10" style="height: auto;" >
                             <p onclick="window.open('{{bm.site.url}}')"  style="display: inline;">{{bm.site}}</p>
                             <span style="display: inline;">
                                 <img class="bm icon" onclick="window.location.href = '/delete_bookmark/{{bm.site.bookmarked}}'" src="{% static 'icons/bookmarked.png' %}" width= 15px>
