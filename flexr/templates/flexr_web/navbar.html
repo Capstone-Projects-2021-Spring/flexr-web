@@ -30,7 +30,7 @@
 <body>
   <div class="container-fluid" id="navDiv">
 
-  <nav class="navbar  navbar-expand-lg  bg-transparent">
+  <nav class="navbar navbar-expand-lg  bg-transparent">
     
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"> <i title="" class="fa fa-bars"></i></span>
@@ -164,7 +164,7 @@
         <div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title" id="add_accountLabel">Add an account!</h5>
-            <img type="button" class = "icon close" data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
+            <img class = "icon close" data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
             </button>
         </div>
         <div class="modal-body">
@@ -197,7 +197,7 @@
           <div class="modal-content">
           <div class="modal-header">
               <h5 class="modal-title" id="add_tabLabel">Add a tab!</h5>
-              <img type="button" data-dismiss="modal" class = "icon close" src = "{% static 'icons/cancel.png' %}" width=20px>
+              <img data-dismiss="modal" class = "icon close" src = "{% static 'icons/cancel.png' %}" width=20px>
               </button>
           </div>
           <div class="modal-body">
@@ -219,9 +219,9 @@
         <div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title" id="add_noteLabel">Add a note!</h5>
-            <img type="button" data-dismiss="modal" class = "icon close" src = "{% static 'icons/cancel.png' %}" width=20px>
-            </button>
+            <img data-dismiss="modal" class = "icon close" src = "{% static 'icons/cancel.png' %}" width=20px>
         </div>
+        
         <div class="modal-body">
                 <form method = "POST" action="{% url 'create_note' %}">
                     {% csrf_token %}

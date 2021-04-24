@@ -232,22 +232,6 @@ class TabAPIView(View):
         except Exception as e:
             return JsonResponse({ "error": str(e), "traceback": traceback.extract_tb(e.__traceback__).format() }, status=500)
 
-    # @method_decorator(csrf_exempt)
-    # def edit_tab(self, request, *args, **kwargs):
-    #     # get the current user and current account
-    #     curr_user = request.user
-    #     curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
-    #
-    #     data = json.loads(request.body)
-    #
-    #     if 'url' in data:
-    #         site = Site.objects.get_or_create(account = curr_account, url = data['url'])[0]
-    #         data['site_id'] = site.id
-    #
-    #     result = Tab.objects.filter(pk = kwargs["id"]).update(**data)
-    #
-    #     return JsonResponse({"success": "tab edited"})
-
     @method_decorator(csrf_exempt)
     def visit_tab(self, request, *args, **kwargs):
         """

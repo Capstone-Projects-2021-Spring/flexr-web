@@ -28,7 +28,6 @@
                             {{ field.label_tag }}
                             {{ field }} 
                         </p><br>
-    
                         {% endfor %}
                         <button type="submit" class="btn btn-primary">Filter</button>
                     </form>
@@ -57,7 +56,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="edit_noteLabel">Edit Folder!</h5>
-        <img type="button" data-dismiss="modal" class = "icon" src = "{% static 'icons/cancel.png' %}" width=20px>
+        <img data-dismiss="modal" class = "icon" src = "{% static 'icons/cancel.png' %}" width=20px>
         </button>
       </div>
       <div class="modal-body">
@@ -87,14 +86,16 @@
 <link rel="stylesheet" href="{% static 'css/index.css' %}">
 <div id = "head">
     <h1 id = "title">{{bookmark_folder.title}} Bookmark Folder</h1> 
-    <img id="plus-icon" data-toggle="modal" data-target="#edit_folder" src="{% static 'icons/edit.png' %}" width="30px">
+    <br>
+   <img id="plus-icon" data-toggle="modal" data-target="#edit_folder" src="{% static 'icons/edit.png' %}" width="30px">
+   <h3 id = "title">{{bookmark_folder.created_date}}</h3> 
 </div>
 <div class="modal fade" id="edit_folder" tabindex="-1" role="dialog" aria-labelledby="edit_folderLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title" id="edit_folderLabel">Edit your folder</h5>
-            <img type="button" data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
+            <img data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
             </button>
         </div>
         <div class="modal-body">

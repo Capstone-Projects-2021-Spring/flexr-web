@@ -253,7 +253,6 @@ class FoldersViewAPI(LoginRequiredMixin, DetailView):
             note = Note.objects.get(id = nt_id)
             shared_folder.notes.add(note)
         shared_folder.save()
-        # shared_folder.update(**data)
         data = SharedFolderSerializer(shared_folder)
         return JsonResponse(data.data, safe=False)
 
