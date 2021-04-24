@@ -28,15 +28,16 @@
                 <button type="submit" class="btn btn-primary">Unlock</button>
             </form>
         {%else%}
-        <form method="POST" action="/edit_note/2/">
+        <form method="POST" action="/edit_note/{{object.id}}/">
             <div class="note_form">
                 <h2>{{object.created_date}}</h2>
+                {% csrf_token %}
                     <input type="text" name="title" value="{{object.title}}" maxlength="100" required="" id="id_title">
                     <br>
                     <textarea name="content" cols="40" rows="10" required="" id="id_content">{{object.content}}</textarea>
                     <br>
                     <label for="id_lock">Lock:</label>
-                    {%if object.locked %}
+                    {%if object.lock %}
                         <input type="checkbox" name="lock" id="id_lock" checked>
                     {%else%}
                         <input type="checkbox" name="lock" id="id_lock">
@@ -65,7 +66,6 @@
                 </div>
                 <div class="modal-body">
                         <form method = "POST" action="{% url 'edit_note' object.pk%}">
-                                
                                 
                                 <div class="modal-footer">
                             <button type = "button" class = "btn btn-danger" onclick="window.location.href='/delete-note/{{object.id}}/'">Delete</button>

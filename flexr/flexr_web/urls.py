@@ -35,7 +35,6 @@ urlpatterns = [
 
     path('browsing_history/', HistoryView.as_view(), name='history'),
     path('browsing_history/delete/', HistoryView().delete, name='delete history'),
-    #path('filter_history/', HistoryView().filter, name = "filter history"),
 
     path('notes/', NotesView.as_view(), name='notes'), #broken
     path('search_notes/', NotesView().search_note, name='search_notes'), #broken

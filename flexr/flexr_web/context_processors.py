@@ -5,7 +5,8 @@ def add_variable_to_context(request):
             'Accounts': request.user.accounts.all(),
             'curr_acc': request.user.accounts.get(account_id = request.session['account_id']),
             'Suggested_Sites': request.user.accounts.get(account_id = request.session['account_id']).suggested_sites.order_by('-site_ranking'),
-            'acc_form': AccountForm()
+            'acc_form': AccountForm(),
+            'note_form': CreateNoteForm()
             }
     else:
         return {}

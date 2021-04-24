@@ -90,7 +90,7 @@ class NoteView(LoginRequiredMixin, View):
             tit = request.POST.get('title')
             cont = request.POST.get('content')
             lo = request.POST.get('lock')
-            print("NotesView: edit_note(): locked: ", lo)
+            print("NoteView: edit_note(): locked: ", lo)
             passw = request.POST.get('password')
             passw2 = request.POST.get('password2')
             if passw != note.password and passw != passw2:
@@ -110,9 +110,10 @@ class NoteView(LoginRequiredMixin, View):
 
             note.title = tit
             note.content = cont
-            note.locked = lo
+            note.lock = lo
             note.password = passw
             note.save()
+            print(note.lock)
             request.session['note_unlocked'] = noteid
             request.session['message'] = "Note edited"
 

@@ -1,4 +1,4 @@
-from django.contrib import messages
+from django.contrib import messages, auth
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, JsonResponse
@@ -38,17 +38,21 @@ class UserAPIView(View):
                 password = data['password']
 
                 user = User.objects.create_user(username, email, password)
+                user = auth.authenticate(username=username, password=password)
+                if user is not None and user.is_active:
+                    auth.login(request, user)
+                    new_account = Account.objects.create(user=user, email=user.email, username = user.username)
+                    request.session['account_id'] = new_account.account_id
+                    site = Site.objects.create(account=new_account, url="https://google.com")
+                    site.save()
+                    new_account.account_preferences = Account_Preferences.objects.create(home_page = site)
+                    new_account.save()
 
-                new_account = Account.objects.create(user=user, email=user.email, username = user.username)
-                request.session['account_id'] = new_account.account_id
-                site = Site.objects.create(account=new_account, url="https://google.com")
-                site.save()
-                new_account.account_preferences = Account_Preferences.objects.create(home_page = site)
-                new_account.save()
-                print("UserAPIView: logout(): user", new_account, " Message: USER SIGNED UP")
-                return JsonResponse({"success": f"User {username} created"})
+                    print("UserAPIView: logout(): user", new_account, " Message: USER SIGNED UP")
+                    data = AccountSerializer(new_account)
+                    return JsonResponse(data.data, safe=False)
 
-                
+                x
             return JsonResponse({"error": f"Error creating user"})
 
         except Exception as e:
