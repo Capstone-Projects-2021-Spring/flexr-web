@@ -208,6 +208,9 @@ class Site(models.Model):
                 except:
                     self.name = url2[2]
 
+        if(len(self.name) > 25):
+            self.name = self.name[0:24]
+
 
         super().save(*args, **kwargs)
 

@@ -151,7 +151,7 @@
       <div id = "sites_nav" class="row justify-content-center" >
         
           {%for site in Suggested_Sites%}
-          <div id = "bookmark" class = "card col-md-10" style="height: auto; color: black; box-shadow: none !important; margin-top: 4%; border: 1px solid white; background-color: white;" >
+          <div id = "bookmark" class = "card col-md-10" style="height: auto; color: black; box-shadow: none !important; margin-top: 4%; border: 1px solid white; background-color: white; font-size: small;" >
             <p onclick="window.open('{{site.url}}')"  style="display: inline; margin-top: 2%;">
                 {%if site.favicon_img_url != None%}
                     <img class = "icon" src="{{ site.favicon_img_url }}" width="15px">

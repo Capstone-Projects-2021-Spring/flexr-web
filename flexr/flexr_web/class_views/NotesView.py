@@ -142,6 +142,9 @@ class NotesView(LoginRequiredMixin, View):
         """
         Delete a note
         """
+        if (Note.objects.filter(id = kwargs['pk']).count() == 0):
+            request.session['err_message'] = "Note does not exist"
+            return redirect(request.session['redirect_url'])
 
         # grab requested note object
         obj = Note.objects.get(pk=kwargs['pk'])

@@ -133,10 +133,17 @@ class HistoryView(LoginRequiredMixin, View):
         # get current user and current account
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
-    
+
         # get history objects to delete
         delete = request.POST.getlist('DELETE', [])
-
+        print(delete)
+        for x in delete:
+            print(x)
+            if (curr_account.history.filter(id=int(x)).count() == 0):
+                delete.remove(x)
+        if(len(delete) == 0):
+            request.session['err_message'] = "History does not exist"
+            return redirect(request.session['redirect_url'])
         # delete requested history objects
         curr_account.history.filter(pk__in=delete).delete()
 

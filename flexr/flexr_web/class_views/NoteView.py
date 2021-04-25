@@ -29,6 +29,10 @@ class NoteView(LoginRequiredMixin, View):
         curr_account = curr_user.accounts.get(account_id=self.request.session['account_id'])
 
         # get requested note object and all accounts for user
+        if (Note.objects.filter(id = kwargs['pk']).count() == 0):
+            request.session['err_message'] = "Note does not exist"
+            return redirect(request.session['redirect_url'])
+
         obj = Note.objects.get(pk=kwargs['pk'])
         accounts = curr_user.accounts.all()
 
@@ -79,6 +83,9 @@ class NoteView(LoginRequiredMixin, View):
         # get form object on the page
         form = EditNoteForm(request.POST)
         # check if form is valid
+        if (Note.objects.filter(id = kwargs['pk']).count() == 0):
+            request.session['err_message'] = "Note does not exist"
+            return redirect('/notes/')
         if form.is_valid():
             
             # get current account
@@ -130,6 +137,10 @@ class NoteView(LoginRequiredMixin, View):
 
         # get current account
         current_acc = request.user.accounts.get(account_id = request.session['account_id'])
+
+        if (Note.objects.filter(id=kwargs['pk']).count() == 0):
+            request.session['err_message'] = "Note does not exist"
+            return redirect('/notes/')
 
         # grab stored password and requested note
         form_password = request.POST.get('password')
