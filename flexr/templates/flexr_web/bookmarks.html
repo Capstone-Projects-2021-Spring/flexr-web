@@ -63,10 +63,13 @@
                         </div>
                         <div class="card-body justify-content-center row">
                             {%for bm in Bookmarks%}
-                                <div id = "bookmark" class = "card col-md-3" style="height: auto;" >
-                                    <p onclick="window.open('{{bm.site.url}}')"  style="display: inline;">{{bm.site}}</p>
+                                <div id = "bookmark" class = "card col-md-8" style="height: auto;" >
                                     <span style="display: inline;">
-                                        <img class="bm icon" onclick="window.location.href = '/delete_bookmark/{{bm.site.bookmarked}}'" src="{% static 'icons/bookmarked.png' %}" width= 15px>
+                                    <p onclick="window.open('{{bm.site.url}}')"  style="display: inline;">
+                                        {%if bm.site.favicon_img_url != None%}
+                                            <img class = "icon" src="{{ bm.site.favicon_img_url }}" width="15px">
+                                        {%endif%}{{bm.site}}</p>
+                                        <img class="bm_icon icon" onclick="window.location.href = '/delete_bookmark/{{bm.site.bookmarked}}'" src="{% static 'icons/bookmarked.png' %}" width= 15px>
                                     </span>
                                 </div>
                             {%endfor%}

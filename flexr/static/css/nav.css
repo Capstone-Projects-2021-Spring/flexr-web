@@ -101,7 +101,7 @@ h2{
     border-radius: 7px; 
     text-align:center;
     margin: 1%;
-    max-height: 8rem;
+    max-height: 4rem;
     word-wrap: break-word;
 }
 
@@ -115,7 +115,7 @@ h2{
 }
 
 .close{
-    margin-top: 3%;
+    /* margin-top: 3%; */
 }
 
 #plus-icon{
@@ -158,8 +158,6 @@ h2{
 .card{
     /* box-shadow: 1px 1px 10px 1px #ccd3eb; */
     border: 1px solid #e5f7fc ;
-    padding: .5%;
-    height: 5rem;
     overflow: hidden;
 }
 
@@ -386,4 +384,12 @@ input, textarea{
 img:hover{
     zoom: 1.2;
     cursor: pointer;
+}
+
+.bm_icon{
+    position: absolute;
+    margin-top: 2.5%;
+    margin-right: 3.5%;
+    top:0;
+    right: 0;
 }
