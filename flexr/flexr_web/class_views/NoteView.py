@@ -31,7 +31,7 @@ class NoteView(LoginRequiredMixin, View):
         # get requested note object and all accounts for user
         if (Note.objects.filter(id = kwargs['pk']).count() == 0):
             request.session['err_message'] = "Note does not exist"
-            return redirect(request.session['redirect_url'])
+            return redirect('/notes/')
 
         obj = Note.objects.get(pk=kwargs['pk'])
         accounts = curr_user.accounts.all()
