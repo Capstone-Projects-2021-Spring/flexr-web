@@ -17,57 +17,50 @@
 
     <div class = "body">
         <div class = "main">
-            <hr>
-                <h3>Notes:</h3>
-                <hr>
-                {%if Notes|length > 0 or searched == True %}
-                    {% if Notes|length == 0 and searched == True%}
-                        <h1>No notes found.</h1>
-                    {%endif%}
-                    <div class="modal-body">
-                        <form method="POST" action="/notes/">
-                            {% csrf_token %}
-                            <span>
-                            
-                                <p>
-                                    <label style = "display: inline;"for="id_search">Search:</label><br>
-                                    <input style = "width: 50%; display: inline;" type="text" name="search" class="form-control" id="id_search">
-                                    <button style = "display:inline;" type="submit" class="btn btn-primary">Search</button>
-                               </p>
-   
-                          
-                        </span>
-                      </form>
-                    </div>
-                {%else%}
-                    <h1>No notes found.</h1>
-                {%endif%}
-            <p style="display: inline;">Create Note</p><img style="display:inline;" id="plus-icon" width = 20px data-toggle="modal" data-target="#add_note" src="{% static 'icons/plus.png' %}" class = "icon">
+                <div class="card-header">
+                    <span>
+                        <h3 style="display:inline;">Notes</h3><img style="display:inline;" id="plus-icon" width = 20px data-toggle="modal" data-target="#add_note" src="{% static 'icons/plus.png' %}" class = "icon">
+                        {%if Notes|length > 0 or searched == True %}
+                            {% if Notes|length == 0 and searched == True%}
+                                <h1>No notes found.</h1>
+                            {%endif%}
+                                <form method="POST" action="/notes/" style="display: inline; margin-left: 10%;">
+                                    {% csrf_token %}
+                                    <span style="display: inline;">
+                                        <p style="display: inline;">
+                                            <input style = "width: 50%; display: inline;" type="text" name="search" class="form-control" id="id_search">
+                                            <button style = "display:inline;" type="submit" class="btn btn-primary">Search</button>
+                                        </p>                          
+                                    </span>
+                                </form>
+                        {%else%}
+                            <h1>No notes found.</h1>
+                        {%endif%}
+                    </span>
+                </div>
 
-            <div class = "card-body row">
+            <div class = "card-body justify-content-center row">
                 
                 {%for note in Notes%}
 
-                    <div id = "note" class = "note card col-lg-3 "  >
-                        <span style="text-align: left;">
+                <div id = "note" class = "note card col-lg-2"  >
+                    <div class="card-body" style="">
+                        <span style="position: absolute; top:0; left:0; margin-left: 5%;">
                             {%if not note.lock%}
                                 <img style= "display: inline;"  class="close icon" onclick=" var conf = confirm('Do you want to delete this note?'); if(conf){ window.location.href = '/delete-note/{{note.id}}'}" src="{% static 'icons/cancel.png' %}" width= 15px>
                             {%else%}
                                 <img style= "display: inline;"  class="close icon" onclick=" var conf = confirm('You must unlock this note to delete it.'); if(conf){ window.location.href = '/opennote/{{note.id}}'}" src="{% static 'icons/cancel.png' %}" width= 15px>
                             {%endif%}
                         </span>
-                       <script>
-                        </script>
-                        <div class="card-body" onclick="window.location.href = '/opennote/{{note.id}}'" style="">
-
-                            <p style="display: inline;">{{note}}</p>
-                            {%if note.lock%}
-                                <img style= "display: inline;" class="lock icon" src="{% static 'icons/lock.png' %}" width= 15px>
-                            {%endif%}
-
-                        </div>
+                    
+                        <p style="display: inline;" onclick="window.location.href = '/opennote/{{note.id}}'">{{note}}</p>
+                        {%if note.lock%}
+                            <img style= "display: inline;" class="lock icon" src="{% static 'icons/lock.png' %}" width= 15px>
+                        {%endif%}
 
                     </div>
+
+                </div>
                 {%endfor%}
             </div>
 

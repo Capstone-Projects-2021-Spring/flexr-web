@@ -17,7 +17,7 @@
     {% include "flexr_web/navbar.html" %}
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
     <div class="row body">
-        <div class = "main row">
+        <div class = "main_bm row">
             <div class="suggested sidenav">
                 <a class="navbar-brand" href="/"><img src="{% static 'flexr_light.png' %}" width="100%"></a>
                 <h3>Filter Bookmarks</h3>
@@ -37,17 +37,16 @@
             </div>
             <div class="bm_folders col-md-3">
                 <div class="row">
-                        <div class= "card-header">
+                        <div class= "">
                             <h3 style="display:inline;" >Folders</h3>
                             <img style="display:inline; width: 20px !important;"  id="plus-icon" data-toggle="modal" data-target="#add_bookmark_folder" class = "icon" src="{% static 'icons/plus.png' %}">
                         </div>
                         
                         <div class="card-body justify-content-center">
                             {%for folder in Folders%}
-                                <div id = "bookmark" class = "folder card col-md-12" style="height: auto;" >
+                                <div id = "bmf" class = "folder card col-md-12" style="height: auto;" >
                                     <img class="close icon" onclick=" var conf = confirm('Do you want to delete this bookmark folder?'); if(conf){ window.location.href = '/delete_bookmark_folder/{{folder.id}}/'}" src="{% static 'icons/cancel.png' %}" width= 15px>
                                     <h4 style="cursor: pointer;" onclick="window.location.href = '/bookmark_folder/{{folder.id}}'">{{folder.title}}</h4>
-                                    <!-- <p>Created: {{folder.created_date}}</p> -->
                                     <p>{{folder.bookmarks.all|length}} bookmarks</p>
                                     <!-- <p><a href="{% url 'delete-bookmark-folder' folder.pk%}">Delete Folder</a></p> -->
                                     <br>
@@ -58,12 +57,12 @@
                 </div>
             </div>
             <div class="bms col-md-8">
-                        <div class="card-header">
+                        <div class="">
                             <h3>All Bookmarks</h3>
                         </div>
                         <div class="card-body justify-content-center row">
                             {%for bm in Bookmarks%}
-                                <div id = "bookmark" class = "card col-md-8" style="height: auto;" >
+                                <div id = "bookmark" class = "card col-md-5" style="height: auto;" >
                                     <span style="display: inline;">
                                     <p onclick="window.open('{{bm.site.url}}')"  style="display: inline;">
                                         {%if bm.site.favicon_img_url != None%}

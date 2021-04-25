@@ -59,7 +59,6 @@ class TabsView(LoginRequiredMixin, View):
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id= request.session['account_id'])
 
-
         # get site url
         site_url = request.POST.get("url")
         
@@ -108,7 +107,6 @@ class TabsView(LoginRequiredMixin, View):
         curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
         
         try:
-
             site_url = curr_account.sites.get(id = kwargs['id']).url
             tab = Tab.open_tab(site_url=site_url, curr_account=curr_account)
             request.session['message'] = "Tab added"

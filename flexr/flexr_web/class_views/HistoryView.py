@@ -113,10 +113,23 @@ class HistoryView(LoginRequiredMixin, View):
             history = history.filter(
             visit_datetime__lte=end
         )
+        
 
-
+        if(history.count()>0):
         # request message for debugging
-        request.session['message'] = "History Filtered"
+            request.session['message'] = "History Filtered"
+        else:   
+            request.session['err_message'] = "No history found. Try a different filter"
+
+             # request messages for debugging
+        if ('message' in request.session):
+            message = request.session['message']
+            del request.session['message']
+            messages.success(request, message)
+        elif('err_message' in request.session):
+            message = request.session['err_message']
+            del request.session['err_message']
+            messages.error(request, message)
 
         # Gerald: using redirect doesn't work here?
         return render(request, "flexr_web/browsing_history.html",
