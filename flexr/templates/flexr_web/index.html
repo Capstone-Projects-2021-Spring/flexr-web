@@ -3,7 +3,7 @@
 <head>
     {% load static %}
     <meta charset="UTF-8">
-    <title>Flexr | Home This is testing how long these can be Flexr | Home This is testing how long these can be Flexr | Home This is testing how long these can be Flexr | Home This is testing how long these can be Flexr | Home This is testing how long these can be Flexr | Home This is testing how long these can be Flexr | Home This is testing how long these can be</title>
+    <title>Flexr | Home</title>
 
     <script>
         async function switch_account(id){
@@ -48,8 +48,9 @@
         <div class="bm-tabs row justify-content-center">
             <div id = "tabs" class="card col-lg-4">
                 <div class = "card-header sticky-top">
-                    <h2 style="display:inline">Recent tabs</h2>
+                    <h2 style="display:inline">Tabs</h2>
                     <img id="plus-icon" class="plus-icon icon" width = 20px; data-toggle="modal" data-target="#add_tab" src="{% static 'icons/plus.png' %}"> 
+                    <button onclick="window.location.href = '/open_tabs/'" style="position: absolute; right: 0; top: 0; margin-top: 2.5%; margin-right: 2.5%;" class="btn btn-primary">View all</button>
                 </div>
                 <div class="card-body justify-content-center row">
                     {%for tab in Tabs%}
@@ -70,9 +71,10 @@
                     {%endfor%}
                 </div>
             </div>
-            <div id = "bookmarks" class="col-lg-4">
+            <div id = "tabs" class="right card col-lg-4">
                 <div class = "card-header sticky-top">
-                    <h2>Recent bookmarks</h2>
+                    <h2>Bookmarks</h2> 
+                    <button onclick="window.location.href = '/bookmarks/'" style="position: absolute; right: 0; top: 0; margin-top: 2.5%; margin-right: 2.5%;" class="btn btn-primary">View all</button>
                 </div>
                 <div class="card-body justify-content-center row">
                     {%for bm in Bookmarks%}
@@ -101,10 +103,12 @@
             </div>
         </div>
 
-        <div class="bm-tabs row justify-content-center">
-            <div id = "tabs" class="card col-lg-4">
+        <div class="bm-tabs row justify-content-center" style="margin-bottom: 2% !important;">
+            <div id = "tabs" class="card col-md-4">
                 <div class = "card-header sticky-top">
-                    <h2 style="display:inline">Recent notes</h2><img style="display:inline;" id="plus-icon" width = 20px data-toggle="modal" data-target="#add_note" src="{% static 'icons/plus.png' %}" class = "icon">
+                    <h2 style="display:inline">Notes</h2><img style="display:inline;" id="plus-icon" width = 20px data-toggle="modal" data-target="#add_note" src="{% static 'icons/plus.png' %}" class = "icon">
+                    <button onclick="window.location.href = '/notes/'" style="position: absolute; right: 0; top: 0; margin-top: 2.5%; margin-right: 2.5%;" class="btn btn-primary">View all</button>
+
                 </div>
                 <script>
                     
@@ -113,7 +117,6 @@
                 <div class = "card-body row justify-content-center">
                     
                     {%for note in Notes%}
-
                         <div id = "note" class = "note card col-lg-5"  >
                             <div class="card-body" style="">
                                 <span style="position: absolute; top:0; left:0; margin-left: 5%;">
@@ -135,23 +138,25 @@
                     {%endfor%}
                 </div>
             </div>
-            <div id = "bookmarks" class="col-lg-4">
+            <div id = "tabs" class="right card col-md-4">
                 <div class = "card-header sticky-top">
-                    <h2 style="display: inline;">Recent shared folders</h2>
+                    <h2 style="display: inline;">Shared folders</h2>
                     <img id="plus-icon" width = 20px id = "plus-icon" src="{% static 'icons/plus.png'%}" class = "icon" data-toggle="modal" data-target="#folder">
+                    <button onclick="window.location.href = '/shared_folders/'" style="position: absolute; right: 0; top: 0; margin-top: 2.5%; margin-right: 2.5%;" class="btn btn-primary">View all</button>
+
                 </div>
                 <div class = "card-body row justify-content-center" style="position: relative;">
                     {%for sf in Folders%}
                         <div id = "bookmark" class = "tab card col-lg-5"  >
                             <div class="card-body" style="position: relative;">
-                                <form  method="post" action = "/shared_folder/{{sf.id}}/remove_collaborator/" id = "remove_collab_form{{account.account_id}}">
+                                <form  method="post" action = "/shared_folder/{{sf.id}}/remove_collaborator/" id = "remove_collab_form{{sf.id}}">
                                     {% csrf_token %}
                                     <span>
                                         <input hidden name = "search_id" value = "{{curr_acc.account_id}}"></input>
                                         <input hidden name = "search_username" value = "{{curr_acc.username}}"></input>
                                         
                                         <span style="position: absolute; top:0; left:0;">
-                                            <img  src="{% static 'icons/cancel.png'%}"  width = 15px style="display: inline;" class = "close icon" onclick="var conf = confirm('Would you like to remove yourself from {{sf}} shared folder?'); if(conf){ document.getElementById('remove_collab_form{{account.account_id}}').submit()}">
+                                            <img  src="{% static 'icons/cancel.png'%}"  width = 15px style="display: inline;" class = "close icon" onclick="var conf = confirm('Would you like to remove yourself from {{sf}} shared folder?'); if(conf){ document.getElementById('remove_collab_form{{sf.id}}').submit()}">
                                         </span>
                                         <div onclick="window.location.href = '/shared_folder/{{sf.id}}/'">
                                             <p style="display: inline;">{{sf}}</p>

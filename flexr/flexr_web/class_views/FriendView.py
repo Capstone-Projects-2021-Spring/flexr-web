@@ -30,6 +30,10 @@ class FriendViewWeb(LoginRequiredMixin, DetailView):
         friend_acc_username = request.POST.get('search_username')
         print("FriendViewWeb: add_friend(): friend_acc_username: ", friend_acc_username)
         print("FriendViewWeb: add_friend : friend_acc_id: ",friend_acc_id)
+
+        if(user_account.friends.filter(account_id = friend_acc_id).count() > 0):
+            request.session['err_message'] = "You are already friends with that user"
+            return redirect(request.session['redirect_url'])
         try:
             friend_account = Account.objects.get(account_id=friend_acc_id, username = friend_acc_username)
             friend_request = Friendship.objects.get_or_create(sent=user_account, received=friend_account)
@@ -41,6 +45,9 @@ class FriendViewWeb(LoginRequiredMixin, DetailView):
             return redirect(request.session['redirect_url'])
 
     def deny_friend(self, request, pk):
+        if (Friendship.objects.filter(id=pk).count() == 0):
+            request.session['err_message'] = "Friendship doesn't exist"
+            return redirect(request.session['redirect_url'])
         friend_request = Friendship.objects.get(id=pk)
         friend_request.status = "Declined"
         friend_request.save()
@@ -48,6 +55,9 @@ class FriendViewWeb(LoginRequiredMixin, DetailView):
         return redirect(request.session['redirect_url'])
 
     def accept_friend(self, request, pk):
+        if (Friendship.objects.filter(id=pk).count() == 0):
+            request.session['err_message'] = "Friendship doesn't exist"
+            return redirect(request.session['redirect_url'])
         friend_request = Friendship.objects.get(id=pk)
         friend_request.status = "Accepted"
         friend_request.save()
@@ -56,6 +66,9 @@ class FriendViewWeb(LoginRequiredMixin, DetailView):
 
     def remove_notif(self, request, pk):
         curr_account = request.user.accounts.get(account_id=request.session['account_id'])
+        if (curr_account.notifs.filter(id = pk) == 0):
+            request.session['message'] = "Notification no longer exists"
+            return redirect(request.session['redirect_url'])
         notif = curr_account.notifs.get(id=pk)
         curr_account.notifs.remove(notif)
         curr_account.save()

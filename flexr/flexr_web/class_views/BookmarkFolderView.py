@@ -103,6 +103,9 @@ class BookmarkFolderView(LoginRequiredMixin, View):
             return redirect('/bookmarks/')
         # get the current account and requested shared folder
         current_acc = request.user.accounts.get(account_id = request.session['account_id'])
+        if (current_acc.bookmark_folders.filter(id = kwargs['pk']).count() == 0):
+            request.session['err_message'] = "Bookmark folder is not owned by you."
+            return redirect('/bookmarks/')
         bookmark_folder = current_acc.bookmark_folders.get(id = kwargs['pk'])
         form = FilterBookmarkForm
         formb = EditBookmarkForm()

@@ -60,7 +60,7 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content" id = "edit_collabs_modal">
             <div class="modal-header">
-                <h5 class="modal-title" id="edit_collabsLabel">Add a friend</h5>
+                <h5 class="modal-title" id="edit_collabsLabel">Add collaborators!</h5>
                 <img data-dismiss="modal" class = "icon close" src = "{% static 'icons/cancel.png' %}" width=20px>
                 </button>
             </div>
@@ -115,7 +115,7 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content" id = "edit_collabs_modal">
             <div class="modal-header">
-                <h5 class="modal-title" id="add_tab_sfLabel">Add notes</h5>
+                <h5 class="modal-title" id="add_tab_sfLabel">Add tabs!</h5>
                 <img data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
                 </button>
             </div>
@@ -189,7 +189,7 @@
                                     <form  method="post" action = "/shared_folder/{{shared_folder.id}}/add_bookmark/" id = "add_bm_form{{bm.id}}">
                                         {% csrf_token %}
                                         <input hidden name = "bm_id" value = "{{bm.id}}"></input>
-                                        <p style="display: inline;">{{bm}}{{bm.id}}</p>
+                                        <p style="display: inline;">{{bm}}</p>
                                         <img  class = "icon" src="{% static 'icons/plus.png'%}"  width = 20px style="display: inline;" id = "add-user" onclick="document.getElementById('add_bm_form{{bm.id}}').submit()">
                                         </script>
                                     </form>
@@ -226,7 +226,6 @@
                                 <p onclick="window.open('{{tab.site.url}}')" style="display: inline;">{{tab.site}}</p>
                             </form>
                         </div>
-
                         <script>
                         </script>
 
@@ -257,7 +256,7 @@
     </div>
 
     <div class="bm-tabs row justify-content-center">
-        <div id = "tabs" class="card col-lg-4">
+        <div id = "tabs" class="card col-md-12" style="width: 85% !important;">
             <div class = "card-header sticky-top">
                 <h2 style="display:inline">Notes</h2><img id="plus-icon" class="plus-icon" width = 20px; data-toggle="modal" data-target="#add_note_sf" src="{% static 'icons/plus.png' %}">
             </div>

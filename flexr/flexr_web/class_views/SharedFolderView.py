@@ -33,6 +33,10 @@ class SharedFolderView(LoginRequiredMixin, View):
         if (sharedFolder.objects.filter(id=kwargs['pk']).count() == 0):
             request.session['err_message'] = "Folder does not exist"
             return redirect('/shared_folders/')
+        if (current_acc.collab_shared_folders.filter(id = kwargs['pk']).count() == 0):
+            request.session['err_message'] = "You are not a collaborator on that shared folder"
+            return redirect('/shared_folders/')
+          
         shared_folder = current_acc.collab_shared_folders.get(id = kwargs['pk'])
 
         # grab attributes for the shared folder
@@ -44,6 +48,11 @@ class SharedFolderView(LoginRequiredMixin, View):
         #print(tabs)
         bookmarks = shared_folder.bookmarks.all()
         notes = shared_folder.notes.all()
+
+        for x in notes:
+            request.session['note_'+str(x.id)] = []
+            for j in collaborators:
+                request.session['note_'+str(x.id)].append(j.account_id)
 
         # Edit shared folder form
         form = EditSharedFolder()
