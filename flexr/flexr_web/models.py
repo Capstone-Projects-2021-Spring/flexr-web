@@ -325,9 +325,12 @@ class Bookmark(models.Model):
         return str(self.bookmark_name)
 
     @classmethod
-    def create_bookmark(cls, site, curr_account, last_visited=None):
+    def create_bookmark(cls, site, curr_account, last_visited=None, name=None):
         # try:
-        bm = Bookmark.objects.create(account = curr_account, bookmark_name = site.name, site=site)
+        if name:
+            bm = Bookmark.objects.create(account = curr_account, bookmark_name = name, site=site)
+        else:
+            bm = Bookmark.objects.create(account = curr_account, bookmark_name = site.name, site=site)
         bm.save()
         site.bookmarked = bm.id
         print("Model: Bookmark.create_bookmark(): bm: ", bm)
