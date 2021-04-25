@@ -98,7 +98,9 @@ class BookmarkFolderView(LoginRequiredMixin, View):
         """
         Display a single shared folder
         """
-  
+        if (bookmarkFolder.objects.filter(id = kwargs['pk']).count() == 0):
+            request.session['err_message'] = "Folder does not exist"
+            return redirect('/bookmarks/')
         # get the current account and requested shared folder
         current_acc = request.user.accounts.get(account_id = request.session['account_id'])
         if (current_acc.bookmark_folders.filter(id = kwargs['pk']).count() == 0):
@@ -159,6 +161,10 @@ class BookmarkFolderView(LoginRequiredMixin, View):
         return redirect(request.session['redirect_url'])
           
     def edit_bookmark_folder(self, request, *args, **kwargs):
+        if (bookmarkFolder.objects.filter(id = kwargs['pk']).count() == 0):
+            request.session['err_message'] = "Folder does not exist"
+            return redirect('/bookmarks/')
+
         current_acc = request.user.accounts.get(account_id=request.session['account_id'])
         bookmark_folder = current_acc.bookmark_folders.get(id=kwargs['pk'])
         """
@@ -186,16 +192,19 @@ class BookmarkFolderView(LoginRequiredMixin, View):
         return redirect(request.session['redirect_url'])
 
     def delete_bookmark_folder_web(self, request, *args, **kwargs):
+        if (bookmarkFolder.objects.filter(id = kwargs['pk']).count() == 0):
+            request.session['err_message'] = "Folder does not exist"
+            return redirect('/bookmarks/')
         current_acc = request.user.accounts.get(account_id = request.session['account_id'])
         obj = current_acc.bookmark_folders.get(id=kwargs['pk'])
-            # delete note object
         obj.delete()
-
-            # return to notes page
         return redirect('/bookmarks')
 
     def remove_from_folder(self, request, *args, **kwargs):
         current_acc = request.user.accounts.get(account_id = request.session['account_id'])
+        if (bookmarkFolder.objects.filter(id = kwargs['pk']).count() == 0):
+            request.session['err_message'] = "Folder does not exist"
+            return redirect('/bookmarks/')
         folder = current_acc.bookmark_folders.get(id=kwargs['id'])
 
         bookmarks = folder.bookmarks
