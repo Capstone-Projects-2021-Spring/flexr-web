@@ -39,14 +39,14 @@
                 <div class="row">
                         <div class= "">
                             <h3 style="display:inline;" >Folders</h3>
-                            <img style="display:inline; width: 20px !important;"  id="plus-icon" data-toggle="modal" data-target="#add_bookmark_folder" class = "icon" src="{% static 'icons/plus.png' %}">
+                            <img style="display:inline; width: 20px !important;"  id="plus-icon" data-toggle="modal" data-target="#add_bookmark_folder" class = "icon" src="{% static 'icons/add_folder.png' %}">
                         </div>
                         
                         <div class="card-body justify-content-center">
                             {%for folder in Folders%}
                                 <div id = "bmf" class = "folder card col-md-12" style="height: auto;" >
                                     <img class="close icon" onclick=" var conf = confirm('Do you want to delete this bookmark folder?'); if(conf){ window.location.href = '/delete_bookmark_folder/{{folder.id}}/'}" src="{% static 'icons/cancel.png' %}" width= 15px>
-                                    <h4 style="cursor: pointer;" onclick="window.location.href = '/bookmark_folder/{{folder.id}}'">{{folder.title}}</h4>
+                                    <h4 style="cursor: pointer;" onclick="window.location.href = '/bookmark_folder/{{folder.id}}'" style="display: inline;">{{folder.title}}</h4>
                                     <p>{{folder.bookmarks.all|length}} bookmarks</p>
                                     <!-- <p><a href="{% url 'delete-bookmark-folder' folder.pk%}">Delete Folder</a></p> -->
                                     <br>

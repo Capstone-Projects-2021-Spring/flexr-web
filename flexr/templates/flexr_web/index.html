@@ -3,7 +3,7 @@
 <head>
     {% load static %}
     <meta charset="UTF-8">
-    <title>Flexr | Home This is testing how long these can be Flexr | Home This is testing how long these can be Flexr | Home This is testing how long these can be Flexr | Home This is testing how long these can be Flexr | Home This is testing how long these can be Flexr | Home This is testing how long these can be Flexr | Home This is testing how long these can be</title>
+    <title>Flexr | Home</title>
 
     <script>
         async function switch_account(id){
@@ -50,7 +50,7 @@
                 <div class = "card-header sticky-top">
                     <h2 style="display:inline">Tabs</h2>
                     <img id="plus-icon" class="plus-icon icon" width = 20px; data-toggle="modal" data-target="#add_tab" src="{% static 'icons/plus.png' %}"> 
-                    <button onclick="window.location.href = '/open_abs/'" style="position: absolute; right: 0; top: 0; margin-top: 2.5%; margin-right: 2.5%;" class="btn btn-primary">View all</button>
+                    <button onclick="window.location.href = '/open_tabs/'" style="position: absolute; right: 0; top: 0; margin-top: 2.5%; margin-right: 2.5%;" class="btn btn-primary">View all</button>
                 </div>
                 <div class="card-body justify-content-center row">
                     {%for tab in Tabs%}

@@ -207,11 +207,9 @@
           <div class="modal-body">
               <form method = "post" action="{% url 'add tab' %}">
                   {% csrf_token %}
-                  <label for = "url">URL</label>
-                  <input type="url" id = "url" name = "url">
-                  <div class="modal-footer">      
-                    <button type="submit" class="btn btn-primary">Add tab</button>
-                  </div>
+                  <label for = "url">URL: </label>
+                  <input type="url" id = "url" name = "url" style="padding-bottom: 2.5%;">   
+                  <button type="submit" class="btn btn-primary">Add tab</button>
               </form>
           </div>
           </div>

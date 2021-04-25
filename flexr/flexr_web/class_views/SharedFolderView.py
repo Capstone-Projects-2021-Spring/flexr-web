@@ -29,6 +29,9 @@ class SharedFolderView(LoginRequiredMixin, View):
 
         # get the current account and requested shared folder
         current_acc = self.request.user.accounts.get(account_id = self.request.session['account_id'])
+        if (current_acc.collab_shared_folders.filter(id = kwargs['pk']).count() == 0):
+            request.session['err_message'] = "You are not a collaborator on that shared folder"
+            return redirect('/shared_folders/')
         shared_folder = current_acc.collab_shared_folders.get(id = kwargs['pk'])
 
         # grab attributes for the shared folder
@@ -40,6 +43,11 @@ class SharedFolderView(LoginRequiredMixin, View):
         #print(tabs)
         bookmarks = shared_folder.bookmarks.all()
         notes = shared_folder.notes.all()
+
+        for x in notes:
+            request.session['note_'+str(x.id)] = []
+            for j in collaborators:
+                request.session['note_'+str(x.id)].append(j.account_id)
 
         # Edit shared folder form
         form = EditSharedFolder()
