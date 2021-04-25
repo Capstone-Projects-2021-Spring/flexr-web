@@ -45,9 +45,9 @@ class AccountPreferencesAPIView(LoginRequiredMixin, DetailView):
         edit_home_url = request_data['home_page_url']
         print("AccountPreferencesAPIView: put(): edit_home_url: ",edit_home_url)
         if(curr_acc.sites.filter(url = edit_home_url).count() > 0):
-            edit_home_site = curr_acc.sites.get(url = edit_home_url)
+            edit_home_site = curr_acc.sites.filter(url = edit_home_url)
         else:
-            edit_home_site = Site.objects.all(account = curr_acc, url = edit_home_url)
+            edit_home_site = Site.objects.filter(account = curr_acc, url = edit_home_url)
         print("AccountPreferencesAPIView: put(): edit_home_site: ", edit_home_site)
         acc_pref.home_page = edit_home_site[0]
         acc_pref.sync_enabled = request_data['sync_enabled']
