@@ -31,9 +31,6 @@ class BookmarkFolderView(LoginRequiredMixin, View):
         # get current user and current account
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
-        if (bookmarkFolder.objects.filter(id = kwargs['pk']).count() == 0):
-            request.session['err_message'] = "Folder does not exist"
-            return redirect('/bookmarks/')
         bookmark_folder = curr_account.bookmark_folders.get(id = kwargs['pk'])
 
         # get all user's accounts
@@ -197,10 +194,7 @@ class BookmarkFolderView(LoginRequiredMixin, View):
             return redirect('/bookmarks/')
         current_acc = request.user.accounts.get(account_id = request.session['account_id'])
         obj = current_acc.bookmark_folders.get(id=kwargs['pk'])
-            # delete note object
         obj.delete()
-
-            # return to notes page
         return redirect('/bookmarks')
 
     def remove_from_folder(self, request, *args, **kwargs):
