@@ -302,7 +302,6 @@ class FriendsTest(TestCase):
             print(x.account_id, " = ", x.mutual_friends.all())
 
 class NoteTestCase(TestCase):
-
     def setUp(self):
         test_user = User.objects.create(first_name="Al", last_name="Annon", username="annon1234",
                                         email="anon@gmail.com")
