@@ -106,7 +106,13 @@ class EditBookmarkForm(ModelForm):
     class Meta:
         model = bookmarkFolder
         # Make homepage a url field? may need to apppend https://www.
-        fields = ('title', 'bookmarks')
+        fields = ('title',)
+
+class EditBookmarksFolderForm(ModelForm):
+    class Meta:
+        model = bookmarkFolder
+        # Make homepage a url field? may need to apppend https://www.
+        fields = ('bookmarks',)
 
 class CreateNoteForm(ModelForm):
 

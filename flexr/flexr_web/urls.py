@@ -59,7 +59,10 @@ urlpatterns = [
     path('bookmark_folder/<int:pk>/', BookmarkFolderView.as_view(), name='bookmark-folder-detail'),
     path('delete_bookmark_folder/<int:pk>/', BookmarkFolderView().delete_bookmark_folder_web, name='delete-bookmark-folder'),
     path('edit_bookmark_folder/<int:pk>', BookmarkFolderView().edit_bookmark_folder, name='edit_bookmark_folder'),
-    path('remove_from_folder/<int:pk>/<int:id>/', BookmarkFolderView().remove_from_folder, name='remove_from_folder'),
+                        #bookmark id / bookmark_folder_pk
+    path('remove_from_folder/<int:id>/<int:pk>/', BookmarkFolderView().remove_from_folder, name='remove_from_folder'),
+    path('bookmark_folder/<id>/add_bookmark/', BookmarkFolderView().add_bookmark, name = "add bookmark bookmark"),
+
 
     path('shared_folders/', SharedFoldersView.as_view(), name = "shared folders"),
     path('add_shared_folder/', SharedFoldersView().create_shared_folder, name = "add shared folder"),

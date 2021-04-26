@@ -100,5 +100,34 @@
                     </div>
                 </div>
             </div>
+        <div class="modal fade" id="add_bm" tabindex="-1" role="dialog" aria-labelledby="add_bmLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content" id = "edit_collabs_modal">
+        <div class="modal-header">
+            <h5 class="modal-title" id="add_bmLabel">Add bookmarks!</h5>
+            <img type="button" class = "icon" data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
+            </button>
+        </div>
+        <div class="modal-body">
+                <div class = "add_friend">
+                    <div class = "row justify-content-center">
+                        <div class="col-md-12">
+                            {% for bm in myBookmarks%}
+                            <form  method="post" action = "/bookmark_folder/{{bookmark_folder.id}}/add_bookmark/" id = "add_bm_form{{bm.id}}">
+                                {% csrf_token %}
+                                    <input hidden name = "bm_id" value = "{{bm.id}}"></input>
+                                    <p style="display: inline;">{{bm}}{{bm.id}}</p>
+                                    <img  class = "icon" src="{% static 'icons/plus.png'%}"  width = 20px style="display: inline;" id = "add-user" onclick="document.getElementById('add_bm_form{{bm.id}}').submit()">
+                                    </script>
+                                </form>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

@@ -301,3 +301,31 @@ class FriendsTest(TestCase):
         for x in Account.objects.all():
             print(x.account_id, " = ", x.mutual_friends.all())
 
+class NoteTestCase(TestCase):
+    def setUp(self):
+        test_user = User.objects.create(first_name="Al", last_name="Annon", username="annon1234",
+                                        email="anon@gmail.com")
+        test_user.save()
+        test_acc = Account.objects.create(user=test_user, email=test_user.email, phone_number="5704600704",
+                                          type_of_account="Business")
+        test_acc.save()
+        test_note = Note.objects.create(account=test_acc, title="Test Note", content="Note")
+        test_note.save()
+
+    def test_note_created(self):
+        test_acc = Account.objects.get(email = "anon@gmail.com")
+        note_count = test_acc.notes.all().count()
+        self.assertEqual(note_count, 1)
+
+    def test_create_another_note(self):
+        test_acc = Account.objects.get(email = "anon@gmail.com")
+        note2 = Note.objects.create(account=test_acc, title="Test Note2", content="Note2")
+        note2.save()
+        note_count = test_acc.notes.all().count()
+        self.assertEqual(note_count, 2, "Create another note success")
+
+    def test_notes_delete(self):
+        test_acc = Account.objects.get(email="anon@gmail.com")
+        test_acc.notes.all().delete()
+        note_count = test_acc.notes.all().count()
+        self.assertEqual(note_count, 0)
