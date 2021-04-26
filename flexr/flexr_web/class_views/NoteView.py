@@ -27,9 +27,20 @@ class NoteView(LoginRequiredMixin, View):
         # get current user and current account
         curr_user = self.request.user
         curr_account = curr_user.accounts.get(account_id=self.request.session['account_id'])
-
-        # get requested note object and all accounts for user
         obj = Note.objects.get(pk=kwargs['pk'])
+        if(curr_account.notes.filter(id = kwargs['pk']).count() == 0):
+            if('note_'+str(obj.id) not in request.session):
+                request.session['err_message'] = "You do not have access to this note."
+                return redirect('/notes/')
+            if(curr_account.account_id not in request.session['note_'+str(obj.id) ]):
+                request.session['err_message'] = "You do not have access to this note."
+                return redirect('/notes/')
+        # get requested note object and all accounts for user
+        if (Note.objects.filter(id = kwargs['pk']).count() == 0):
+            request.session['err_message'] = "Note does not exist"
+            return redirect('/notes/')
+
+     
         accounts = curr_user.accounts.all()
 
         # get form object and initialize it with data
@@ -79,6 +90,9 @@ class NoteView(LoginRequiredMixin, View):
         # get form object on the page
         form = EditNoteForm(request.POST)
         # check if form is valid
+        if (Note.objects.filter(id = kwargs['pk']).count() == 0):
+            request.session['err_message'] = "Note does not exist"
+            return redirect('/notes/')
         if form.is_valid():
             
             # get current account
@@ -131,9 +145,13 @@ class NoteView(LoginRequiredMixin, View):
         # get current account
         current_acc = request.user.accounts.get(account_id = request.session['account_id'])
 
+        if (Note.objects.filter(id=kwargs['pk']).count() == 0):
+            request.session['err_message'] = "Note does not exist"
+            return redirect('/notes/')
+
         # grab stored password and requested note
         form_password = request.POST.get('password')
-        note = current_acc.notes.get(pk = kwargs['pk'])
+        note = Note.objects.get(pk = kwargs['pk'])
 
         # check that password is correct
         # and setup request message for debugging

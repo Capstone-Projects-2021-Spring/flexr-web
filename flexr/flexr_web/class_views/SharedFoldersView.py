@@ -28,7 +28,6 @@ class SharedFoldersView(LoginRequiredMixin, View):
 
         # get all folders for the current account
         folders = curr_account.collab_shared_folders.all()
-
         # created a shared folder and populate its attributes
         folder_form = EditSharedFolder()
         friends = curr_account.friends.all()
@@ -86,6 +85,12 @@ class SharedFoldersView(LoginRequiredMixin, View):
         return redirect(request.session['redirect_url'])
 
     def delete_shared_folder(self,request, *args, **kwargs):
+        if (sharedFolder.objects.filter(id=kwargs['pk']).count() == 0):
+            request.session['err_message'] = "Folder does not exist"
+            return redirect('/shared_folders/')
+        # if (sharedFolder.objects.filter(id = kwargs['pk']).count() == 0):
+        #     request.session['err_message'] = "Folder does not exist"
+        #     return redirect('shared_folders/')
         print("SharedFoldersView: delete_shared_folder(): shared_folder", sharedFolder.objects.get(pk=kwargs['pk']))
         my = sharedFolder.objects.get(pk=kwargs['pk'])
         my.delete()

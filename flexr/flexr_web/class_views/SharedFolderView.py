@@ -29,6 +29,14 @@ class SharedFolderView(LoginRequiredMixin, View):
 
         # get the current account and requested shared folder
         current_acc = self.request.user.accounts.get(account_id = self.request.session['account_id'])
+        
+        if (sharedFolder.objects.filter(id=kwargs['pk']).count() == 0):
+            request.session['err_message'] = "Folder does not exist"
+            return redirect('/shared_folders/')
+        if (current_acc.collab_shared_folders.filter(id = kwargs['pk']).count() == 0):
+            request.session['err_message'] = "You are not a collaborator on that shared folder"
+            return redirect('/shared_folders/')
+          
         shared_folder = current_acc.collab_shared_folders.get(id = kwargs['pk'])
 
         # grab attributes for the shared folder
@@ -40,6 +48,11 @@ class SharedFolderView(LoginRequiredMixin, View):
         #print(tabs)
         bookmarks = shared_folder.bookmarks.all()
         notes = shared_folder.notes.all()
+
+        for x in notes:
+            request.session['note_'+str(x.id)] = []
+            for j in collaborators:
+                request.session['note_'+str(x.id)].append(j.account_id)
 
         # Edit shared folder form
         form = EditSharedFolder()
@@ -134,6 +147,10 @@ class SharedFolderView(LoginRequiredMixin, View):
     def remove_collaborator(self, request, *args, **kwargs):
         user_account = request.user.accounts.get(account_id=request.session['account_id'])
         collab_id = request.POST.get('search_id')
+        if(user_account.shared_folders.filter(id = kwargs['id']).count() == 0):
+            request.session['err_message'] = "Shared folder does not exist"
+            return redirect(request.session['redirect_url'])
+
         shared_folder = sharedFolder.objects.get(id = kwargs['id'])
         print("SharedFolderView: remove_collaborator(): collab_id: ", collab_id)
         collab_acc_username = request.POST.get('search_username')
@@ -162,6 +179,11 @@ class SharedFolderView(LoginRequiredMixin, View):
         user_account = request.user.accounts.get(account_id=request.session['account_id'])
         note_id = request.POST.get('note_id')
         shared_folder = sharedFolder.objects.get(id = kwargs['id'])
+        # Some version if this error checking needs to be implemented at some point:
+        # if (Note.objects.filter(id=kwargs['id']).count() == 0): 
+        #     request.session['err_message'] = "Note does not exist"
+        #     return redirect(request.session['redirect_url'])
+
         note = Note.objects.get(id = note_id)
         shared_folder.notes.add(note)
         request.session['message'] = "Note added!"
@@ -171,6 +193,10 @@ class SharedFolderView(LoginRequiredMixin, View):
         user_account = request.user.accounts.get(account_id=request.session['account_id'])
         note_id = request.POST.get('note_id')
         shared_folder = sharedFolder.objects.get(id = kwargs['id'])
+        if (Note.objects.filter(id=kwargs['id']).count() == 0):
+            request.session['err_message'] = "Note does not exist"
+            return redirect(request.session['redirect_url'])
+        
         note = Note.objects.get(id = note_id)
         shared_folder.notes.remove(note)
         request.session['message'] = "Note removed!"
@@ -180,6 +206,10 @@ class SharedFolderView(LoginRequiredMixin, View):
         user_account = request.user.accounts.get(account_id=request.session['account_id'])
         tab_id = request.POST.get('tab_id')
         shared_folder = sharedFolder.objects.get(id = kwargs['id'])
+        
+        # if (Tab.objects.filter(id=kwargs['id']).count() == 0):
+        #     request.session['err_message'] = "Tab does not exist"
+        #     return redirect(request.session['redirect_url'])
         tab = Tab.objects.get(id = tab_id)
         shared_folder.tabs.add(tab)
         request.session['message'] = "Tab added!"
@@ -189,6 +219,9 @@ class SharedFolderView(LoginRequiredMixin, View):
         user_account = request.user.accounts.get(account_id=request.session['account_id'])
         tab_id = request.POST.get('tab_id')
         shared_folder = sharedFolder.objects.get(id = kwargs['id'])
+        # if (Tab.objects.filter(id=kwargs['id']).count() == 0):
+        #     request.session['err_message'] = "Tab does not exist"
+        #     return redirect(request.session['redirect_url'])
         tab = Tab.objects.get(id = tab_id)
         shared_folder.tabs.remove(tab)
         request.session['message'] = "Tab removed!"
@@ -199,6 +232,9 @@ class SharedFolderView(LoginRequiredMixin, View):
         bm_id = request.POST.get('bm_id')
         shared_folder = sharedFolder.objects.get(id = kwargs['id'])
         bm = Bookmark.objects.get(id = bm_id)
+        # if (Bookmark.objects.filter(id=kwargs['id']).count() == 0):
+        #     request.session['err_message'] = "Bookmark does not exist"
+        #     return redirect('/shared_folders/')
         shared_folder.bookmarks.add(bm)
         request.session['message'] = "Bookmark added!"
         return redirect(request.session['redirect_url'])
@@ -207,6 +243,9 @@ class SharedFolderView(LoginRequiredMixin, View):
         user_account = request.user.accounts.get(account_id=request.session['account_id'])
         bm_id = request.POST.get('bm_id')
         shared_folder = sharedFolder.objects.get(id = kwargs['id'])
+        # if (Bookmark.objects.filter(id=kwargs['id']).count() == 0):
+        #     request.session['err_message'] = "Bookmark does not exist"
+        #     return redirect('/shared_folders/')
         bm = Bookmark.objects.get(id = bm_id)
         shared_folder.bookmarks.remove(bm)
         request.session['message'] = "Bookmark removed!"
@@ -253,7 +292,6 @@ class FoldersViewAPI(LoginRequiredMixin, DetailView):
             note = Note.objects.get(id = nt_id)
             shared_folder.notes.add(note)
         shared_folder.save()
-        # shared_folder.update(**data)
         data = SharedFolderSerializer(shared_folder)
         return JsonResponse(data.data, safe=False)
 

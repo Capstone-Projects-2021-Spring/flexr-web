@@ -190,7 +190,7 @@ class AccountViewAPI(LoginRequiredMixin, DetailView):
             curr_user = request.user
             data = json.loads(request.body)
 
-            new_account = Account.objects.create(user = curr_user, **data)
+            new_account = Account.objects.create(user = curr_user, )
             new_account.save()
             data = AccountSerializer(new_account)
             return JsonResponse(data.data, safe=False)

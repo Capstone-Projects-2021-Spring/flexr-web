@@ -144,6 +144,9 @@ class BookmarksView(LoginRequiredMixin, View):
         accounts = curr_user.accounts.all()
         tabs = curr_account.tabs.all()
 
+        if (curr_account.tabs.filter(id=kwargs['id']).count() == 0):
+            request.session['err_message'] = "Tab does not exist"
+            return redirect(request.session['redirect_url'])
         # get requested tab object
         tab = curr_account.tabs.get(pk = kwargs['id'])
 
@@ -155,15 +158,20 @@ class BookmarksView(LoginRequiredMixin, View):
         # go to open_tabs page
         return redirect(request.session['redirect_url'])
 
-
     def delete_bookmark(self, request, *args, **kwargs):
         """
         Delete a bookmark from the current account
         """
 
         # get current user and current account
+
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+
+        if (curr_account.bookmarks.filter(id = kwargs['id']).count() == 0):
+            request.session['err_message'] = "Bookmark does not exist"
+            return redirect(request.session['redirect_url'])
+
         bm = curr_account.bookmarks.get(id = kwargs['id'])
         # delete requested bookmark
         Bookmark.delete_bookmark(kwargs['id'])
@@ -191,10 +199,15 @@ class BookmarksViewAPI(LoginRequiredMixin, DetailView):
 
         data = json.loads(request.body)
 
+        name = None
+
+        if 'bookmark_name' in data:
+            name = data['bookmark_name']
+
         if 'url' in data:
             site = Site.objects.get_or_create(account = curr_account, url = data['url'])[0]
             
-            bm = Bookmark.create_bookmark(site, curr_account)
+            bm = Bookmark.create_bookmark(site, curr_account, name=name)
             bookmark = Bookmark.objects.get(id = bm)
             data = BookmarkSerializer(bookmark)
         

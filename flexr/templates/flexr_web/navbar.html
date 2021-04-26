@@ -30,10 +30,10 @@
 <body>
   <div class="container-fluid" id="navDiv">
 
-  <nav class="navbar  navbar-expand-lg  bg-transparent">
+  <nav class="navbar navbar-expand-lg  bg-transparent">
     
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"> <i title="" class="fa fa-bars"></i></span>
+      <span class="navbar-toggler-icon">      <img src="{% static 'icons/menu.png' %}" width="20px" style="display: inline;  padding-bottom: 5%;"></span>
     </button>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -148,12 +148,16 @@
      
       <a class="navbar-brand" href="/"><img src="{% static 'flexr_light.png' %}" width="70%" style="padding-bottom: 8%;"></a>
       <h2 id = "sites-head">Suggested Sites</h2>
-      <div id = "sites_nav">
-        {%for site in Suggested_Sites%}
-                <div id = "acc" class = "col-lg-10" onclick="window.open('{{site.url}}'); ">
-                        <p>{{site.name}}</p>
-                </div>
-        {%endfor%}
+      <div id = "sites_nav" class="row justify-content-center" >
+        
+          {%for site in Suggested_Sites%}
+            <div id = "bookmark" class = "card col-md-10" style="height: auto; color: black;  box-shadow: 1px 2px 3px  hsl(202, 100%, 65%); margin-top: 4%; border: 1px solid white; background-color: white; font-size: small;" >
+              <p onclick="window.open('{{site.url}}')"  style="display: inline; margin-top: 2%;">
+                  {%if site.favicon_img_url != None%}
+                      <img class = "icon" src="{{ site.favicon_img_url }}" width="15px">
+                  {%endif%}{{site}}</p>
+            </div>
+          {%endfor%}
      </div>
     </div>
   </div>
@@ -164,7 +168,7 @@
         <div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title" id="add_accountLabel">Add an account!</h5>
-            <img type="button" class = "icon close" data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
+            <img class = "icon close" data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
             </button>
         </div>
         <div class="modal-body">
@@ -197,17 +201,15 @@
           <div class="modal-content">
           <div class="modal-header">
               <h5 class="modal-title" id="add_tabLabel">Add a tab!</h5>
-              <img type="button" data-dismiss="modal" class = "icon close" src = "{% static 'icons/cancel.png' %}" width=20px>
+              <img data-dismiss="modal" class = "icon close" src = "{% static 'icons/cancel.png' %}" width=20px>
               </button>
           </div>
           <div class="modal-body">
               <form method = "post" action="{% url 'add tab' %}">
                   {% csrf_token %}
-                  <label for = "url">URL</label>
-                  <input type="url" id = "url" name = "url">
-                  <div class="modal-footer">      
-                    <button type="submit" class="btn btn-primary">Add tab</button>
-                  </div>
+                  <label for = "url">URL: </label>
+                  <input type="url" id = "url" name = "url" style="padding-bottom: 2.5%;">   
+                  <button type="submit" class="btn btn-primary">Add tab</button>
               </form>
           </div>
           </div>
@@ -219,9 +221,9 @@
         <div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title" id="add_noteLabel">Add a note!</h5>
-            <img type="button" data-dismiss="modal" class = "icon close" src = "{% static 'icons/cancel.png' %}" width=20px>
-            </button>
+            <img data-dismiss="modal" class = "icon close" src = "{% static 'icons/cancel.png' %}" width=20px>
         </div>
+        
         <div class="modal-body">
                 <form method = "POST" action="{% url 'create_note' %}">
                     {% csrf_token %}
@@ -246,5 +248,37 @@
         </div>
     </div>
     </div>
+    <div class="modal fade" id="folder" tabindex="-1" role="dialog" aria-labelledby="folderLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+          <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="folderLabel">Create a shared folder</h5>
+              <img class = "icon" data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
+              </button>
+          </div>
+          <div class="modal-body">
+              <form method="post" action="/add_shared_folder/">
+                  {% csrf_token %}
+                      {% for field in folder_form %}
+                          <p>
+                              {{ field.label_tag }}<br>
+                              {{ field }}
+                              {% if field.help_text %}
+                                  <small style="color: grey">{{ field.help_text }}</small>
+                              {% endif %}
+                              {% for error in field.errors %}
+                                  <p style="color: red">{{ error }}</p>
+                              {% endfor %}
+                          </p>
+                      {% endfor %}
+
+                  <div class="modal-footer">
+                      <button type="submit" class="btn btn-primary">Create folder</button>
+                  </div>
+              </form>
+          </div>
+          </div>
+      </div>
+      </div>
 </body>
 </html>

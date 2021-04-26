@@ -17,8 +17,9 @@
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
 
 <div class = "body">
-    <div class = "main">
+    <div class = "">
         {%if locked%}
+        <div class="note_form">
             <h1>{{object.title}}</h1>
             <h2>This note is locked</h2>
             <form method = "POST" action="{% url 'unlock note' object.pk%}">
@@ -27,6 +28,7 @@
                     <input type="password" id = "password" name = "password">
                 <button type="submit" class="btn btn-primary">Unlock</button>
             </form>
+        </div>
         {%else%}
         <form method="POST" action="/edit_note/{{object.id}}/">
             <div class="note_form">
@@ -61,7 +63,7 @@
                 <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="edit_noteLabel">Edit a note!</h5>
-                    <img type="button" data-dismiss="modal" class = "icon close" src = "{% static 'icons/cancel.png' %}" width=20px>
+                    <img data-dismiss="modal" class = "icon close" src = "{% static 'icons/cancel.png' %}" width=20px>
                     </button>
                 </div>
                 <div class="modal-body">
