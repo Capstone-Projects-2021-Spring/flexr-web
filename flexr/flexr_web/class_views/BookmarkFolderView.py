@@ -109,15 +109,13 @@ class BookmarkFolderView(LoginRequiredMixin, View):
         bookmark_folder = current_acc.bookmark_folders.get(id = kwargs['pk'])
         form = FilterBookmarkForm
         formb = EditBookmarkForm()
-        formb.fields['bookmarks'].queryset = current_acc.bookmarks.all()
         formb.fields["title"].initial = bookmark_folder.title
-        formb.fields["bookmarks"].initial = bookmark_folder.bookmarks.all()
         # grab attributes for the shared folder
         owner = bookmark_folder.owner
         #CHANGE THIS TO NOT USE THE SHARED FOLDERS COLLABORATORS, this was written this way for testing the view method
-        #print(collaborators)
-        #print(tabs)
+
         bookmarks = bookmark_folder.bookmarks.all()
+        myBookmarks =current_acc.bookmarks.exclude(id__in = bookmarks)
 
         # if a tab, bookmark, note is in the shared folder. Then the way we have the api's set up the user that doesn't own the object will now not be able to view, edit, or delete the object
         # we may want to add a field to each object that says "shared"
@@ -129,6 +127,7 @@ class BookmarkFolderView(LoginRequiredMixin, View):
          {"bookmark_folder": bookmark_folder, 
           "formb": formb,
           "form": form,
+          "myBookmarks": myBookmarks,
           "Bookmarks": bookmarks})
 
     def create_bookmark_folder_web(self, request, *args, **kwargs):
@@ -177,16 +176,16 @@ class BookmarkFolderView(LoginRequiredMixin, View):
         # check if form is valid
         if form.is_valid():
 
-            bookmarkos = form.cleaned_data['bookmarks']
+            # bookmarkos = form.cleaned_data['bookmarks']
 
             # titleos = form.cleaned_data['title']
 
             bookmark_folder.title = request.POST.get("new_title")
             bookmark_folder.title = request.POST.get("new_description")
             bookmark_folder.title = request.POST.get('title')
-            bookmark_folder.bookmarks.set(bookmarkos)
+            # bookmark_folder.bookmarks.set(bookmarkos)
             tileo = form.cleaned_data['title']
-            descrippy = form.cleaned_data['bookmarks']
+            # descrippy = form.cleaned_data['bookmarks']
         bookmark_folder.save()
         request.session['message'] = "Bookmark edited"
         return redirect(request.session['redirect_url'])
@@ -199,6 +198,35 @@ class BookmarkFolderView(LoginRequiredMixin, View):
         obj = current_acc.bookmark_folders.get(id=kwargs['pk'])
         obj.delete()
         return redirect('/bookmarks')
+
+    def add_bookmark(self, request, *args, **kwargs):
+        user_account = request.user.accounts.get(account_id=request.session['account_id'])
+        bm_id = request.POST.get('bm_id')
+        bookmark_folder = bookmarkFolder.objects.get(id = kwargs['id'])
+        bm = Bookmark.objects.get(id = bm_id)
+        bookmark_folder.bookmarks.add(bm)
+        request.session['message'] = "Bookmark added!"
+        return redirect(request.session['redirect_url'])
+
+    # def edit_bookmark_folders_folder(self, request, *args, **kwargs):
+    #     current_acc = request.user.accounts.get(account_id=request.session['account_id'])
+    #     bookmark_folder = current_acc.bookmark_folders.get(id=kwargs['pk'])
+    #     """
+    #     """
+
+    #     form = EditBookmarksFolderForm(request.POST)
+    #     form.fields['bookmarks'].queryset = current_acc.bookmarks.all()
+    #     form.fields["bookmarks"].initial = bookmark_folder.bookmarks.all()
+    #     # check if form is valid
+    #     if form.is_valid():
+
+    #         bookmarkos = form.cleaned_data['bookmarks']
+
+    #         bookmark_folder.bookmarks.set(bookmarkos)
+    #         descrippy = form.cleaned_data['bookmarks']
+    #     bookmark_folder.save()
+    #     request.session['message'] = "Bookmark edited"
+    #     return redirect(request.session['redirect_url'])
 
     def remove_from_folder(self, request, *args, **kwargs):
         current_acc = request.user.accounts.get(account_id = request.session['account_id'])
