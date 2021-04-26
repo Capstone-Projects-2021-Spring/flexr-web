@@ -66,7 +66,7 @@ class FriendViewWeb(LoginRequiredMixin, DetailView):
 
     def remove_notif(self, request, pk):
         curr_account = request.user.accounts.get(account_id=request.session['account_id'])
-        if (curr_account.notifs.filter(id = pk) == 0):
+        if (curr_account.notifs.filter(id = pk).count() == 0):
             request.session['message'] = "Notification no longer exists"
             return redirect(request.session['redirect_url'])
         notif = curr_account.notifs.get(id=pk)
