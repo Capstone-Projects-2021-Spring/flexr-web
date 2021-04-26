@@ -9,7 +9,7 @@ window.onload = function () {
     let password = document.getElementById("password").value;
 
     async function login(){
-        let login_response = await fetch('http://127.0.0.1:8000/api/login/',
+        let login_response = await fetch('http://flexr.org/api/login/',
         {
             method: 'POST',
             headers: {
@@ -28,7 +28,7 @@ window.onload = function () {
         
 
 
-        let accounts_response = await fetch('http://127.0.0.1:8000/api/accounts/',
+        let accounts_response = await fetch('http://flexr.org/api/accounts/',
         {
             method: 'GET'
         })
@@ -44,7 +44,7 @@ window.onload = function () {
         accountid = accounts[0].account_id;
 
 
-        let switch_response = await fetch(`http://127.0.0.1:8000/api/account/${accountid}/switch/`,
+        let switch_response = await fetch(`http://flexr.org/api/account/${accountid}/switch/`,
         {
             method: 'GET'
         })
@@ -62,7 +62,7 @@ window.onload = function () {
     }
 
     async function check_status(){
-        let status_response = await fetch('http://127.0.0.1:8000/api/status/',
+        let status_response = await fetch('http://flexr.org/api/status/',
         {
             method: 'GET',
             
@@ -82,7 +82,7 @@ window.onload = function () {
         
 
 
-        let accounts_response = await fetch('http://127.0.0.1:8000/api/accounts/',
+        let accounts_response = await fetch('http://flexr.org/api/accounts/',
         {
             method: 'GET'
         })
@@ -98,7 +98,7 @@ window.onload = function () {
         accountid = accounts[0].account_id;
 
 
-        let switch_response = await fetch(`http://127.0.0.1:8000/api/account/${accountid}/switch/`,
+        let switch_response = await fetch(`http://flexr.org/api/account/${accountid}/switch/`,
         {
             method: 'GET'
         })
