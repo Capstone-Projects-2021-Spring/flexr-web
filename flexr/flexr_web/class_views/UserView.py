@@ -51,8 +51,6 @@ class UserAPIView(View):
                     print("UserAPIView: logout(): user", new_account, " Message: USER SIGNED UP")
                     data = AccountSerializer(new_account)
                     return JsonResponse(data.data, safe=False)
-
-                x
             return JsonResponse({"error": f"Error creating user"})
 
         except Exception as e:
