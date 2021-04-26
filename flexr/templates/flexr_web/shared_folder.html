@@ -127,7 +127,10 @@
                                     <form  method="post" action = "/shared_folder/{{shared_folder.id}}/add_tab/" id = "add_tab_form{{tab.id}}">
                                         {% csrf_token %}
                                         <input hidden name = "tab_id" value = "{{tab.id}}"></input>
-                                        <p style="display: inline;">{{tab}}</p>
+                                        <p onclick="window.open('{{tab.site.url}}')"  style="display: inline; margin-top: 2%;">
+                                    {%if tab.site.favicon_img_url != None%}
+                                        <img class = "icon" src="{{ tab.site.favicon_img_url }}" width="15px">
+                                    {%endif%}{{tab.site}}</p>
                                         <img class = "icon" src="{% static 'icons/plus.png'%}"  width = 20px style="display: inline;" id = "add-user" onclick="document.getElementById('add_tab_form{{tab.id}}').submit()">
                                     </form>
                                 {% endfor %}
@@ -224,6 +227,7 @@
                                 <img  class = "icon" src="{% static 'icons/cancel.png'%}"  width = 15px style="display: inline;" class="close" onclick="document.getElementById('remove_tab_form{{tab.id}}').submit()">
                                 <input hidden name = "tab_id" value = "{{tab.id}}"></input>
                                 <p onclick="window.open('{{tab.site.url}}')" style="display: inline;">{{tab.site}}</p>
+
                             </form>
                         </div>
                         <script>
