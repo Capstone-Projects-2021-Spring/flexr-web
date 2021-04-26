@@ -101,11 +101,13 @@ class BookmarkFolderView(LoginRequiredMixin, View):
         if (bookmarkFolder.objects.filter(id = kwargs['pk']).count() == 0):
             request.session['err_message'] = "Folder does not exist"
             return redirect('/bookmarks/')
+
         # get the current account and requested shared folder
         current_acc = request.user.accounts.get(account_id = request.session['account_id'])
         if (current_acc.bookmark_folders.filter(id = kwargs['pk']).count() == 0):
             request.session['err_message'] = "Bookmark folder is not owned by you."
             return redirect('/bookmarks/')
+
         bookmark_folder = current_acc.bookmark_folders.get(id = kwargs['pk'])
         form = FilterBookmarkForm
         formb = EditBookmarkForm()
@@ -117,8 +119,19 @@ class BookmarkFolderView(LoginRequiredMixin, View):
         #CHANGE THIS TO NOT USE THE SHARED FOLDERS COLLABORATORS, this was written this way for testing the view method
         #print(collaborators)
         #print(tabs)
-        bookmarks = bookmark_folder.bookmarks.all()
 
+        bookmarks = bookmark_folder.bookmarks.all()
+        myBookmarks = current_acc.bookmarks.exclude(id__in = bookmarks)
+
+        # request messages for debugging
+        if ('message' in self.request.session):
+            message = self.request.session['message']
+            del self.request.session['message']
+            messages.success(self.request, message)
+        elif ('err_message' in self.request.session):
+            message = self.request.session['err_message']
+            del self.request.session['err_message']
+            messages.error(self.request, message)
         # if a tab, bookmark, note is in the shared folder. Then the way we have the api's set up the user that doesn't own the object will now not be able to view, edit, or delete the object
         # we may want to add a field to each object that says "shared"
 
@@ -126,10 +139,11 @@ class BookmarkFolderView(LoginRequiredMixin, View):
         request.session['redirect_url'] = '/bookmark_folder/' + str(kwargs['pk'])
         # display the page
         return render(request, "flexr_web/bookmark_folder.html",
-         {"bookmark_folder": bookmark_folder, 
+         {"bookmark_folder": bookmark_folder,
           "formb": formb,
           "form": form,
-          "Bookmarks": bookmarks})
+          "Bookmarks": bookmarks,
+          "myBookmarks": myBookmarks})
 
     def create_bookmark_folder_web(self, request, *args, **kwargs):
     
@@ -202,17 +216,23 @@ class BookmarkFolderView(LoginRequiredMixin, View):
 
     def remove_from_folder(self, request, *args, **kwargs):
         current_acc = request.user.accounts.get(account_id = request.session['account_id'])
-        if (bookmarkFolder.objects.filter(id = kwargs['pk']).count() == 0):
+        if (current_acc.bookmark_folders.filter(id = kwargs['pk']).count() == 0):
             request.session['err_message'] = "Folder does not exist"
             return redirect('/bookmarks/')
-        folder = current_acc.bookmark_folders.get(id=kwargs['id'])
 
-        bookmarks = folder.bookmarks
+        if(current_acc.bookmarks.filter(id = kwargs['id']).count() == 0):
+            request.session['err_message'] = "Bookmark does not exist"
+            return redirect(request.session['redirect_url'])
+
+        folder = current_acc.bookmark_folders.get(id=kwargs['pk'])
+        bookmark = current_acc.bookmarks.get(id = kwargs['id'])
+        folder.bookmarks.remove(bookmark)
         # print(kwargs["pk"])
         # print(folder.id)
         # print('deleting')
-        bookmarks.set(bookmarks.filter(~Q(pk = kwargs["pk"])))
+        # bookmarks.set(bookmarks.filter(~Q(pk = kwargs["pk"])))
         # bookmarks.exclude(pk = kwargs["pk"]).update()
+        request.session['message'] = "Bookmark removed"
         return redirect(request.session['redirect_url'])
 
 @method_decorator(csrf_exempt, name='dispatch')
