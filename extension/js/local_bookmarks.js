@@ -30,10 +30,10 @@ window.onload = function () {
                 chromeBookmarks.push(bookmark)
 
                 var parent = document.createElement('p');
-                button = document.createElement('img').style.cursor = "pointer";
+                button = document.createElement('img');
                 button.setAttribute('src', 'icons/plus.png');
                 button.setAttribute('width', '20px');
-                button.setAttribute('class','plus_icon')
+                button.setAttribute('class','plus_icon');
                 button.style.cursor = "pointer";
 
 
