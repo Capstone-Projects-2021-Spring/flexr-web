@@ -180,7 +180,7 @@ class SharedFolderView(LoginRequiredMixin, View):
         note_id = request.POST.get('note_id')
         shared_folder = sharedFolder.objects.get(id = kwargs['id'])
         # Some version if this error checking needs to be implemented at some point:
-        # if (Note.objects.filter(id=kwargs['id']).count() == 0): 
+        # if (Note.objects.filter(id=kwargs['id']).count() == 0):
         #     request.session['err_message'] = "Note does not exist"
         #     return redirect(request.session['redirect_url'])
 
@@ -193,7 +193,7 @@ class SharedFolderView(LoginRequiredMixin, View):
         user_account = request.user.accounts.get(account_id=request.session['account_id'])
         note_id = request.POST.get('note_id')
         shared_folder = sharedFolder.objects.get(id = kwargs['id'])
-        if (Note.objects.filter(id=kwargs['id']).count() == 0):
+        if (Note.objects.filter(id=note_id).count() == 0):
             request.session['err_message'] = "Note does not exist"
             return redirect(request.session['redirect_url'])
         
@@ -207,9 +207,10 @@ class SharedFolderView(LoginRequiredMixin, View):
         tab_id = request.POST.get('tab_id')
         shared_folder = sharedFolder.objects.get(id = kwargs['id'])
         
-        # if (Tab.objects.filter(id=kwargs['id']).count() == 0):
-        #     request.session['err_message'] = "Tab does not exist"
-        #     return redirect(request.session['redirect_url'])
+        if (Tab.objects.filter(id=tab_id).count() == 0):
+            request.session['err_message'] = "Tab does not exist"
+            return redirect(request.session['redirect_url'])
+
         tab = Tab.objects.get(id = tab_id)
         shared_folder.tabs.add(tab)
         request.session['message'] = "Tab added!"
@@ -219,9 +220,10 @@ class SharedFolderView(LoginRequiredMixin, View):
         user_account = request.user.accounts.get(account_id=request.session['account_id'])
         tab_id = request.POST.get('tab_id')
         shared_folder = sharedFolder.objects.get(id = kwargs['id'])
-        # if (Tab.objects.filter(id=kwargs['id']).count() == 0):
-        #     request.session['err_message'] = "Tab does not exist"
-        #     return redirect(request.session['redirect_url'])
+        if (Tab.objects.filter(id=tab_id).count() == 0):
+            request.session['err_message'] = "Tab does not exist"
+            return redirect(request.session['redirect_url'])
+
         tab = Tab.objects.get(id = tab_id)
         shared_folder.tabs.remove(tab)
         request.session['message'] = "Tab removed!"
@@ -232,9 +234,10 @@ class SharedFolderView(LoginRequiredMixin, View):
         bm_id = request.POST.get('bm_id')
         shared_folder = sharedFolder.objects.get(id = kwargs['id'])
         bm = Bookmark.objects.get(id = bm_id)
-        # if (Bookmark.objects.filter(id=kwargs['id']).count() == 0):
-        #     request.session['err_message'] = "Bookmark does not exist"
-        #     return redirect('/shared_folders/')
+        if (Bookmark.objects.filter(id=bm_id).count() == 0):
+            request.session['err_message'] = "Bookmark does not exist"
+            return redirect('/shared_folders/')
+
         shared_folder.bookmarks.add(bm)
         request.session['message'] = "Bookmark added!"
         return redirect(request.session['redirect_url'])
@@ -243,9 +246,10 @@ class SharedFolderView(LoginRequiredMixin, View):
         user_account = request.user.accounts.get(account_id=request.session['account_id'])
         bm_id = request.POST.get('bm_id')
         shared_folder = sharedFolder.objects.get(id = kwargs['id'])
-        # if (Bookmark.objects.filter(id=kwargs['id']).count() == 0):
-        #     request.session['err_message'] = "Bookmark does not exist"
-        #     return redirect('/shared_folders/')
+        if (Bookmark.objects.filter(id=bm_id).count() == 0):
+            request.session['err_message'] = "Bookmark does not exist"
+            return redirect('/shared_folders/')
+
         bm = Bookmark.objects.get(id = bm_id)
         shared_folder.bookmarks.remove(bm)
         request.session['message'] = "Bookmark removed!"
