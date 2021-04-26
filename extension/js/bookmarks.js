@@ -14,7 +14,7 @@ window.onload = function () {
     
 
     async function get_bookmarks(){
-        bookmarks_response = await fetch("http://127.0.0.1:8000/api/bookmarks/");
+        bookmarks_response = await fetch("http://flexr.org/api/bookmarks/");
 
         bookmarks = await bookmarks_response.json();
 
@@ -29,7 +29,6 @@ window.onload = function () {
             var linkText = document.createTextNode(bookmarks[i].url);
             a.appendChild(linkText);
             a.href = bookmarks[i].url;
-
             parent.appendChild(a);
             document.body.appendChild(parent);
         }

@@ -7,7 +7,7 @@ window.onload = function () {
     let bkg = chrome.extension.getBackgroundPage();
 
     async function logout(){
-        let logout_response = await fetch('http://127.0.0.1:8000/api/logout/',
+        let logout_response = await fetch('http://flexr.org/api/logout/',
         {
             method: 'GET',
             headers: {
@@ -28,7 +28,7 @@ window.onload = function () {
     }
 
     siteButton.onclick = function(){
-        window.open('http://127.0.0.1:8000', "_blank");
+        window.open('http://flexr.org', "_blank");
     }
 
     tabsButton.onclick = function(){
