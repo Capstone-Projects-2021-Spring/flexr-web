@@ -26,10 +26,10 @@
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
     <div class="body">
         <div class = "main">
-            <h1 style="display: inline;">Shared Folders </h1><img style = "padding-bottom: 1%;" width = 20px id = "add_folder_icon" src="{% static 'icons/plus.png'%}" class = "icon" data-toggle="modal" data-target="#folder">
+            <h1 style="display: inline;">Shared Folders </h1><img style = "padding-bottom: 1%;" width = 20px id = "add_folder_icon" src="{% static 'icons/add_folder.png'%}" class = "icon" data-toggle="modal" data-target="#folder">
             <div class = "row">
                 {% for folder in Folders %}
-                    <div class = "folder card col-md-3" style="height: auto;">
+                    <div  id = "bmf" class = "folder card col-md-3" style="height: 10% !important;">
                         <form  method="post" action = "/shared_folder/{{folder.id}}/remove_collaborator/" id = "remove_collab_form{{folder.id}}">
                             {% csrf_token %}
                             <span>
