@@ -147,6 +147,10 @@ class SharedFolderView(LoginRequiredMixin, View):
     def remove_collaborator(self, request, *args, **kwargs):
         user_account = request.user.accounts.get(account_id=request.session['account_id'])
         collab_id = request.POST.get('search_id')
+        if(user_account.shared_folders.filter(id = kwargs['id']).count() > 0):
+            request.session['err_message'] = "Shared folder does not exist"
+            return redirect(request.session['redirect_url'])
+
         shared_folder = sharedFolder.objects.get(id = kwargs['id'])
         print("SharedFolderView: remove_collaborator(): collab_id: ", collab_id)
         collab_acc_username = request.POST.get('search_username')
