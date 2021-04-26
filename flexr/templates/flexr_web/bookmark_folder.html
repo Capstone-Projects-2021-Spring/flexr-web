@@ -134,7 +134,7 @@
                     <div class = "row justify-content-center">
                         <div class="col-md-12">
                             {% for bm in myBookmarks%}
-                            <form  method="post" action = "/bookmark_folder/{{shared_folder.id}}/add_bookmark/" id = "add_bm_form{{bm.id}}">
+                            <form  method="post" action = "/bookmark_folder/{{bookmark_folder.id}}/add_bookmark/" id = "add_bm_form{{bm.id}}">
                                 {% csrf_token %}
                                     <input hidden name = "bm_id" value = "{{bm.id}}"></input>
                                     <p style="display: inline;">{{bm}}{{bm.id}}</p>
