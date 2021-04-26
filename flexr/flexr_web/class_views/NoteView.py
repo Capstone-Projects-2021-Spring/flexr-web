@@ -30,10 +30,10 @@ class NoteView(LoginRequiredMixin, View):
         obj = Note.objects.get(pk=kwargs['pk'])
         if(curr_account.notes.filter(id = kwargs['pk']).count() == 0):
             if('note_'+str(obj.id) not in request.session):
-                request.session['err_message'] = "You do not have access to this note."
+                # request.session['err_message'] = "You do not have access to this note."
                 return redirect('/notes/')
             if(curr_account.account_id not in request.session['note_'+str(obj.id) ]):
-                request.session['err_message'] = "You do not have access to this note."
+                # request.session['err_message'] = "You do not have access to this note."
                 return redirect('/notes/')
         # get requested note object and all accounts for user
         if (Note.objects.filter(id = kwargs['pk']).count() == 0):
@@ -93,12 +93,25 @@ class NoteView(LoginRequiredMixin, View):
         if (Note.objects.filter(id = kwargs['pk']).count() == 0):
             request.session['err_message'] = "Note does not exist"
             return redirect('/notes/')
+
         if form.is_valid():
             
             # get current account
             acc = request.user.accounts.get(account_id = request.session['account_id'])
             noteid = kwargs['pk']
-            note = acc.notes.get(id = noteid)
+            if (acc.notes.filter(id=kwargs['pk']).count() == 0):
+                if ('note_' + str(noteid) not in request.session):
+                    # request.session['err_message'] = "You do not have access to this note."
+                    return redirect('/notes/')
+                if (acc.account_id not in request.session['note_' + str(noteid)]):
+                    # request.session['err_message'] = "You do not have access to this note."
+                    return redirect('/notes/')
+                # get requested note object and all accounts for user
+            if (Note.objects.filter(id=kwargs['pk']).count() == 0):
+                request.session['err_message'] = "Note does not exist"
+                return redirect('/notes/')
+
+            note = Note.objects.get(id = noteid)
             print("NotesView: edit_note(): note: ", note)
             # grab note information from the form 
             tit = request.POST.get('title')
