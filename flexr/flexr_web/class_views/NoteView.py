@@ -27,9 +27,20 @@ class NoteView(LoginRequiredMixin, View):
         # get current user and current account
         curr_user = self.request.user
         curr_account = curr_user.accounts.get(account_id=self.request.session['account_id'])
-
-        # get requested note object and all accounts for user
         obj = Note.objects.get(pk=kwargs['pk'])
+        if(curr_account.notes.filter(id = kwargs['pk']).count() == 0):
+            if('note_'+str(obj.id) not in request.session):
+                request.session['err_message'] = "You do not have access to this note."
+                return redirect('/notes/')
+            if(curr_account.account_id not in request.session['note_'+str(obj.id) ]):
+                request.session['err_message'] = "You do not have access to this note."
+                return redirect('/notes/')
+        # get requested note object and all accounts for user
+        if (Note.objects.filter(id = kwargs['pk']).count() == 0):
+            request.session['err_message'] = "Note does not exist"
+            return redirect('/notes/')
+
+     
         accounts = curr_user.accounts.all()
 
         # get form object and initialize it with data
@@ -42,7 +53,6 @@ class NoteView(LoginRequiredMixin, View):
         form.fields['lock'].initial = obj.lock
         form.fields['password'].label = "Password:"
         form.fields['password'].initial = obj.password
-        print("note password",obj.password)
 
         # request messages for debugging
         if ('message' in self.request.session):
@@ -64,7 +74,7 @@ class NoteView(LoginRequiredMixin, View):
                 locked = False
             del self.request.session['note_unlocked']
 
-        request.session['prev_url'] = '/opennote/'+ str(kwargs['pk'])+'/'
+        request.session['redirect_url'] = '/opennote/'+ str(kwargs['pk'])+'/'
         # display note on the page
         return render(self.request, "flexr_web/note.html", 
         {"object": obj, 
@@ -79,57 +89,53 @@ class NoteView(LoginRequiredMixin, View):
 
         # get form object on the page
         form = EditNoteForm(request.POST)
-        #print("Note edited")
-        print(form)
         # check if form is valid
+        if (Note.objects.filter(id = kwargs['pk']).count() == 0):
+            request.session['err_message'] = "Note does not exist"
+            return redirect('/notes/')
         if form.is_valid():
             
             # get current account
             acc = request.user.accounts.get(account_id = request.session['account_id'])
             noteid = kwargs['pk']
-            print(noteid)
-            print(acc.notes.all())
             note = acc.notes.get(id = noteid)
-            print(note)
+            print("NotesView: edit_note(): note: ", note)
             # grab note information from the form 
             tit = request.POST.get('title')
             cont = request.POST.get('content')
             lo = request.POST.get('lock')
-            print("locked",lo)
+            print("NoteView: edit_note(): locked: ", lo)
             passw = request.POST.get('password')
             passw2 = request.POST.get('password2')
-            print("Note passw: ",passw)
-            print("Note passw2: ",passw2)
             if passw != note.password and passw != passw2:
                 request.session['note_unlocked'] = noteid
                 request.session['err_message'] = "Note not edited. Passwords do not match"
-                return redirect(request.session['prev_url'])
+                return redirect(request.session['redirect_url'])
 
             # check whether note is password locked
             if lo == 'on':
                 lo = True
             else:
                 if (passw not in EMPTY_VALUES):
-                    print("reached",passw)
                     request.session['note_unlocked'] = noteid
                     request.session['err_message'] = "Note not edited. Please put a password on locked note"
-                    return redirect(request.session['prev_url'])
+                    return redirect(request.session['redirect_url'])
                 lo = False
 
             note.title = tit
             note.content = cont
-            note.locked = lo
+            note.lock = lo
             note.password = passw
             note.save()
+            print(note.lock)
             request.session['note_unlocked'] = noteid
             request.session['message'] = "Note edited"
 
         else:
-            request.session['note_unlocked'] = noteid
+            request.session['note_unlocked'] = kwargs['pk']
             request.session['err_message'] = "Note not edited. Please put a password on locked note"
-            #print(form.errors)
 
-        return redirect(request.session['prev_url'])
+        return redirect(request.session['redirect_url'])
 
     def unlock_note(self, request, *args, **kwargs):
         """
@@ -139,9 +145,13 @@ class NoteView(LoginRequiredMixin, View):
         # get current account
         current_acc = request.user.accounts.get(account_id = request.session['account_id'])
 
+        if (Note.objects.filter(id=kwargs['pk']).count() == 0):
+            request.session['err_message'] = "Note does not exist"
+            return redirect('/notes/')
+
         # grab stored password and requested note
         form_password = request.POST.get('password')
-        note = current_acc.notes.get(pk = kwargs['pk'])
+        note = Note.objects.get(pk = kwargs['pk'])
 
         # check that password is correct
         # and setup request message for debugging
@@ -152,7 +162,7 @@ class NoteView(LoginRequiredMixin, View):
             request.session['err_message'] = "Wrong password"
 
         # display requested note after unlock attempt
-        return redirect(request.session['prev_url'])
+        return redirect(request.session['redirect_url'])
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -198,12 +208,11 @@ class NoteViewAPI(LoginRequiredMixin, DetailView):
         # TODO: make this access and update properly
         note = curr_acc.notes.get(pk=kwargs['id'])
         request_data = json.loads(request.body)
-        note.edit_title = request_data['title']
-        note.edit_content = request_data['content']
-        note.edit_lock = request_data['lock']
-        note.edit_password = request_data['password']
+        note.title = request_data['title']
+        note.content = request_data['content']
+        note.lock = request_data['lock']
+        note.password = request_data['password']
         note.save()
-
         data = NoteSerializer(note)
         return JsonResponse(data.data, safe=False)
 

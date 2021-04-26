@@ -10,6 +10,7 @@ from django.views.generic import DetailView
 from django.http import HttpResponse, JsonResponse
 
 import pytz
+import traceback
 
 from ..models import *
 from ..forms import *
@@ -61,7 +62,7 @@ class AccountViewWeb(LoginRequiredMixin, DetailView):
             request.session['message'] = "Account Created"
 
             # return to index page
-            return redirect(request.session['prev_url'])
+            return redirect(request.session['redirect_url'])
 
     # Gerald: is this decorator stil required?
     @csrf_exempt
@@ -74,7 +75,7 @@ class AccountViewWeb(LoginRequiredMixin, DetailView):
 
             # get account to switch to
             request.user.accounts.get(account_id = kwargs["id"])
-            print("Requested accounts",request.user.accounts.get(account_id = kwargs["id"]))
+            print("AccountViewWeb.switch_account(): requested account: ", request.user.accounts.get(account_id = kwargs["id"]))
             # switch account id and message of the session
             request.session['message'] = "Account Switched"
             if ("account_id" in request.session):
@@ -86,7 +87,7 @@ class AccountViewWeb(LoginRequiredMixin, DetailView):
             request.session['err_message'] = "Error switching account"
 
         # return to index page
-        return redirect(request.session['prev_url'])
+        return redirect(request.session['redirect_url'])
 
     def delete(self, request, pk):
         curr_user = request.user
@@ -94,16 +95,17 @@ class AccountViewWeb(LoginRequiredMixin, DetailView):
             if (request.session['account_id'] == pk):
                 curr_account = curr_user.accounts.get(account_id=request.session['account_id'])
                 curr_account.delete()
-                new_curr_account = curr_user.accounts.all()[0]
-                request.session['account_id'] = new_curr_account.account_id
+                
             else:
                 del_account = curr_user.accounts.get(account_id=pk)
                 del_account.delete()
+            new_curr_account = curr_user.accounts.all()[0]
+            request.session['account_id'] = new_curr_account.account_id
             request.session['message'] = "Account deleted"
-            return redirect(request.session['prev_url'])
+            return redirect(request.session['redirect_url'])
         else:
             request.session['err_message'] = "Can't delete your only account"
-            return redirect(request.session['prev_url'])
+            return redirect(request.session['redirect_url'])
 
 @method_decorator(csrf_exempt, name='dispatch')
 class AccountViewAPI(LoginRequiredMixin, DetailView):
@@ -120,62 +122,81 @@ class AccountViewAPI(LoginRequiredMixin, DetailView):
             return self.get_account(request, *args, **kwargs)
 
     def get_account(self, request, *args, **kwargs):
-        curr_user = request.user
-        current_account = curr_user.accounts.get(account_id = request.session['account_id'])
+        try:
+            curr_user = request.user
 
+            account = Account.objects.get(account_id = kwargs['id'])
 
-        account = Account.objects.filter(account_id = kwargs['id'])
-
-        data = AccountSerializer(account)
-        return JsonResponse(data.data, safe=False)
+            data = AccountSerializer(account)
+            return JsonResponse(data.data, safe=False)
+        
+        except Exception as e:
+            return JsonResponse({ "error": str(e), "traceback": traceback.extract_tb(e.__traceback__).format() }, status=500)
 
     def get_all(self, request, *args, **kwargs):
-        curr_user = request.user
+        try:
+            curr_user = request.user
 
-        accounts = curr_user.accounts.all()
+            accounts = curr_user.accounts.all()
 
-        data = AccountSerializer(accounts, many = True)
-        return JsonResponse(data.data, safe=False)
+            data = AccountSerializer(accounts, many = True)
+            return JsonResponse(data.data, safe=False)
+
+        except Exception as e:
+            return JsonResponse({ "error": str(e), "traceback": traceback.extract_tb(e.__traceback__).format() }, status=500)
 
     @method_decorator(csrf_exempt)
     def switch_account(self, request, *args, **kwargs):
-        curr_user = request.user
-        if(curr_user.accounts.filter(account_id = kwargs['id']).count() == 1):
-            request.session['account_id'] = kwargs['id']
-            print("Account View API: account switched")
-            return JsonResponse({"status": "account switched"})
-            # need to return some json
-        else:
-            print("Account View API: account does not exist for that user with that id")
-            return JsonResponse({"error": "account does not exist for that user with that id"})
-            # need to return some json here 404 or 403
+        try:
+            curr_user = request.user
+            if(curr_user.accounts.filter(account_id = kwargs['id']).count() == 1):
+                request.session['account_id'] = kwargs['id']
+                print("AccountViewAPI.switch_account(): requested account: "+str(kwargs['id'])+" Message : Account switched")
+                return JsonResponse({"status": "account switched"})
+                # need to return some json
+            else:
+                print("AccountViewAPI.switch_account(): requested account: " + str(
+                    kwargs['id']) + " ERROR MESSAGE : account does not exist for that user with that id")
+                return JsonResponse({"error": "account does not exist for that user with that id"})
+                # need to return some json here 404 or 403
+
+        except Exception as e:
+            return JsonResponse({ "error": str(e), "traceback": traceback.extract_tb(e.__traceback__).format() }, status=500)
 
 
     @method_decorator(csrf_exempt)
     def delete(self, request , *args, **kwargs):
-        curr_user = request.user
-        if(curr_user.accounts.all().count() > 1):
-            if(request.session['account_id'] == kwargs['id']):
-                curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
-                curr_account.delete()
-                new_curr_account =  curr_user.accounts.all()[0]
-                request.session['account_id'] = new_curr_account.account_id
+        try:
+            curr_user = request.user
+            if(curr_user.accounts.all().count() > 1):
+                if(request.session['account_id'] == kwargs['id']):
+                    curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+                    curr_account.delete()
+                    new_curr_account =  curr_user.accounts.all()[0]
+                    request.session['account_id'] = new_curr_account.account_id
+                else:
+                    del_account = curr_user.accounts.get(account_id =  kwargs['id'])
+                    del_account.delete()
+                return JsonResponse({"success": "Account deleted"})
             else:
-                del_account = curr_user.accounts.get(account_id =  kwargs['id'])
-                del_account.delete()
-            return JsonResponse({"success": "Account deleted"})
-        else:
-            return JsonResponse({"error": "User only has 1 account and can not be deleted"})
+                return JsonResponse({"error": "User only has 1 account and can not be deleted"})
+
+        except Exception as e:
+            return JsonResponse({ "error": str(e), "traceback": traceback.extract_tb(e.__traceback__).format() }, status=500)
 
     @method_decorator(csrf_exempt)
     def post(self, request):
-        curr_user = request.user
-        data = json.loads(request.body)
+        try:
+            curr_user = request.user
+            data = json.loads(request.body)
 
-        new_account = Account.objects.create(user = curr_user, **data)
-        new_account.save()
-        data = AccountSerializer(new_account)
-        return JsonResponse(data.data, safe=False)
+            new_account = Account.objects.create(user = curr_user, )
+            new_account.save()
+            data = AccountSerializer(new_account)
+            return JsonResponse(data.data, safe=False)
+        
+        except Exception as e:
+            return JsonResponse({ "error": str(e), "traceback": traceback.extract_tb(e.__traceback__).format() }, status=500)
 
     @method_decorator(csrf_exempt)
     def put(self, request, *args, **kwargs):
@@ -192,9 +213,3 @@ class AccountViewAPI(LoginRequiredMixin, DetailView):
             return JsonResponse(data.data, safe=False)
         except:
             return JsonResponse({"error": "Account doesn't exist for this user"})
-
-    # This needs to be POST
-    # def edit_account(self, request):
-    #     curr_user = request.user
-    #     curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
-

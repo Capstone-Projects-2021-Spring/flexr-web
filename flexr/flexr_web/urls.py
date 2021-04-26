@@ -19,7 +19,7 @@ from .class_views.BookmarkFolderView import BookmarkFolderView, BookmarkFoldersV
 from .class_views.SharedFoldersView import SharedFoldersView
 from .class_views.TabsView import TabsView, TabAPIView
 from .class_views.UserView import UserAPIView
-from .class_views.FriendView import FriendView, FriendAPIView
+from .class_views.FriendView import FriendViewWeb, FriendAPIView
 from .class_views.SiteView import SiteAPIView
 from .class_views.NoteView import NoteViewAPI
 from .class_views.SharedFolderView import FoldersViewAPI
@@ -35,7 +35,6 @@ urlpatterns = [
 
     path('browsing_history/', HistoryView.as_view(), name='history'),
     path('browsing_history/delete/', HistoryView().delete, name='delete history'),
-    #path('filter_history/', HistoryView().filter, name = "filter history"),
 
     path('notes/', NotesView.as_view(), name='notes'), #broken
     path('search_notes/', NotesView().search_note, name='search_notes'), #broken
@@ -60,7 +59,10 @@ urlpatterns = [
     path('bookmark_folder/<int:pk>/', BookmarkFolderView.as_view(), name='bookmark-folder-detail'),
     path('delete_bookmark_folder/<int:pk>/', BookmarkFolderView().delete_bookmark_folder_web, name='delete-bookmark-folder'),
     path('edit_bookmark_folder/<int:pk>', BookmarkFolderView().edit_bookmark_folder, name='edit_bookmark_folder'),
-    path('remove_from_folder/<int:pk>/<int:id>/', BookmarkFolderView().remove_from_folder, name='remove_from_folder'),
+                        #bookmark id / bookmark_folder_pk
+    path('remove_from_folder/<int:id>/<int:pk>/', BookmarkFolderView().remove_from_folder, name='remove_from_folder'),
+    path('bookmark_folder/<id>/add_bookmark/', BookmarkFolderView().add_bookmark, name = "add bookmark bookmark"),
+
 
     path('shared_folders/', SharedFoldersView.as_view(), name = "shared folders"),
     path('add_shared_folder/', SharedFoldersView().create_shared_folder, name = "add shared folder"),
@@ -83,12 +85,12 @@ urlpatterns = [
     path('edit_preferences/', ProfileView().edit_account_preferences, name = "edit account preferences"),
 
     
-    path('friends/', FriendView.as_view(), name = "friends"),
-    path('add_friend/', FriendView().add_friend, name = "add friend"),
-    path('deny_friend/<int:pk>', FriendView().deny_friend, name = "deny friend"),
-    path('accept_friend/<int:pk>', FriendView().accept_friend, name="accept friend"),
-    path('remove_friend/<int:pk>', FriendView().remove_friend, name="remove friend"),
-    path('remove_notif/<int:pk>', FriendView().remove_notif, name="remove notif"),
+    path('friends/', FriendViewWeb.as_view(), name ="friends"),
+    path('add_friend/', FriendViewWeb().add_friend, name ="add friend"),
+    path('deny_friend/<int:pk>', FriendViewWeb().deny_friend, name ="deny friend"),
+    path('accept_friend/<int:pk>', FriendViewWeb().accept_friend, name="accept friend"),
+    path('remove_friend/<int:pk>', FriendViewWeb().remove_friend, name="remove friend"),
+    path('remove_notif/<int:pk>', FriendViewWeb().remove_notif, name="remove notif"),
 
     #API Endpoints
 

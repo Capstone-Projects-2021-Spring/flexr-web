@@ -17,9 +17,9 @@
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
 
 <div class = "body">
-    <div class = "main">
-
+    <div class = "">
         {%if locked%}
+        <div class="note_form">
             <h1>{{object.title}}</h1>
             <h2>This note is locked</h2>
             <form method = "POST" action="{% url 'unlock note' object.pk%}">
@@ -28,31 +28,33 @@
                     <input type="password" id = "password" name = "password">
                 <button type="submit" class="btn btn-primary">Unlock</button>
             </form>
+        </div>
         {%else%}
-            <form method = "POST" action="{% url 'edit_note' object.pk%}">
-                    {% csrf_token %}
-                    <h2>{{object.created_date}}</h2>
-                    {% for field in form %}
-                    <p>
-                        {{ field.label_tag }}
-                        {{ field }}
-                        {% if field.help_text %}
-                            <small style="color: grey">{{ field.help_text }}</small>
-                        {% endif %}
-                        {% for error in field.errors %}
-                            <p style="color: red">{{ error }}</p>
-                        {% endfor %}
-                    </p>
-                    {% endfor %}
-                    <label>Retype password: </label><input type = "password" name = "password2"> 
+        <form method="POST" action="/edit_note/{{object.id}}/">
+            <div class="note_form">
+                <h2>{{object.created_date}}</h2>
+                {% csrf_token %}
+                    <input type="text" name="title" value="{{object.title}}" maxlength="100" required="" id="id_title">
+                    <br>
+                    <textarea name="content" cols="40" rows="10" required="" id="id_content">{{object.content}}</textarea>
+                    <br>
+                    <label for="id_lock">Lock:</label>
+                    {%if object.lock %}
+                        <input type="checkbox" name="lock" id="id_lock" checked>
+                    {%else%}
+                        <input type="checkbox" name="lock" id="id_lock">
+                    {%endif%}
+                    <br>
+                    <label for="id_password">Password:</label>
+                    <input type="password" name="password" id="id_password" value="{{object.password}}" autocomplete="off">    
+                    <br>
+                    <label>Retype password: </label><input type="password" id = "id_password2" name="password2" autocomplete="off"> 
                     <br>
                     <br>
-                    <div class="modal-footer">
-                
-                <button type = "button" class = "btn btn-danger" onclick="window.location.href='/delete-note/{{object.id}}/'">Delete</button>
-                <button type="submit" class="btn btn-primary">Confirm edit</button>
-                </div>
-            </form>
+                    <button type="button" style = "display: inline;" class="btn btn-danger" onclick="window.location.href='/delete-note/{{object.id}}/'" id = "note_btn">Delete</button>
+                    <button type="submit"  style = "display: inline;"  class="btn btn-primary" id = "note_btn">Confirm edit</button>
+            </div>
+    </form>
         
             <!-- Edit Note <img id="plus-icon" width = 20px data-toggle="modal" data-target="#edit_note" src="{% static 'icons/edit.png' %}"> -->
 
@@ -61,12 +63,11 @@
                 <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="edit_noteLabel">Edit a note!</h5>
-                    <img type="button" data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
+                    <img data-dismiss="modal" class = "icon close" src = "{% static 'icons/cancel.png' %}" width=20px>
                     </button>
                 </div>
                 <div class="modal-body">
                         <form method = "POST" action="{% url 'edit_note' object.pk%}">
-                                
                                 
                                 <div class="modal-footer">
                             <button type = "button" class = "btn btn-danger" onclick="window.location.href='/delete-note/{{object.id}}/'">Delete</button>
@@ -78,7 +79,7 @@
             </div>
             </div>
         {% endif%}
-        </div>
     </div>
+</div>
 </body>
 </html>

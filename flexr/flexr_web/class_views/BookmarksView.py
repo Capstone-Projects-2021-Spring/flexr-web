@@ -84,7 +84,7 @@ class BookmarksView(LoginRequiredMixin, View):
         # request message for debugging
         request.session['message'] = "Bookmark Filtered"
 
-        request.session['prev_url'] = '/bookmarks/'
+        request.session['redirect_url'] = '/bookmarks/'
         # Gerald: using redirect doesn't work here?
         return render(request, "flexr_web/bookmarks.html",
          {"Bookmarks": bookmarks, 
@@ -121,7 +121,7 @@ class BookmarksView(LoginRequiredMixin, View):
             del self.request.session['err_message']
             messages.error(self.request, message)
 
-        request.session['prev_url'] = '/bookmarks/'
+        request.session['redirect_url'] = '/bookmarks/'
         # display the page
         return render(self.request, "flexr_web/bookmarks.html", 
         {"Bookmarks": bookmarks,
@@ -144,6 +144,9 @@ class BookmarksView(LoginRequiredMixin, View):
         accounts = curr_user.accounts.all()
         tabs = curr_account.tabs.all()
 
+        if (curr_account.tabs.filter(id=kwargs['id']).count() == 0):
+            request.session['err_message'] = "Tab does not exist"
+            return redirect(request.session['redirect_url'])
         # get requested tab object
         tab = curr_account.tabs.get(pk = kwargs['id'])
 
@@ -153,8 +156,7 @@ class BookmarksView(LoginRequiredMixin, View):
         request.session['message'] = "Bookmark Created"
 
         # go to open_tabs page
-        return redirect(request.session['prev_url'])
-
+        return redirect(request.session['redirect_url'])
 
     def delete_bookmark(self, request, *args, **kwargs):
         """
@@ -162,8 +164,14 @@ class BookmarksView(LoginRequiredMixin, View):
         """
 
         # get current user and current account
+
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+
+        if (curr_account.bookmarks.filter(id = kwargs['id']).count() == 0):
+            request.session['err_message'] = "Bookmark does not exist"
+            return redirect(request.session['redirect_url'])
+
         bm = curr_account.bookmarks.get(id = kwargs['id'])
         # delete requested bookmark
         Bookmark.delete_bookmark(kwargs['id'])
@@ -172,7 +180,7 @@ class BookmarksView(LoginRequiredMixin, View):
         request.session['message'] = "Bookmark Deleted"
         
         # return to bookmarks page
-        return redirect(request.session['prev_url'])
+        return redirect(request.session['redirect_url'])
 
 @method_decorator(csrf_exempt, name='dispatch')
 class BookmarksViewAPI(LoginRequiredMixin, DetailView):
@@ -191,10 +199,15 @@ class BookmarksViewAPI(LoginRequiredMixin, DetailView):
 
         data = json.loads(request.body)
 
+        name = None
+
+        if 'bookmark_name' in data:
+            name = data['bookmark_name']
+
         if 'url' in data:
             site = Site.objects.get_or_create(account = curr_account, url = data['url'])[0]
             
-            bm = Bookmark.create_bookmark(site, curr_account)
+            bm = Bookmark.create_bookmark(site, curr_account, name=name)
             bookmark = Bookmark.objects.get(id = bm)
             data = BookmarkSerializer(bookmark)
         
@@ -214,15 +227,14 @@ class BookmarksViewAPI(LoginRequiredMixin, DetailView):
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
 
         data = json.loads(request.body)
-
+        result = Bookmark.objects.get(pk=kwargs["id"])
         if 'url' in data:
             site = Site.objects.get_or_create(account = curr_account, url = data['url'])[0]
-            data['site_id'] = site.id
-
-        result = Bookmark.objects.filter(pk = kwargs["id"]).update(**data)
-
-        data = BookmarkSerializer(bookmark)
-        
+            result.url = data['url']
+            result.site = site
+        result.bookmark_name = data['bookmark_name']
+        result.save()
+        data = BookmarkSerializer(result)
         return JsonResponse(data.data, safe=False)
 
     def get(self, request, *args, **kwargs):

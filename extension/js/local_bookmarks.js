@@ -9,21 +9,19 @@ window.onload = function () {
 
     async function add_bookmark(bookmarkUrl){
         bkg.console.log(bookmarkUrl);
-        add_response = await fetch("http://18.221.147.115:8000/api/bookmarks/", {
+        add_response = await fetch("http://flexr.org/api/bookmarks/", {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
           },
         body: JSON.stringify({url: bookmarkUrl})
-
     })
 
     }
 
     //stolen from stackoverflow
     function process_bookmark(bookmarks) {
-
         for (var i =0; i < bookmarks.length; i++) {
             var bookmark = bookmarks[i];
             if (bookmark.url) {
@@ -32,9 +30,15 @@ window.onload = function () {
                 chromeBookmarks.push(bookmark)
 
                 var parent = document.createElement('p');
-                button = document.createElement('button');
+                button = document.createElement('img').style.cursor = "pointer";
+                button.setAttribute('src', 'icons/plus.png');
+                button.setAttribute('width', '20px');
+                button.setAttribute('class','plus_icon')
+                button.style.cursor = "pointer";
+
+
                 var text = document.createTextNode(bookmark.url);
-                button.appendChild(text);
+                parent.appendChild(text);
                 
                 bkg.console.log(bookmark.url)
                 button.onclick = function(url){
@@ -51,34 +55,6 @@ window.onload = function () {
             }
         }
     }
-
-    // async function display_bookmarks(){
-    //     await chrome.bookmarks.getTree(process_bookmark);
-    //     bkg.console.log(chromeBookmarks.length);
-    //     for(i = 0; i < chromeBookmarks.length; i++){
-    //         bkg.console.log(chromeBookmarks[i].url);
-
-    //         var parent = document.createElement('p');
-    //         button = document.createElement('button');
-    //         var text = document.createTextNode(chromeBookmarks[i].url);
-    //         button.appendChild(text);
-            
-    //         bkg.console.log(chromeBookmarks[i].url)
-    //         button.onclick = function(index){
-                
-    //             return function(){add_bookmark(chromeBookmarks[index].url)}
-    //         }(i);
-
-    //         parent.appendChild(button);
-    //         document.body.appendChild(parent);
-               
-            
-    //     }
-    // }
-
-
-    
-    // display_bookmarks();
 
     chrome.bookmarks.getTree(process_bookmark);
 

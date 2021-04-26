@@ -13,77 +13,121 @@
 </head>
 <body>
     {% include "flexr_web/navbar.html" %}
-    <hr>
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
     <div class="body">
         <div class="main">
-            <div class="modal-body">
-                <form method="post">
-                    {% csrf_token %}
-                    {% for field in form %}
-                    <p>
-                        {{ field.label_tag }}<br>
-                        {{ field }} 
-                    </p>
-
-                    {% endfor %}
-
-                <div class="modal-footer">
-                    <!--  -->
-
-            <!--                    <button type="button" class="btn btn-danger" onclick="delete_account()">Delete</button>-->
-                    <button type="submit" class="btn btn-primary">Filter</button>
-                </div>
-                </form>
-            </div>
-Edit Folder <img id="plus-icon" data-toggle="modal" data-target="#edit_folder" style = "padding-bottom: 1%;" width = 20px src="{% static 'icons/plus.png' %}">
-
-<div class="modal fade" id="edit_folder" tabindex="-1" role="dialog" aria-labelledby="edit_folderLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="edit_noteLabel">Edit Folder!</h5>
-        <img type="button" data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
-        </button>
-      </div>
-      <div class="modal-body">
-            <form method = "POST" action="{% url 'edit_bookmark_folder' bookmark_folder.pk%}">
-                    {% csrf_token %}
-                    {% for field in formb %}
-                    <p>
-                        {{ field.label_tag }}<br>
-                        {{ field }}
-                        {% if field.help_text %}
-                            <small style="color: grey">{{ field.help_text }}</small>
-                        {% endif %}
-                        {% for error in field.errors %}
-                            <p style="color: red">{{ error }}</p>
+                <div class="suggested sidenav">
+                    <a class="navbar-brand" href="/"><img src="{% static 'flexr_logo_2.png' %}" width="100%"></a>
+                    <h3>Filter Bookmarks</h3>
+                    <div class="filter">
+                    <form method="post">
+                        {% csrf_token %}
+                        {% for field in form %}
+                        <p style="display: inline;" >
+                            {{ field.label_tag }}
+                            {{ field }} 
+                        </p><br>
                         {% endfor %}
-                    </p>
-                    {% endfor %}
-                    <div class="modal-footer">
-                
-                <button type="submit" class="btn btn-primary">Confirm edit</button>
+                        <button type="submit" class="btn btn-primary">Filter</button>
+                    </form>
+                </div>
+                </div>
+            <div id = "head" style="text-align: center;">
+                <h1 id = "title" style="display: inline;">{{bookmark_folder.title}} Bookmark Folder</h1> 
+                <img id="plus-icon" data-toggle="modal" data-target="#edit_folder" src="{% static 'icons/edit.png' %}" width="30px">
+                <br>
+                <h3 id = "title">{{bookmark_folder.created_date}}</h3> 
             </div>
+
+                <div class="entire_folder col-md-12">
+                    <div class = "card-header sticky-top">
+                        <h2 style="display: inline;">Bookmarks</h2> 
+                        <img id="plus-icon" class="plus-icon" width = 20px; data-toggle="modal" data-target="#add_bm" src="{% static 'icons/plus.png' %}">
+                    </div>
+                    <div class = "card-body row justify-content-center" >
+                        {%for bm in Bookmarks%}
+                            
+                            <div id = "bookmark" class = "tab card col-lg-5" >
+                                <form  method="post" action = "/remove_from_folder/{{bookmark.id}}/{{bookmark_folder.pk}}/">
+                                    {% csrf_token %}
+                                    <span style="display: inline; position: absolute; left: 0; top: 0; margin-left: 5%; margin-top: 2%;">
+                                        <img class="bm" onclick="window.location.href = '/remove_from_folder/{{bm.id}}/{{bookmark_folder.pk}}/'" src="{% static 'icons/cancel.png' %}" width= 15px>
+                                    </span>
+                                    <input hidden name = "bm_id" value = "{{bm.id}}"></input>
+                                    <span style="display: inline;">
+                                        <p onclick="window.open('{{bm.site.url}}')"  style="display: inline;">
+                                            {%if bm.site.favicon_img_url != None%}
+                                                <img class = "icon" src="{{ bm.site.favicon_img_url }}" width="15px">
+                                            {%endif%}{{bm.site}}</p>
+                                    </span>
+                                </form>
+                            </div>
+
+                        {%endfor%}
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="edit_folder" tabindex="-1" role="dialog" aria-labelledby="edit_folderLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="edit_folderLabel">Edit your folder</h5>
+                        <img data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                            <form method = "POST" action="{% url 'edit_bookmark_folder' bookmark_folder.pk%}">
+                                    {% csrf_token %}
+                                    {% for field in formb %}
+                                    <p>
+                                        {{ field.label_tag }}<br>
+                                        {{ field }}
+                                        {% if field.help_text %}
+                                            <small style="color: grey">{{ field.help_text }}</small>
+                                        {% endif %}
+                                        {% for error in field.errors %}
+                                            <p style="color: red">{{ error }}</p>
+                                        {% endfor %}
+                                    </p>
+                                    {% endfor %}
+                                    <div class="modal-footer">
+                                
+                                <button type="submit" class="btn btn-primary">Confirm edit</button>
+                            </div>
+                            </form>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        <div class="modal fade" id="add_bm" tabindex="-1" role="dialog" aria-labelledby="add_bmLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content" id = "edit_collabs_modal">
+        <div class="modal-header">
+            <h5 class="modal-title" id="add_bmLabel">Add bookmarks!</h5>
+            <img type="button" class = "icon" data-dismiss="modal" src = "{% static 'icons/cancel.png' %}" width=20px>
+            </button>
+        </div>
+        <div class="modal-body">
+                <div class = "add_friend">
+                    <div class = "row justify-content-center">
+                        <div class="col-md-12">
+                            {% for bm in myBookmarks%}
+                            <form  method="post" action = "/bookmark_folder/{{bookmark_folder.id}}/add_bookmark/" id = "add_bm_form{{bm.id}}">
+                                {% csrf_token %}
+                                    <input hidden name = "bm_id" value = "{{bm.id}}"></input>
+                                    <p style="display: inline;">{{bm}}{{bm.id}}</p>
+                                    <img  class = "icon" src="{% static 'icons/plus.png'%}"  width = 20px style="display: inline;" id = "add-user" onclick="document.getElementById('add_bm_form{{bm.id}}').submit()">
+                                    </script>
+                                </form>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
             </form>
-      </div>
+        </div>
+        </div>
     </div>
-  </div>
-</div>
-
-<hr>
-    <h1>Folder title: {{bookmark_folder.title}}</h1>
-    <!-- <h1>Folder owner: {{bookmark_folder.owner}}</h1> -->
-    <h3>Bookmarks:</h3>
-    {%for bookmark in Bookmarks%}
-    <p>Bookmark: <a href="{{bookmark.site.url}}">{{bookmark.site.url}}</a></p>
-    <p>Created Date: {{bookmark.created_date}}</p>
-    <p>Last Visited: {{bookmark.last_visited}}</p>
-    <button onclick="window.location.href = '/remove_from_folder/{{bookmark.id}}/{{bookmark_folder.pk}}/'">Remove From Folder</button>
-    <br>
-    {%endfor%}
-
-</div>
 </div>
 </body>
 </html>

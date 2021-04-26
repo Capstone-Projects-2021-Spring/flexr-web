@@ -1,7 +1,7 @@
 async function add_tab(tabId, tabUrl){
     var storage = window.localStorage;
 
-    add_response = await fetch("http://18.221.147.115:8000/api/tabs/", {
+    add_response = await fetch("http://flexr.org/api/tabs/", {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -22,7 +22,7 @@ async function add_tab(tabId, tabUrl){
 async function remove_tab(tabId){
     var storage = window.localStorage;
 
-    del_response = await fetch(`http://18.221.147.115:8000/api/tab/${storage.getItem(tabId)}`, {
+    del_response = await fetch(`http://flexr.org/api/tab/${storage.getItem(tabId)}`, {
         method: 'DELETE',
         headers: {
             'Accept': 'application/json',

@@ -8,13 +8,21 @@
     color: white;
 }
 
+
+
 #navDiv{
     background-image: linear-gradient(90deg, #00C4EE,#0087C2);
-    margin-bottom: 2%;
     border-radius: 7px;
-    width: 90%;
+    width: 92.6%;
     box-shadow: 1px 5px 15px 1px #ccd3eb;
-    margin-top: 2%;
+    margin-top: .4%;
+    text-align: center;
+    -webkit-transition: box-shadow .5s ease-in-out ;
+	-moz-transition: box-shadow  .5s ease-in-out;
+	transition: box-shadow .5s ease-in-out;
+}
+#navDiv:hover{
+    box-shadow: 0px 3px 15px 1px #5a5d68;
 }
 
 .nav-link {
@@ -22,7 +30,6 @@
     border-radius: 7px;
     font-size: x-large;
     transition: all .5s ease;
-    
 }
 
 .nav-item:hover {
@@ -43,20 +50,17 @@
 }
 
 .body{
-    margin-left: 2%;
-    margin-right: 2%;
     overflow-x: hidden;
 }
 
 body{
-    padding-top: 1%;
+    padding-top: 0%;
     padding-left: 15%;
     padding-right: 15%;
     font-family: 'Ubuntu', sans-serif;
-    background-color: #e5f7fc !important;
+    background-color: #ffffff !important;
     overflow-x: hidden;
-}
-    
+}    
 
 #plus-icon:hover{
     cursor: pointer;
@@ -74,16 +78,14 @@ body{
     background-color: #f7fdff !important;
     box-shadow: 1px 5px 15px 1px #e5e8f3;
     border-radius: 7px;
-    margin-bottom: 2%;
     transition: all 1s ease;
 }
 
 #accounts:hover{
-    box-shadow: 1px 7px 12px 2px #c3c6d4;
-    -webkit-transition: all 1s ease;
-	-moz-transition: all 1s ease;
-	-o-transition: all 1s ease;
-	-ms-transform: all 1s ease;
+    box-shadow: 0px 3px 15px 1px #5a5d68;
+   -webkit-transition: box-shadow .5s ease-in-out ;
+	-moz-transition: box-shadow  .5s ease-in-out;
+    transition: box-shadow .5s ease-in-out;
 }
 
 #tabs, #bookmarks{
@@ -98,12 +100,11 @@ h2{
     color: #001872;
 }
 
-
 #account, #tab, #note, #history, #bookmark, #sf {
     border-radius: 7px; 
     text-align:center;
     margin: 1%;
-    max-height: 8rem;
+    max-height: 4rem;
     word-wrap: break-word;
 }
 
@@ -115,8 +116,9 @@ h2{
     top: -2px;
 
 }
+
 .close{
-    margin-top: 3%;
+    /* margin-top: 3%; */
 }
 
 #plus-icon{
@@ -138,36 +140,39 @@ h2{
     font-size: x-large;
     display: inline;
 }
+
+#sites_nav{
+    margin-top: 5%;
+}
+
 #site{
-    
     height: 3rem;
     width: 102%;
     font-size: larger;
     padding: 1%;
     margin-top: 5% !important;
 }
+
 #site:hover{
     cursor: pointer;
 }
 
+
 .card{
     /* box-shadow: 1px 1px 10px 1px #ccd3eb; */
     border: 1px solid #e5f7fc ;
-    padding: .5%;
-    height: 5rem;
-    word-wrap: break-word;
+    overflow: hidden;
 }
+
 .site{
     border: none !important;
-    font-size: .7rem !important;
+    font-size: 1rem !important;
     z-index: -1;
     max-height: 5rem;
     padding: 1%;
     color: white;
     word-wrap: break-word;
     background-color: inherit;
-    /* box-shadow: inset 10px 0px 10px -10px #001872, inset -30px 0px 30px -30px #001872; */
-    /* box-shadow: inset  1px 1px 5px ; */
 }
 
 .site:hover{
@@ -178,95 +183,254 @@ h2{
     transition: width 2s;
     transition-timing-function: linear;
     text-align: center;
-    /* -webkit-transition: all 1s ease;
-	-moz-transition: all 1s ease;
-	-o-transition: all 1s ease;
-	-ms-transform: all 1s ease; */
 }
 
 /* The sidebar menu */
 .sidenav {
     color: white;
     text-align:center;
-    height: 88.5%; /* Full-height: remove this if you want "auto" height */
-    width: 14%; /* Set the width of the sidebar */
-    margin-left:2%;
-    margin-right: 2%;
-    margin-top: 2.4%;
+    height: 94%; /* Full-height: remove this if you want "auto" height */
+    width: 15%; /* Set the width of the sidebar */
+    margin-left: 1.3%;
+    margin-right: 1.3%;
+    margin-top: 1.3%;
     border-radius: 7px;
+    /* height: 44%; */
     position: fixed; /* Fixed Sidebar (stay in place on scroll) */
     z-index: 1; /* Stay on top */
     top: 0; /* Stay at the top */
     left: 0;
     /* background-color: #0087C2; */
-    background-image: linear-gradient( #00C4EE,#0087C2, #00559F
-    , #001872);
-    padding-top: 20px;
-    box-shadow: inset  0 0 10px #001872;
-}   
+    background-image: linear-gradient(#00C4EE,#0087C2, #00559F);
+    /* padding-top: 20px; */
+    /* box-shadow: inset  0 0 10px #001872; */
+    box-shadow: 1px 5px 15px 1px #b9bece;
+    -webkit-transition: box-shadow .5s ease-in-out ;
+	-moz-transition: box-shadow  .5s ease-in-out;
+	transition: box-shadow .5s ease-in-out;
+    
+}
 
+.sidenav:hover{
+    box-shadow: 3px 7px 15px 1px #5a5d68;
+}
 /* The sidebar menu */
 .sidenav4 {
     color: white;
     font-size: .7rem;
     text-align:center;
-    height: 88.5%; /* Full-height: remove this if you want "auto" height */
-    width: 14%; /* Set the width of the sidebar */
-    margin-left:2%;
-    margin-right: 2%;
-    margin-top: 2.4%;
+    height: 83%; /* Full-height: remove this if you want "auto" height */
+    width: 15%; /* Set the width of the sidebar */
+    margin-left: 1.3%;
+    margin-right: 1.3%;
+    margin-top: 105px;
     border-radius: 7px;
     position: fixed; /* Fixed Sidebar (stay in place on scroll) */
-    z-index: 1; /* Stay on top */
+    z-index: 0; /* Stay on top */
     top: 0; /* Stay at the top */
     right: 0;
     /* background-color: #0087C2; */
+    /* background-color: #00C4EE; */
     background-image: linear-gradient(#00C4EE,#0087C2, #00559F);
     padding-top: 20px;
-    box-shadow: inset  0 0 10px #001872;
+   /* box-shadow: inset  0 0 10px #001872; */
+   box-shadow: 1px 5px 15px 1px #b9bece;
 }   
 
 .sidenav2{
     color: white;
     font-size: .7rem;
     text-align:center;
-    height: 44%; /* Full-height: remove this if you want "auto" height */
-    width: 14%; /* Set the width of the sidebar */
-    margin-left: 2%;
-    margin-right: 2%;
-    margin-top: 2.4%;
+    max-height: 69px;
+    -webkit-transition: max-height 1.3s ease-in-out, box-shadow 0.1s ease-in-out, background-image .2s ease-in-out ;
+	-moz-transition: max-height 1.3s ease-in-out, box-shadow 0.1s ease-in-out, background-image .2s ease-in-out;
+	transition: max-height 1.3s ease-in-out, box-shadow 0.1s ease-in-out, background-image .2s ease-in-out;
+    /* transition: height 0.15s ease-out; */
+    overflow: hidden; 
+    width: 15%; /* Set the width of the sidebar */
+    margin-left: 1.3%;
+    margin-right: 1.3%;
+    margin-top: 1.3%;
     border-radius: 7px;
     position: fixed; /* Fixed Sidebar (stay in place on scroll) */
     z-index: 1; /* Stay on top */
     top: 0; /* Stay at the top */
     right: 0;
     /* background-color: #0087C2; */
-    background-image: linear-gradient(#00C4EE,#0087C2, #00559F);
+    background-image: linear-gradient(90deg, #00C4EE,#0087C2);
+ 
     padding-top: 20px;
-    box-shadow: inset  0 0 10px #001872;
+    /* box-shadow: inset  0 0 10px #001872; */
+   box-shadow: 1px 5px 15px 1px #e5e8f3;
 }
 
-#acc{
-    width: 105%;
-    font-size: 1.2rem;
+.sidenav2:hover{
+    height: auto;
+    max-height: 100%;
+    overflow: auto;
+    background-image: linear-gradient(#00C4EE,#0087C2, #00559F);
+    box-shadow: -3px 7px 15px 1px #5a5d68;
 }
-#acc:hover{
+
+
+#acc, #site{
+    width: 100%;
+    font-size: 1rem;
+    background-color: inherit;
+}
+
+#acc:hover, #site:hover{
     cursor: pointer;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: black;
     background-color: #e5f7fc;
-    box-shadow: 1px 1px 10px 0px #001872;
+    font-weight: bold;
 }
 
 .active_acc{
     font-size: 1.2rem;
     color: black;
     background-color: #e5f7fc;
-    box-shadow: 1px 1px 10px 0px #001872;
 }
 
 
 .fa-window-close:hover{
     cursor: pointer;
     color: grey;
+}
+
+.btn{
+    border-radius: 7px;
+}
+
+.btn-primary{
+    border:1px solid #0087C2;
+    background-color: white;
+    color:  #0087C2;
+}
+
+
+.btn-primary:hover{
+    background-color:  #0087C2;
+    color: white;
+    border: none;
+}
+
+
+.btn-secondary{
+    background-color: white;
+    color: #0087C2;
+}
+
+
+.btn-secondary:hover{
+    background-color: inherit;
+    border: 1px solid white;
+    color: white;
+}
+
+.btn-danger2{
+    background-color: red;
+    color: white;
+    border: none;
+}
+
+.btn-danger2:hover{
+    background-color: white;
+    color: red;
+    border: 1px solid red;
+}
+.btn-success2{
+    background-color: green;
+    color: white;
+    border: none;
+}
+
+.btn-success2:hover{
+    background-color: white;
+    color: green;
+    border: 1px solid green;
+}
+
+.btn-danger{
+    background-color: inherit;
+    border: 1px solid red;
+    color: red;
+
+}
+
+.btn-danger:hover{
+    background-color: red;
+    color: white;
+    border: none;
+}
+
+
+.btn-success{
+    background-color: inherit;
+    border: 1px solid green;
+    color: green;
+}
+
+.btn-success:hover{
+    background-color: green;
+    color: white;
+    border: none;
+}
+input, textarea{
+    border-radius: 7px;
+    /* border: 1px solid #81898d; */
+    border: .1px solid rgb(221, 221, 221);
+    box-shadow: inset  0 0 5px #f3f3f3;
+}
+
+.plus-icon:hover{
+    zoom: 1.1;
+}
+
+img:hover{
+    zoom: 1.2;
+    cursor: pointer;
+}
+
+.bm_icon{
+    position: absolute;
+    margin-top: 4%;
+    margin-right: 4%;
+    top:0;
+    right: 0;
+}
+
+.filter{
+    width: 80%;
+    margin: 0 auto;
+    padding-bottom: 10%;
+}
+
+#tabs{
+
+    -webkit-transition: box-shadow  ease-in-out ;
+	-moz-transition: box-shadow   ease-in-out;
+	transition: box-shadow  ease-in-out;
+}
+
+#tabs:hover{
+    box-shadow: 1px 5px 15px 1px #b9bece;
+}
+
+#account, #tab, #note,  #history, #bookmark, #sf {
+    border-radius: 7px; 
+    text-align:center;
+    box-shadow: 0px 0px 5px 1px hsl(200, 33%, 93%);
+    -webkit-transition: box-shadow .5s ease-in-out ;
+	-moz-transition: box-shadow .5s  ease-in-out;
+	transition: box-shadow .5s ease-in-out;
+}
+
+#account:hover, #tab:hover, #note:hover, #history:hover, #bookmark:hover, #sf:hover{
+    text-align:center;
+    box-shadow: 2px 5px 10px 2px  #00c2ee50;
+    cursor: pointer;
+    position: relative; 
+    top: -2px;
 }

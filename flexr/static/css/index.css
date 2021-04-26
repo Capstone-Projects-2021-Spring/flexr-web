@@ -1,8 +1,8 @@
 body {
-    padding-top: 1%;
+    padding-top: 1.05%;
     padding-left: 15%;
     padding-right: 15%;
-    background-color: #e5f7fc !important;
+    background-color: #ffffff !important;
     overflow-x: hidden;
 }
 
@@ -23,14 +23,16 @@ body {
 }
 
 #tabs, #bookmarks, #notes, #shared_folders{
-    background-color: #f7fdff !important;
-    box-shadow: 1px 5px 15px 1px #e5e8f3;
+    margin-top: 2%;
+    background-color: #ffffff !important;
+    /* box-shadow: 1px 5px 15px 1px #e5e8f3; */
+    box-shadow: 1px 2px 10px  #bad0da;
     border-radius: 7px;
-    margin-bottom: 2%;
     transition: all 1s ease;
     padding: inherit !important;
-    border-bottom: 10px solid #f7fdff;
+    /* border-bottom: 10px solid #f7fdff; */
 }
+
 
 #title, #plus-icon{
     display: inline;
@@ -47,25 +49,18 @@ body {
 }
 
 #tabs, #bookmarks, .header, #notes, #shared_folders{
-    width: 45%;
+    width: 43%;
 }
 
 #tabs, #notes{
-    margin-right: 2%;
-    max-height: 27rem;
-    overflow: auto;
+    overflow: auto; 
 }
 
-#bookmarks, #shared_folders{
-    max-height: 27rem;
-    overflow: auto;
-}
 
 .card-header{
+    background-color: #ffffff !important;
     /* position: sticky; */
-    background-color: #f7fdff !important;
     z-index: 1;
-    /* top: -.5px; */
     width: 100%;
     margin-bottom: 10px;
     height: 100%;
@@ -80,18 +75,23 @@ h2{
 #account, #tab, #note,  #history, #bookmark, #sf {
     border-radius: 7px; 
     text-align:center;
-    margin: 1%;
+    box-shadow: 1px 2px 5px  hsl(199, 19%, 70%);
+    -webkit-transition: box-shadow .5s ease-in-out ;
+	-moz-transition: box-shadow  .5s ease-in-out;
+    transition: box-shadow .5s ease-in-out;
 }
 
 #account:hover, #tab:hover, #note:hover, #history:hover, #bookmark:hover, #sf:hover{
     text-align:center;
-    box-shadow: 1px 2px 15px 1px #ccd3eb;
+    box-shadow: 1px 3px 5px 1px  #0088c29f;
     cursor: pointer;
     position: relative; 
     top: -2px;
 }
 
-
+.close:hover{
+    zoom: 1.2;
+}
 #active_acc{
     color: #0087C2;
 }
@@ -99,8 +99,8 @@ h2{
 .card{
     /* box-shadow: 1px 1px 10px 1px #ccd3eb; */
     border: 1px solid #e5f7fc ;
-    padding: 1%;
-    height: 6rem;
+    /* padding: 1%; */
+
     word-wrap: break-word;
     text-overflow: ellipsis;
 }

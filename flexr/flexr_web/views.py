@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 
-from django.contrib import messages
+from django.contrib import messages, auth
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.validators import EMPTY_VALUES
 from django.shortcuts import render, redirect, get_object_or_404
@@ -92,11 +92,17 @@ def register_web(request):
             form.save()
             username = form.cleaned_data['username']
             password = form.cleaned_data['password1']
-            user = authenticate(username=username, password=password)
-            new_account = Account.objects.create(user=user, email=user.email, username = user.username)
-            new_account.save()
-            request.session['account_id'] = new_account.account_id
-            return redirect('/')
+            user = auth.authenticate(username=username, password=password)
+            if user is not None and user.is_active:
+                auth.login(request, user)
+                new_account = Account.objects.create(user=user, email=user.email, username = user.username)
+                new_account.save()
+                request.session['account_id'] = new_account.account_id
+                return redirect('/')
+            else:
+                form = registrationform
+                context = {'form': form}
+                return render(request, 'registration/register.html', context)
     else:
         form = registrationform
     context = {'form' : form}

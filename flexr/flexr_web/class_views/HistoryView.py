@@ -10,6 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 import json
 import pytz
+import traceback
 
 from ..models import *
 from ..forms import *
@@ -49,7 +50,7 @@ class HistoryView(LoginRequiredMixin, View):
             del request.session['err_message']
             messages.error(request, message)
 
-        request.session['prev_url'] = '/browsing_history/'
+        request.session['redirect_url'] = '/browsing_history/'
         # display the page
         return render(request, "flexr_web/browsing_history.html",
          {"History": history, 
@@ -112,10 +113,23 @@ class HistoryView(LoginRequiredMixin, View):
             history = history.filter(
             visit_datetime__lte=end
         )
+        
 
-
+        if(history.count()>0):
         # request message for debugging
-        request.session['message'] = "History Filtered"
+            request.session['message'] = "History Filtered"
+        else:   
+            request.session['err_message'] = "No history found. Try a different filter"
+
+             # request messages for debugging
+        if ('message' in request.session):
+            message = request.session['message']
+            del request.session['message']
+            messages.success(request, message)
+        elif('err_message' in request.session):
+            message = request.session['err_message']
+            del request.session['err_message']
+            messages.error(request, message)
 
         # Gerald: using redirect doesn't work here?
         return render(request, "flexr_web/browsing_history.html",
@@ -132,10 +146,17 @@ class HistoryView(LoginRequiredMixin, View):
         # get current user and current account
         curr_user = request.user
         curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
-    
+
         # get history objects to delete
         delete = request.POST.getlist('DELETE', [])
-
+        print(delete)
+        for x in delete:
+            print(x)
+            if (curr_account.history.filter(id=int(x)).count() == 0):
+                delete.remove(x)
+        if(len(delete) == 0):
+            request.session['err_message'] = "History does not exist"
+            return redirect(request.session['redirect_url'])
         # delete requested history objects
         curr_account.history.filter(pk__in=delete).delete()
 
@@ -143,7 +164,7 @@ class HistoryView(LoginRequiredMixin, View):
         request.session['message'] = "History Deleted"
 
         # return to history page
-        return redirect(request.session['prev_url'])
+        return redirect(request.session['redirect_url'])
         
 @method_decorator(csrf_exempt, name='dispatch')
 class HistoryViewAPI(LoginRequiredMixin, DetailView):
@@ -169,11 +190,15 @@ class HistoryViewAPI(LoginRequiredMixin, DetailView):
                     JSONRequest with success message and the SiteHistory instance or error message
         """
 
-        curr_user = request.user
-        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
-        history = History.objects.filter(account = curr_account)
-        data = HistorySerializer(history, many=True)
-        return JsonResponse(data.data, safe=False)
+        try:
+            curr_user = request.user
+            curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+            history = History.objects.filter(account = curr_account)
+            data = HistorySerializer(history, many=True)
+            return JsonResponse(data.data, safe=False)
+        
+        except Exception as e:
+            return JsonResponse({ "error": str(e), "traceback": traceback.extract_tb(e.__traceback__).format() }, status=500)
 
     def filter_history(self, request, *args, **kwargs):
         """
@@ -184,34 +209,42 @@ class HistoryViewAPI(LoginRequiredMixin, DetailView):
                     JSONRequest with success message and the SiteHistory objects or error message
         """
 
-        curr_user = request.user
-        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+        try:
+            curr_user = request.user
+            curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
 
-        payload = request.GET.dict()
-        history = History.objects.filter(
-            account = curr_account,
-            visit_datetime__gte=payload['datetime_from'],
-            visit_datetime__lte=payload['datetime_to'])
-        data = HistorySerializer(history, many=True)
-        return JsonResponse(data.data, safe=False)
+            payload = request.GET.dict()
+            history = History.objects.filter(
+                account = curr_account,
+                visit_datetime__gte=payload['datetime_from'],
+                visit_datetime__lte=payload['datetime_to'])
+            data = HistorySerializer(history, many=True)
+            return JsonResponse(data.data, safe=False)
+
+        except Exception as e:
+            return JsonResponse({ "error": str(e), "traceback": traceback.extract_tb(e.__traceback__).format() }, status=500)
 
     # delete history objects based on list of ids
     def post(self, request, *args, **kwargs):
-        # get current user and current account
-        curr_user = request.user
-        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
-    
-        # get history objects to delete
-        data = json.loads(request.body) #request.POST.getlist('DELETE', [])
+        try:
+            # get current user and current account
+            curr_user = request.user
+            curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+        
+            # get history objects to delete
+            data = json.loads(request.body) #request.POST.getlist('DELETE', [])
 
-        delete = []
-        if 'DELETE' in data:
-            delete = data['DELETE']
+            delete = []
+            if 'DELETE' in data:
+                delete = data['DELETE']
 
-        # delete requested history objects
-        curr_account.history.filter(pk__in=delete).delete()
+            # delete requested history objects
+            curr_account.history.filter(pk__in=delete).delete()
 
-        return JsonResponse({"success": "histories deleted"})
+            return JsonResponse({"success": "histories deleted"})
+
+        except Exception as e:
+            return JsonResponse({ "error": str(e), "traceback": traceback.extract_tb(e.__traceback__).format() }, status=500)
 
     def delete(self, request, *args, **kwargs):
         url = request.path.split('/')
@@ -236,15 +269,19 @@ class HistoryViewAPI(LoginRequiredMixin, DetailView):
                 Returns:
                     JSONRequest with success message and the SiteHistory objects or error message
         """
-        curr_user = request.user
-        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
-        payload = json.loads(request.body)
-        history = History.objects.filter(
-            account = curr_account,
-            visit_datetime__gte=payload['datetime_from'],
-            visit_datetime__lte=payload['datetime_to']).delete()
+        try:
+            curr_user = request.user
+            curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+            payload = json.loads(request.body)
+            history = History.objects.filter(
+                account = curr_account,
+                visit_datetime__gte=payload['datetime_from'],
+                visit_datetime__lte=payload['datetime_to']).delete()
 
-        return JsonResponse({"success": "histories deleted"})
+            return JsonResponse({"success": "histories deleted"})
+
+        except Exception as e:
+            return JsonResponse({ "error": str(e), "traceback": traceback.extract_tb(e.__traceback__).format() }, status=500)
 
     def delete_all_history(self, request, *args, **kwargs):
         """
@@ -254,19 +291,26 @@ class HistoryViewAPI(LoginRequiredMixin, DetailView):
                 Returns:
                     JSONRequest with success message or error message
         """
-        curr_user = request.user
-        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+        try:
+            curr_user = request.user
+            curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
 
-        history = History.objects.filter(account = curr_account).delete()
+            history = History.objects.filter(account = curr_account).delete()
 
-        return JsonResponse({"success": "all history deleted"})
+            return JsonResponse({"success": "all history deleted"})
+
+        except Exception as e:
+            return JsonResponse({ "error": str(e), "traceback": traceback.extract_tb(e.__traceback__).format() }, status=500)
 
 
     def delete_history_single(self, request, *args, **kwargs):
+        try:
+            curr_user = request.user
+            curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
 
-        curr_user = request.user
-        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+            History.objects.filter(account = curr_account, id=kwargs['id']).delete()
 
-        History.objects.filter(account = curr_account, id=kwargs['id']).delete()
+            return JsonResponse({"success": "history object deleted"})
 
-        return JsonResponse({"success": "history object deleted"})
+        except Exception as e:
+            return JsonResponse({ "error": str(e), "traceback": traceback.extract_tb(e.__traceback__).format() }, status=500)

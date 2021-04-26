@@ -28,12 +28,11 @@ class SharedFoldersView(LoginRequiredMixin, View):
 
         # get all folders for the current account
         folders = curr_account.collab_shared_folders.all()
-
         # created a shared folder and populate its attributes
         folder_form = EditSharedFolder()
-        friends = curr_account.friends.all() 
-        print(friends)
-        
+        friends = curr_account.friends.all()
+        print("SharedFoldersView: get(): friends: ", friends)
+
         # request messages for debugging
         if ('message' in self.request.session):
             message = self.request.session['message']
@@ -43,7 +42,7 @@ class SharedFoldersView(LoginRequiredMixin, View):
             message = self.request.session['err_message']
             del self.request.session['err_message']
             messages.error(self.request, message)
-        request.session['prev_url'] = '/shared_folders/'
+        request.session['redirect_url'] = '/shared_folders/'
         # display the page
         return render(self.request, "flexr_web/shared_folders.html", 
         {"Folders": folders, 
@@ -83,10 +82,16 @@ class SharedFoldersView(LoginRequiredMixin, View):
             #print(form.errors)
 
         # return to shared folders page
-        return redirect(request.session['prev_url'])
+        return redirect(request.session['redirect_url'])
 
     def delete_shared_folder(self,request, *args, **kwargs):
-        print(sharedFolder.objects.get(pk=kwargs['pk']))
+        if (sharedFolder.objects.filter(id=kwargs['pk']).count() == 0):
+            request.session['err_message'] = "Folder does not exist"
+            return redirect('/shared_folders/')
+        # if (sharedFolder.objects.filter(id = kwargs['pk']).count() == 0):
+        #     request.session['err_message'] = "Folder does not exist"
+        #     return redirect('shared_folders/')
+        print("SharedFoldersView: delete_shared_folder(): shared_folder", sharedFolder.objects.get(pk=kwargs['pk']))
         my = sharedFolder.objects.get(pk=kwargs['pk'])
         my.delete()
         return redirect('/shared_folders/')
@@ -94,6 +99,6 @@ class SharedFoldersView(LoginRequiredMixin, View):
     def edit_shared_folder(self, request, *args, **kwargs):
         form = EditSharedFolder(request.POST)
         if form.is_valid():
-            print("\n\n\n\nit'svalid")
+            print("SharedFoldersView: edit_shared_folder: Message: form is valid")
 
-        return redirect(request.session['prev_url'])
+        return redirect(request.session['redirect_url'])

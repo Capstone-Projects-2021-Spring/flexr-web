@@ -31,7 +31,7 @@ class NotesView(LoginRequiredMixin, View):
         notes = curr_account.notes.all()
 
         # get note form object on the page
-        form = notef
+        form = CreateNoteForm
         fform = FilterNoteForm
 
         # request messages for debugging
@@ -43,13 +43,14 @@ class NotesView(LoginRequiredMixin, View):
             message = self.request.session['err_message']
             del self.request.session['err_message']
             messages.error(self.request, message)
-        request.session['prev_url'] = '/notes/'
+        request.session['redirect_url'] = '/notes/'
 
         # display the page
         return render(self.request, "flexr_web/notes.html", 
         {"Notes": notes, 
         "Accounts": accounts, 
         'form': form,
+        "searched":False,
         'fform': fform})
 
 
@@ -58,33 +59,43 @@ class NotesView(LoginRequiredMixin, View):
         Filter the account's history by datetime range
         """
 
-        # get current user and current account
         curr_user = request.user
-        curr_account = curr_user.accounts.get(account_id = request.session['account_id'])
+        curr_acc = curr_user.accounts.get(account_id = request.session['account_id'])
+        notes = curr_acc.notes.all()
 
-        # get all user's accounts
-        accounts = curr_user.accounts.all()
+        
+        search = request.POST.get('search')
+        print("NotesView: search_note: search: ", search)
+        content_search = notes.filter(content__icontains=search)
+        title_search = notes.filter(title__icontains = search)
 
-        # get form object on page
+        search_results = content_search | title_search
+        search_results = search_results.distinct()
+        print("NotesView: search_note: search_results: ", search_results)
         form = notef
         fform = FilterNoteForm
-        # grab date and time information from POST form
-        search = request.POST['search']
-        
-        # grab all history objects
-        notes = curr_account.notes.all()
+        if(search_results.count() > 0): 
+            request.session['message'] = "Notes filtered"
+        else:
+            request.session['err_message'] = "No notes found"
 
-        # filter based on site if given
-        if search:
-            notes = notes.filter(title__icontains=search)
+        # request messages for debugging
+        if ('message' in request.session):
+            message = request.session['message']
+            del request.session['message']
+            messages.success(request, message)
+        elif ('err_message' in request.session):
+            message = request.session['err_message']
+            del request.session['err_message']
+            messages.error(request, message)
+        request.session['redirect_url'] = '/notes/'
 
         # request message for debugging
         # request.session['message'] = "History Filtered"
-
         return render(self.request, "flexr_web/notes.html", 
-        {"Notes": notes, 
-        "Accounts": accounts, 
+        {"Notes": search_results, 
         'form': form,
+        'searched':True,
         'fform': fform})
 
     def create_note(self, request, *args, **kwargs):
@@ -113,9 +124,8 @@ class NotesView(LoginRequiredMixin, View):
 
             else:
                 if (passw not in EMPTY_VALUES):
-                    print("reached",passw)
                     request.session['err_message'] = "Note not created. Please put a password on locked note"
-                    return redirect(request.session['prev_url'])
+                    return redirect(request.session['redirect_url'])
                 lo = False
 
             newnote = Note.objects.create(account=acc, title=tit, content=cont, lock=lo, password=passw)
@@ -124,15 +134,17 @@ class NotesView(LoginRequiredMixin, View):
 
         else:
             request.session['err_message'] = "Note not created. Please put a password on locked note"
-            #print(form.errors)
 
-        return redirect(request.session['prev_url'])
+        return redirect(request.session['redirect_url'])
 
 
     def delete_note(self,request, *args, **kwargs):
         """
         Delete a note
         """
+        if (Note.objects.filter(id = kwargs['pk']).count() == 0):
+            request.session['err_message'] = "Note does not exist"
+            return redirect(request.session['redirect_url'])
 
         # grab requested note object
         obj = Note.objects.get(pk=kwargs['pk'])
@@ -141,10 +153,9 @@ class NotesView(LoginRequiredMixin, View):
         obj.delete()
 
         # return to notes page
-        if(request.session['prev_url'] != '/opennote/'+str(kwargs['pk'])+'/'):
-            return redirect(request.session['prev_url'])
+        if(request.session['redirect_url'] != '/opennote/'+str(kwargs['pk'])+'/'):
+            return redirect(request.session['redirect_url'])
         else:
-            print(request.session['prev_url'])
             return redirect('/notes/')
 
     def search_note(self, request):
@@ -154,13 +165,13 @@ class NotesView(LoginRequiredMixin, View):
 
         
         search = request.POST.get('search')
-
+        print("NotesView: search_note: search: ", search)
         content_search = notes.filter(content__icontains=search)
         title_search = notes.filter(title__icontains = search)
 
         search_results = content_search | title_search
         search_results = search_results.distinct()
-        print(search_results)
+        print("NotesView: search_note: search_results: ", search_results)
         form = notef
         fform = FilterNoteForm
         if(search_results.count() > 0): 
@@ -177,7 +188,7 @@ class NotesView(LoginRequiredMixin, View):
             message = request.session['err_message']
             del request.session['err_message']
             messages.error(request, message)
-        request.session['prev_url'] = '/notes/'
+        request.session['redirect_url'] = '/notes/'
 
         # display the page
         return render(request, "flexr_web/notes.html", 

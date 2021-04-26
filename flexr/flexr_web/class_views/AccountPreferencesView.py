@@ -25,6 +25,9 @@ class AccountPreferencesAPIView(LoginRequiredMixin, DetailView):
         curr_user = request.user
         curr_acc = curr_user.accounts.get(account_id = request.session['account_id'])
         acc_pref = curr_acc.account_preferences
+        if (acc_pref == None):
+            print("AccountPreferencesAPIView: get(): acc_pref was NONE!!!!")
+            curr_acc.save()
         data = AccountPreferencesSerializer(acc_pref)
         return JsonResponse(data.data, safe=False)
 
@@ -33,11 +36,19 @@ class AccountPreferencesAPIView(LoginRequiredMixin, DetailView):
         curr_user = request.user
         curr_acc = curr_user.accounts.get(account_id=request.session['account_id'])
         acc_pref = curr_acc.account_preferences
+        if (acc_pref == None):
+            print("AccountPreferencesAPIView: get(): acc_pref was NONE!!!!")
+            curr_acc.save()
         request_data = json.loads(request.body)
+
+        # Edit account pref attributes
         edit_home_url = request_data['home_page_url']
-        print("AccountPreferencesAPIView: ",edit_home_url)
-        edit_home_site = curr_acc.sites.get_or_create(url = edit_home_url)
-        print("AccountPreferencesAPIView: ",edit_home_site)
+        print("AccountPreferencesAPIView: put(): edit_home_url: ",edit_home_url)
+        if(curr_acc.sites.filter(url = edit_home_url).count() > 0):
+            edit_home_site = curr_acc.sites.filter(url = edit_home_url)
+        else:
+            edit_home_site = Site.objects.filter(account = curr_acc, url = edit_home_url)
+        print("AccountPreferencesAPIView: put(): edit_home_site: ", edit_home_site)
         acc_pref.home_page = edit_home_site[0]
         acc_pref.sync_enabled = request_data['sync_enabled']
         acc_pref.searchable_profile = request_data['searchable_profile']

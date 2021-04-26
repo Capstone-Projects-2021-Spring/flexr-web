@@ -17,12 +17,13 @@ window.onload = function () {
     }
 
     trackButton.onclick = function(){
+
         chrome.tabs.query({active: true, currentWindow: true}, function(T) {
             var activeTab = T[0];
             //bkg.console.log('test');
             //bkg.console.log(storage.getItem('chromeTabs'));
-
-
+            p = document.getElementById('msg')
+            p.innerHTML = "Tracking..."
             var chromeTabs = []
 
             if(storage.getItem('chromeTabs') == ''){
@@ -36,7 +37,6 @@ window.onload = function () {
                 chromeTabs.push(activeTab.id)
                 add_tab(activeTab.id, activeTab.url)
             }
-
 
             storage.setItem('chromeTabs', JSON.stringify(chromeTabs));
 
@@ -54,7 +54,7 @@ window.onload = function () {
     }
 
     async function get_tabs(){
-        tabs_response = await fetch("http://18.221.147.115:8000/api/tabs/");
+        tabs_response = await fetch("http://flexr.org/api/tabs/");
 
         tabs = await tabs_response.json();
 
@@ -75,6 +75,7 @@ window.onload = function () {
             parent.appendChild(a);
             document.body.appendChild(parent);
         }
+        
 
 
     }
@@ -82,7 +83,7 @@ window.onload = function () {
     async function add_tab(tabId, tabUrl){
         var storage = window.localStorage;
     
-        add_response = await fetch("http://18.221.147.115:8000/api/tabs/", {
+        add_response = await fetch("http://flexr.org/api/tabs/", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

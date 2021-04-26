@@ -18,42 +18,41 @@
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
     <div class="body">
         <div class = "main">
-            <div style="margin-bottom: 2%;">
-            <h3 style="display: inline;">Open Tabs:</h3><img id="plus-icon" class="plus-icon" width = 20px; data-toggle="modal" data-target="#add_tab" src="{% static 'icons/plus.png' %}">
-            
-            <form style="display: inline; margin-left: 5%;" method="post" action="/open_tabs/">{% csrf_token %}<input type="text" name = "search" placeholder="Search for tab..." style="margin-right: 1%;"><button  style="margin-right: 1%;" type="submit" class="btn btn-primary">Search</button> </form>
-            {%if filtered%}
-                <button class="btn btn-primary" onclick="window.location.href = '/open_tabs/'">Reset</button>
-            {%endif%}
+            <div style="margin-bottom: 2%; margin-top: 2%;">
+                <h3 style="display: inline;">Open Tabs:</h3><img id="plus-icon" class="plus-icon icon" width = 20px; data-toggle="modal" data-target="#add_tab" src="{% static 'icons/plus.png' %}">
+                
+                <form style="display: inline; margin-left: 5%;" method="post" action="/open_tabs/">{% csrf_token %}<input type="text" class = "form-control" name = "search" placeholder="Search for tab..." style="margin-right: 1%; width: 20%; display: inline;"><button  style="margin-right: 1%;" type="submit" class="btn btn-primary">Search</button> </form>
+                {%if filtered%}
+                    <button class="btn btn-primary" onclick="window.location.href = '/open_tabs/'">Reset</button>
+                {%endif%}
             </div>
             <div class = "row ">    
                 {%for tab in Tabs%}
-                    <div class = " tab card col-lg-3" >
-                        <div class="card-body" >
+                    <div class = "tab card col-lg-3" >
+                        <div class="card-body tab_card" >
                             <img  class = "close" onclick=" var conf = confirm('Do you want to close this tab?'); if(conf){ window.location.href = '/close_tab/{{tab.id}}'}" src="{% static 'icons/cancel.png' %}" width= 15px>
                             <br>
+                            {%if tab.site.favicon_img_url != None%}
+                                        <img src="{{ tab.site.favicon_img_url }}" width="15px">
+                            {%endif%}
                             <p onclick="window.open('{{tab.site.url}}')" style="display: inline;">{{tab.site}}</p>
+
                             <span style="display: inline;">
                                 <!-- <p>{{tab.site.bookmarked}}</p> -->
                                 {%if tab.site.bookmarked > 0%}
-                                    <img id="bm-icon" onclick="window.location.href = '/delete_bookmark/{{tab.site.bookmarked}}'" src="{% static 'icons/bookmarked.png' %}" width= 20px>
+                                    <img id="bm-icon icon" onclick="window.location.href = '/delete_bookmark/{{tab.site.bookmarked}}'" src="{% static 'icons/bookmarked.png' %}" width= 20px>
                                 {%else%}
-                                    <img id="bm-icon" onclick="window.location.href = '/add_bookmark/{{tab.id}}'" src="{% static 'icons/empty-bookmark.png' %}" width= 20px>
+                                    <img id="bm-icon icon" onclick="window.location.href = '/add_bookmark/{{tab.id}}'" src="{% static 'icons/empty-bookmark.png' %}" width= 20px>
                                 {%endif%}
                             </span>
+
                             <p><a href="{{tab.site.url}}">{{tab.site.url}}</a></p>
-                            <p>Created Date: {{tab.created_date}}</p>
+                            <p>Created: {{tab.created_date}}</p>
                             <p>Last Visited: {{tab.last_visited}}</p>
                         </div>
 
                         <script>
-                            $(document).ready(function(){
-                                $('.close').hover(function() {
-                                $(this).attr('src', "{% static 'icons/cancel-circle.png' %}");
-                                }, function() {
-                                $(this).attr('src', "{% static 'icons/cancel.png' %}");
-                                });
-                            });
+
                         </script>
 
                     </div>
