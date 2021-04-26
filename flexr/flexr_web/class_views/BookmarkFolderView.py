@@ -111,9 +111,7 @@ class BookmarkFolderView(LoginRequiredMixin, View):
         bookmark_folder = current_acc.bookmark_folders.get(id = kwargs['pk'])
         form = FilterBookmarkForm
         formb = EditBookmarkForm()
-        formb.fields['bookmarks'].queryset = current_acc.bookmarks.all()
         formb.fields["title"].initial = bookmark_folder.title
-        formb.fields["bookmarks"].initial = bookmark_folder.bookmarks.all()
         # grab attributes for the shared folder
         owner = bookmark_folder.owner
         #CHANGE THIS TO NOT USE THE SHARED FOLDERS COLLABORATORS, this was written this way for testing the view method
@@ -144,6 +142,22 @@ class BookmarkFolderView(LoginRequiredMixin, View):
           "form": form,
           "Bookmarks": bookmarks,
           "myBookmarks": myBookmarks})
+
+    def add_bookmark(self, request, *args, **kwargs):
+        user_account = request.user.accounts.get(account_id=request.session['account_id'])
+        bm_id = request.POST.get('bm_id')
+        if (bookmarkFolder.objects.filter(id=kwargs['id']).count() == 0):
+            request.session['err_message'] = "Folder does not exist"
+            return redirect('/bookmarks/')
+        if (Bookmark.objects.filter(id=bm_id).count() == 0):
+            request.session['err_message'] = "Bookmark does not exist"
+            return redirect(request.session['redirect_url'])
+
+        bookmark_folder = bookmarkFolder.objects.get(id=kwargs['id'])
+        bm = Bookmark.objects.get(id=bm_id)
+        bookmark_folder.bookmarks.add(bm)
+        request.session['message'] = "Bookmark added!"
+        return redirect(request.session['redirect_url'])
 
     def create_bookmark_folder_web(self, request, *args, **kwargs):
     
@@ -180,6 +194,9 @@ class BookmarkFolderView(LoginRequiredMixin, View):
             return redirect('/bookmarks/')
 
         current_acc = request.user.accounts.get(account_id=request.session['account_id'])
+        if (bookmarkFolder.objects.filter(id=kwargs['pk']).count() == 0):
+            request.session['err_message'] = "Folder does not exist"
+            return redirect('/bookmarks/')
         bookmark_folder = current_acc.bookmark_folders.get(id=kwargs['pk'])
         """
         """
@@ -190,17 +207,8 @@ class BookmarkFolderView(LoginRequiredMixin, View):
         # form.fields["bookmarks"].initial = bookmark_folder.bookmarks.all()
         # check if form is valid
         if form.is_valid():
-
-            bookmarkos = form.cleaned_data['bookmarks']
-
-            # titleos = form.cleaned_data['title']
-
-            bookmark_folder.title = request.POST.get("new_title")
-            bookmark_folder.title = request.POST.get("new_description")
             bookmark_folder.title = request.POST.get('title')
-            bookmark_folder.bookmarks.set(bookmarkos)
             tileo = form.cleaned_data['title']
-            descrippy = form.cleaned_data['bookmarks']
         bookmark_folder.save()
         request.session['message'] = "Bookmark edited"
         return redirect(request.session['redirect_url'])
@@ -234,6 +242,8 @@ class BookmarkFolderView(LoginRequiredMixin, View):
         # bookmarks.exclude(pk = kwargs["pk"]).update()
         request.session['message'] = "Bookmark removed"
         return redirect(request.session['redirect_url'])
+
+
 
 @method_decorator(csrf_exempt, name='dispatch')
 class BookmarkFoldersViewAPI(LoginRequiredMixin, DetailView):
