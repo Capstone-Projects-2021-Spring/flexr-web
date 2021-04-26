@@ -288,3 +288,18 @@ def AccountPreferencesTestCase(TestCase):
         ]
 
         self.assertEqual(data, data_expected, "Account Preferences works")
+
+def NoteTestCase(TestCase):
+    def setUp(self):
+        test_user = User.objects.create(first_name="Al", last_name="Annon", username="annon1234",
+                                        email="anon@gmail.com", password = "password")
+        test_user.save()
+        test_acc = Account.objects.create(user=test_user, email=test_user.email, phone_number="5704600704",
+                                          type_of_account="Business")
+        test_acc.save()
+        test_note = Note.objects.create(account=test_acc, title="Test Note", content="Note")
+        test_note.save()
+
+    def testNoteCreated(self):
+        note_count = Note.objects.all().count()
+        self.assertEqual(note_count, 2, "Notes count is 1")

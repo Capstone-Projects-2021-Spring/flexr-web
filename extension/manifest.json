@@ -11,6 +11,7 @@
         "webNavigation",
         "http://127.0.0.1:8000/",
         "http://127.0.0.1:8000/",
+        "http://flexr.org/",
         "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js",
         "https://fonts.googleapis.com/css2?family=Ubuntu:wght@300&display=swap",
         "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"],
